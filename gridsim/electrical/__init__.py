@@ -1,0 +1,4 @@
+from gridsim.simulation import Simulator
+from .simulation import ElectricalSimulator
+
+Simulator.register_simulation_module(ElectricalSimulator)
