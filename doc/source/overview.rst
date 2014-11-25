@@ -217,9 +217,9 @@ Simulation
 This diagram presents the heart of the Gridsim simulation framework.
 
 The :class:`gridsim.simulation.Simulator` is the main class of Gridsim. It is
-composed of modules (such as :class:`gridim.electrical.ElectricalSimulator`)
-themselves composed of elements
-(such as :class:`gridim.electrical.ConstantElectricalCPSElement`).
+composed of modules (such as
+:class:`gridsim.electrical.simulation.ElectricalSimulator`)themselves composed of
+elements (such as :class:`gridsim.electrical.element.ConstantElectricalCPSElement`).
 These elements are the living part of the simulation, they will evolve during
 the time and interact with others to simulate the exchange of energy.
 
