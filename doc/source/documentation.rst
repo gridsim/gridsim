@@ -33,6 +33,11 @@ Electrical package
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: gridsim.electrical.loadflow
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. automodule:: gridsim.electrical.network
     :members:
     :undoc-members:
