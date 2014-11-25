@@ -34,7 +34,7 @@ Simulator
 ---------
 
 The Gridsim simulator gives an access to the functionality of the simulation via
-a simple API. The :class:`gridsim.simulation.Simulator` object keeps the time of
+a simple API. The :class:`.Simulator` object keeps the time of
 the simulation and enables the user to proceed in time either by steps or by
 running the simulation for a given time and step size.
 
@@ -90,7 +90,7 @@ want more information about use the simulator you should read
 :ref:`gridsim-use`.
 
 Before doing anything else, you have to create an object of the class
-:class:`gridsim.simulation.Simulator`. This will automatically, almost magically
+:class:`.Simulator`. This will automatically, almost magically
 create an instance of each simulation module you have imported into your Python
 file.::
 
@@ -101,10 +101,10 @@ file.::
 
 The fact that you import the :mod:`gridsim.electrical` package registers the electrical
 simulator within the simulator and every time an instance of the class
-:class:`gridsim.simulation.Simulator` is created, an instance of the electrical
+:class:`.Simulator` is created, an instance of the electrical
 simulation will be created too and registered within the main simulation object.
 If you import a class from a module such as
-:class:`gridsim.electrical.network.ElectricalPVBus`, you do not need to import
+:class:`.ElectricalPVBus`, you do not need to import
 the package. It will be automatically done.
 
 The next step would be to add elements to the different simulation packages and
@@ -216,15 +216,15 @@ Simulation
 
 This diagram presents the heart of the Gridsim simulation framework.
 
-The :class:`gridsim.simulation.Simulator` is the main class of Gridsim. It is
+The :class:`.Simulator` is the main class of Gridsim. It is
 composed of modules (such as
-:class:`gridsim.electrical.simulation.ElectricalSimulator`)themselves composed of
-elements (such as :class:`gridsim.electrical.element.ConstantElectricalCPSElement`).
+:class:`.ElectricalSimulator`)themselves composed of
+elements (such as :class:`.ConstantElectricalCPSElement`).
 These elements are the living part of the simulation, they will evolve during
 the time and interact with others to simulate the exchange of energy.
 
 A simulation with no output is pretty useless, so the
-:class:`gridsim.simulation.Recorder` module enables to save the simulation data
+:class:`.Recorder` module enables to save the simulation data
 either in text based files or enables to plot the values. The following figure
 contains a detailed UML diagram of that module.
 
