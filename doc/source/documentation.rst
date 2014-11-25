@@ -26,7 +26,9 @@ Simulator module
 
 Electrical package
 ==================
-.. autoclass:: gridsim.electrical.simulation.ElectricalSimulator
+.. automodule:: gridsim.electrical
+
+.. automodule:: gridsim.electrical.simulation
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,9 +38,29 @@ Electrical package
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: gridsim.electrical.element
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Thermal package
 ===============
+.. automodule:: gridsim.thermal
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. automodule:: gridsim.thermal.simulation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: gridsim.thermal.element
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: gridsim.thermal.controller
     :members:
     :undoc-members:
     :show-inheritance:

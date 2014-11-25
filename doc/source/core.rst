@@ -23,3 +23,20 @@ Core module
 .. automodule:: gridsim.core
     :members:
     :undoc-members:
+
+*****************
+Electrical module
+*****************
+.. automodule:: gridsim.electrical.core
+    :members:
+    :undoc-members:
+
+
+**************
+Thermal module
+**************
+.. automodule:: gridsim.thermal.core
+    :members:
+    :undoc-members:
+
+
