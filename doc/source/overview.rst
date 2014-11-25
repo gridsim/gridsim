@@ -126,6 +126,7 @@ object and the simulation modules:
 
 .. figure:: ./figures/model-sequence1.png
     :align: center
+    :scale: 100 %
 
     Sequence diagram of the code above
 
@@ -153,6 +154,7 @@ sequence diagram:
 
 .. figure:: ./figures/model-sequence2.png
     :align: center
+    :scale: 100 %
 
     Sequence diagram of a simulation single step
 
