@@ -1,4 +1,4 @@
-.. _gridsim-use-ref:
+.. _gridsim-use:
 
 #########################
 The Simulator General Use
@@ -24,15 +24,20 @@ Simulator module
     :undoc-members:
     :show-inheritance:
 
-Electrical module
-=================
-.. automodule:: gridsim.electrical.simulation
+Electrical package
+==================
+.. autoclass:: gridsim.electrical.simulation.ElectricalSimulator
     :members:
     :undoc-members:
     :show-inheritance:
 
-Thermal module
-==============
+.. automodule:: gridsim.electrical.network
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Thermal package
+===============
 .. automodule:: gridsim.thermal.simulation
     :members:
     :undoc-members:
@@ -52,6 +57,25 @@ Control module
 Record module
 =============
 .. automodule:: gridsim.recorder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+************
+Input/Output
+************
+
+.. automodule:: gridsim.iodata
+
+Input
+=====
+.. automodule:: gridsim.iodata.input
+    :members:
+    :undoc-members:
+    :show-inheritance:
+Output
+======
+.. automodule:: gridsim.iodata.output
     :members:
     :undoc-members:
     :show-inheritance:

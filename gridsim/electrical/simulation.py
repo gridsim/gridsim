@@ -14,11 +14,11 @@ from .network import AbstractElectricalTwoPort, ElectricalTransmissionLine, \
     ElectricalGenTransformer, ElectricalSlackBus
 
 
-class BusElectricalValues(object):
+class _BusElectricalValues(object):
     pass
 
 
-class BranchElectricalValues(object):
+class _BranchElectricalValues(object):
     pass
 
 
@@ -62,10 +62,10 @@ class ElectricalSimulator(AbstractSimulationModule):
         self._b = None
 
         # bus electrical values
-        self._bu = BusElectricalValues()
+        self._bu = _BusElectricalValues()
 
         # branches electrical values
-        self._br = BranchElectricalValues()
+        self._br = _BranchElectricalValues()
 
 
     @property
@@ -73,8 +73,8 @@ class ElectricalSimulator(AbstractSimulationModule):
         return self._load_flow_calculator
 
     @load_flow_calculator.setter
-    def load_flow_calculator(self, value):
-        self._load_flow_calculator = value
+    def load_flow_calculator(self, new_calculator):
+        self._load_flow_calculator = new_calculator
 
     @accepts((1, AbstractElectricalElement))
     def add(self, element):

@@ -1,9 +1,10 @@
 from gridsim.decorators import accepts
 from gridsim.util import Position
 from gridsim.unit import units
-from gridsim.thermal.core import ThermalProcess
 from gridsim.timeseries import TimeSeriesObject
 from gridsim.iodata.input import Reader
+
+from .core import ThermalProcess
 
 
 class ConstantTemperatureProcess(ThermalProcess):

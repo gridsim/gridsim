@@ -100,8 +100,8 @@ from math import floor
 
 from gridsim.iodata.output import AttributesGetter
 
-from .decorators import accepts
 import unit
+from .decorators import accepts
 from .simulation import Recorder
 
 

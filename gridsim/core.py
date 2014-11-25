@@ -114,7 +114,7 @@ class AbstractSimulationModule(object):
         Finds all AbstractSimulationElement derived objects matching the
         given criteria by searching this Gridsim simulation module. Note that
         the method returns always a list of elements, even if only a single
-        instance is found. All parameters are optional, if find() will be
+        instance is found. All parameters are optionaresetl, if find() will be
         called without any parameters, the list of all elements in the actual
         simulation module will be returned.
 

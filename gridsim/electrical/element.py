@@ -342,7 +342,7 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         self._internal_delta_energy = normal * delta_time
 
 
-class TimeSeriesElectricalCPSElement(ConstantElectricalCPSElement):
+class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
 
     @accepts(((1, 3), str),
              (2, Reader))

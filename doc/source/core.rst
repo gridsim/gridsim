@@ -1,4 +1,4 @@
-.. _gridsim-core-ref:
+.. _gridsim-core:
 
 ###################
 The Simulation Core
@@ -7,7 +7,7 @@ The Simulation Core
 .. warning::
     This section will be only interesting for Gridsim module developers,
     if you just use the library, you should be more interested by
-    :ref:`gridsim-use-ref`.
+    :ref:`gridsim-use`.
 
 The following section describes the core of Gridsim hidden to the user but
 useful for developers.
@@ -15,7 +15,7 @@ useful for developers.
 .. note::
     This part is the low level of the simulator, Gridsim also provides
     tools to help the development of modules or element
-    (:ref:`gridsim-tools-ref`).
+    (:ref:`gridsim-tools`).
 
 ***********
 Core module

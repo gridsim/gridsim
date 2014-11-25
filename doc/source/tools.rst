@@ -1,4 +1,4 @@
-.. _gridsim-tools-ref:
+.. _gridsim-tools:
 
 ####################
 The Simulation Tools
