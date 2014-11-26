@@ -28,21 +28,30 @@ Electrical package
 ==================
 .. automodule:: gridsim.electrical
 
+Electrical simulation
+---------------------
 .. automodule:: gridsim.electrical.simulation
     :members:
     :undoc-members:
     :show-inheritance:
+
+Electrical load flow
+--------------------
 
 .. automodule:: gridsim.electrical.loadflow
     :members:
     :undoc-members:
     :show-inheritance:
 
+Electrical network
+------------------
 .. automodule:: gridsim.electrical.network
     :members:
     :undoc-members:
     :show-inheritance:
 
+Electrical elements
+-------------------
 .. automodule:: gridsim.electrical.element
     :members:
     :undoc-members:
@@ -51,20 +60,23 @@ Electrical package
 Thermal package
 ===============
 .. automodule:: gridsim.thermal
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
+Thermal simulation
+------------------
 .. automodule:: gridsim.thermal.simulation
     :members:
     :undoc-members:
     :show-inheritance:
 
+Thermal elements
+----------------
 .. automodule:: gridsim.thermal.element
     :members:
     :undoc-members:
     :show-inheritance:
 
+Thermal control
+---------------
 .. automodule:: gridsim.thermal.controller
     :members:
     :undoc-members:
@@ -84,25 +96,6 @@ Control module
 Record module
 =============
 .. automodule:: gridsim.recorder
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-************
-Input/Output
-************
-
-.. automodule:: gridsim.iodata
-
-Input
-=====
-.. automodule:: gridsim.iodata.input
-    :members:
-    :undoc-members:
-    :show-inheritance:
-Output
-======
-.. automodule:: gridsim.iodata.output
     :members:
     :undoc-members:
     :show-inheritance:
