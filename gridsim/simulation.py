@@ -48,8 +48,9 @@ simulation module by typing::
     Actually, the name of the module is the returned value of
     :func:`.AbstractSimulationModule.attribute_name`.
     Refer to the module you want to use to retrieve the module name.
-    
+
 """
+import inspect
 import types
 from collections import namedtuple
 
@@ -102,14 +103,8 @@ class Recorder(object):
         that you made 3 calls to Sim.record() with the same recorder,
         this method is called 3 times. This method is optional.
 
-<<<<<<< Updated upstream
         :param subjects: List of all observed objects.
         :type subjects: List or tuple of :class:`AbstractSimulationElement`
-=======
-        :param subjects: list of all observed objects.
-        :type subjects: list or tuple of
-            :class:`.AbstractSimulationElement`
->>>>>>> Stashed changes
         """
         raise NotImplementedError('Pure abstract method!')
 
@@ -128,11 +123,7 @@ class Recorder(object):
         """
         Called by the main simulation engine between each simulation step in
         order the recorder can save the time-value pair of one or multiple
-<<<<<<< Updated upstream
-        AbstractSimulationElement subclass(es).
-=======
         :class:`.AbstractSimulationElement` subclass(es).
->>>>>>> Stashed changes
         Any recorder is required to implement this method.
 
         :param subject: The object that will be observed by the recorder.
@@ -233,15 +224,6 @@ class Simulator(object):
              element_class=None, instance_of=None,
              has_attribute=None, close_to=None):
         """
-<<<<<<< Updated upstream
-        Finds all AbstractSimulationElement derived objects matching the given
-        criteria by searching on either the given Gridsim simulation module or
-        by searching the whole simulation of the module was not specified. 
-        Note that the method returns always a list of elements, even if only a 
-        single instance is found. All parameters are optional, if find() will be
-        called without any parameters, the list of all elements in the actual
-        simulation will be returned.
-=======
         find(self, module=None, uid=None, friendly_name=None, element_class=None, instance_of=None, has_attribute=None, close_to=None)
 
         Finds all :class:`.AbstractSimulationElement` derived
@@ -251,7 +233,6 @@ class Simulator(object):
         elements, even if only a single instance is found. All parameters are
         optional, if :func:`find()` will be called without any parameters,
         the list of all elements in the actual simulation will be returned.
->>>>>>> Stashed changes
 
         :param module: The module to search for elements.
         :type module: str
@@ -282,12 +263,8 @@ class Simulator(object):
             the position and the radius in meters [m]
         :type close_to: (Position, float)
         
-<<<<<<< Updated upstream
-        :return: List of objects matching the given criteria.
-=======
         :return: List of :class:`.AbstractSimulationElement`
             matching the given criteria.
->>>>>>> Stashed changes
 
         *Example:*
 
@@ -457,12 +434,7 @@ class Simulator(object):
         
         :param subjects: The subjects of the recorder, in other words the 
             objects which is attributes has to be recorded.
-<<<<<<< Updated upstream
-        :type subjects: :list or tuple of class:`AbstractSimulationElement`
-=======
-        :type subjects: list or tuple of
-            :class:`.AbstractSimulationElement`
->>>>>>> Stashed changes
+        :type subjects: list or tuple of :class:`.AbstractSimulationElement`
 
         :param conversion: Lambda function to convert the actual value taken
             from the attribute before recording. The lambda function gets a
