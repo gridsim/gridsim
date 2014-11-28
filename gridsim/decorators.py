@@ -180,6 +180,8 @@ if __debug__:
         """
         Display registered time of function with :func:`timed` decorator.
 
+        Automatically called at exit.
+
         .. warning:: only reachable in debug mode (if `__debug__` is `True`).
         """
         for func_name, data in PROF_DATA.items():
@@ -187,3 +189,6 @@ if __debug__:
             avg_time = sum(data[1]) / len(data[1])
             print "Function %s called %d times. " % (func_name, data[0]),
             print 'Execution time max: %.7f, average: %.7f' % (max_time, avg_time)
+
+    import atexit
+    atexit.register(print_time_registered)
