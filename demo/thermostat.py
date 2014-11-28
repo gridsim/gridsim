@@ -1,3 +1,5 @@
+from gridsim.decorators import timed
+
 from gridsim.unit import units
 from gridsim.util import Position
 from gridsim.simulation import Simulator
@@ -111,6 +113,7 @@ class Thermostat(AbstractControllerElement):
         """
         pass
 
+    @timed
     def calculate(self, time, delta_time):
         """
         AbstractSimulationElement implementation
@@ -124,6 +127,7 @@ class Thermostat(AbstractControllerElement):
         elif actual_temperature > (self.target_temperature + self.hysteresis / 2.):
             self._output_value = self.off_value
 
+    @timed
     def update(self, time, delta_time):
         """
         AbstractSimulationElement implementation
@@ -168,11 +172,13 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement):
         super(ElectroThermalHeaterCooler, self).reset()
         self.on = False
 
+    @timed
     def calculate(self, time, delta_time):
         self._internal_delta_energy = self.power * delta_time
         if not self.on:
             self._internal_delta_energy = 0*units.joule
 
+    @timed
     def update(self, time, delta_time):
         super(ElectroThermalHeaterCooler, self).update(time, delta_time)
         self._thermal_process.add_energy(

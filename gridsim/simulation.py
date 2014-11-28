@@ -366,6 +366,9 @@ class Simulator(object):
         for recorder_binding in self._recorderBindings:
             recorder_binding.update(self.time, delta_time)
 
+    from gridsim.decorators import timed
+
+    @timed
     @accepts((1, units.Quantity))
     @returns(type(None))
     def step(self, delta_time):

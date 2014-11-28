@@ -10,7 +10,7 @@ import warnings
 import numpy as np
 from scipy.sparse import lil_matrix
 
-from gridsim.decorators import accepts, returns
+from gridsim.decorators import accepts, returns, timed
 from gridsim.unit import units
 from gridsim.core import AbstractSimulationModule
 
@@ -21,11 +21,11 @@ from .network import AbstractElectricalTwoPort, ElectricalTransmissionLine, \
     ElectricalGenTransformer, ElectricalSlackBus
 
 
-class _BusElectricalValues(object):
+class BusElectricalValues(object):
     pass
 
 
-class _BranchElectricalValues(object):
+class BranchElectricalValues(object):
     pass
 
 
@@ -79,10 +79,10 @@ class ElectricalSimulator(AbstractSimulationModule):
         self._b = None
 
         # bus electrical values
-        self._bu = _BusElectricalValues()
+        self._bu = BusElectricalValues()
 
         # branches electrical values
-        self._br = _BranchElectricalValues()
+        self._br = BranchElectricalValues()
 
 
     @property
@@ -414,6 +414,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         self._bu.V = np.zeros(N)*units.volt
         self._bu.Th = np.zeros(N)*units.degree
 
+    @timed
     @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
@@ -434,6 +435,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         for element in self._cps_elements:
             element.calculate(time, delta_time)
 
+    @timed
     @accepts(((1, 2), units.Quantity))
     def update(self, time, delta_time):
         """
