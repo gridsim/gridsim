@@ -30,3 +30,10 @@ Decorators
     :undoc-members:
     :show-inheritance:
 
+Time series
+===========
+
+.. automodule:: gridsim.timeseries
+    :members:
+    :undoc-members:
+    :show-inheritance:
