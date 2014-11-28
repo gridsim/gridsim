@@ -14,6 +14,7 @@ This documentation is separated into four parts:
     documentation.rst
     core.rst
     tools.rst
+    io.rst
 
 *********************
 Context and objective
