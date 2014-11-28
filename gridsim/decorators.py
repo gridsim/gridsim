@@ -136,66 +136,68 @@ def deprecated(func):
 if __debug__:
 
     import time
-    import inspect
 
-    PROF_DATA = {}
+    class _Timed(object):
 
-    def timed(func):
-        """
-        This is a decorator which can be used to register the execution time of
-        functions.
+        def __init__(self):
+            """
+            This is a decorator which can be used to register the execution
+            time of class methods.
 
-        To display the result use :func:`print_time_registered`
+            *Example:*
+            ::
+                class MyClass(object):
+                    @timed
+                    def func(arg1, arg2):
+                        return arg1 * arg2
 
-        *Example:*
-        ::
+                [...]
 
-            @timed
-            def func(arg1, arg2):
-                return arg1 * arg2
+            .. warning:: This decorator only works with class methods and not
+                         with functions.
 
-            [...]
+            .. warning:: only reachable in debug mode (if `__debug__` is `True`).
+            """
+            self._data = {}
 
-            print_time_registered()
+        def __call__(self, func):
 
-        .. warning:: only reachable in debug mode (if `__debug__` is `True`).
-        """
-        @wraps(func)
-        def with_profiling(*args, **kwargs):
-            start_time = time.time()
+            @wraps(func)
+            def store_time(inst, *args, **kwargs):
 
-            ret = func(*args, **kwargs)
+                start_time = time.time()
 
-            elapsed_time = time.time() - start_time
+                ret = func(inst, *args, **kwargs)
 
-            cls_id = ""
-            for cls in inspect.getmro(func.im_class):
-                if func.__name__ in cls.__dict__:
-                    cls_id = str(cls)
+                elapsed_time = time.time() - start_time
 
+                func_id = inst.__class__.__name__+'.'+func.__name__
+                if func_id not in self._data:
+                    self._data[func_id] = [0, []]
+                self._data[func_id][0] += 1
+                self._data[func_id][1].append(elapsed_time)
 
-            func_id = cls_id+'.'+func.__name__
+                return ret
 
-            if func_id not in PROF_DATA:
-                PROF_DATA[func_id] = [0, []]
-            PROF_DATA[func_id][0] += 1
-            PROF_DATA[func_id][1].append(elapsed_time)
+            return store_time
 
-            return ret
+        def print_time_registered(self):
+            """
+            Display registered time of function with :func:`timed` decorator.
 
-        return with_profiling
+            Automatically called at exit.
 
-    def print_time_registered():
-        """
-        Display registered time of function with :func:`timed` decorator.
+            .. warning:: only reachable in debug mode (if `__debug__` is `True`).
+            """
+            for func_name, data in self._data.items():
+                max_time = max(data[1])
+                sum_time = sum(data[1])
+                avg_time = sum_time / len(data[1])
+                print "Function %s called %d times. " % (func_name, data[0]),
+                print 'Execution time max: %.7f, average: %.7f' % (max_time, avg_time),
+                print "Total time: %.7f" % sum_time
+    timed = _Timed()
 
-        .. warning:: only reachable in debug mode (if `__debug__` is `True`).
-        """
-        for func_name, data in PROF_DATA.items():
-            max_time = max(data[1])
-            avg_time = sum(data[1]) / len(data[1])
-            print "Function %s called %d times. " % (func_name, data[0]),
-            print 'Execution time max: %.7f, average: %.7f' % (max_time, avg_time)
 
     import atexit
-    atexit.register(print_time_registered)
+    atexit.register(timed.print_time_registered)

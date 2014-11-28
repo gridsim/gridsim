@@ -97,7 +97,7 @@ class ControllerSimulator(AbstractSimulationModule):
         for controller in self._controllers:
             controller.update(time, delta_time)
 
-    @accepts((1,AbstractControllerElement))
+    @accepts((1, AbstractControllerElement))
     def add(self, element):
         """
         Adds the control element to the controller simulation module.
