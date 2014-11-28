@@ -187,3 +187,6 @@ if __debug__:
             avg_time = sum(data[1]) / len(data[1])
             print "Function %s called %d times. " % (func_name, data[0]),
             print 'Execution time max: %.7f, average: %.7f' % (max_time, avg_time)
+
+    import atexit
+    atexit(print_time_registered)
