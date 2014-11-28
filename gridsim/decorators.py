@@ -136,6 +136,7 @@ def deprecated(func):
 if __debug__:
 
     import time
+    import inspect
 
     PROF_DATA = {}
 
@@ -167,10 +168,18 @@ if __debug__:
 
             elapsed_time = time.time() - start_time
 
-            if func.__name__ not in PROF_DATA:
-                PROF_DATA[func.__name__] = [0, []]
-            PROF_DATA[func.__name__][0] += 1
-            PROF_DATA[func.__name__][1].append(elapsed_time)
+            cls_id = ""
+            for cls in inspect.getmro(func.im_class):
+                if func.__name__ in cls.__dict__:
+                    cls_id = str(cls)
+
+
+            func_id = cls_id+'.'+func.__name__
+
+            if func_id not in PROF_DATA:
+                PROF_DATA[func_id] = [0, []]
+            PROF_DATA[func_id][0] += 1
+            PROF_DATA[func_id][1].append(elapsed_time)
 
             return ret
 
