@@ -1,9 +1,16 @@
+"""
+.. moduleauthor:: Gillian Basso <gillian.basso@hevs.ch>
+.. codeauthor:: Gilbert Maitre <gilbert.maitre@hevs.ch>
+
+
+"""
+
 import warnings
 
 import numpy as np
 from scipy.sparse import lil_matrix
 
-from gridsim.decorators import accepts
+from gridsim.decorators import accepts, returns
 from gridsim.unit import units
 from gridsim.core import AbstractSimulationModule
 
@@ -27,9 +34,19 @@ class ElectricalSimulator(AbstractSimulationModule):
     @accepts((1, AbstractElectricalLoadFlowCalculator))
     def __init__(self, calculator=None):
         """
+        Gridsim main simulation class for electrical part. This module is
+        automatically added to the :class:`.Simulator` when
+        importing any class or module of :mod:`gridsim.electrical` package.
+
+        To access this class from simulation, use
+        :class:`.Simulator` as follow::
+
+            # Create the simulation.
+            sim = Simulator()
+            esim = sim.electrical
 
         :param calculator: The load flow calculator used by the simulator
-        :type calculator: AbstractElectricalLoadFlowCalculator
+        :type calculator: :class:`.AbstractElectricalLoadFlowCalculator`
         """
         super(ElectricalSimulator, self).__init__()
 
@@ -69,15 +86,34 @@ class ElectricalSimulator(AbstractSimulationModule):
 
 
     @property
+    @returns(AbstractElectricalLoadFlowCalculator)
     def load_flow_calculator(self):
+        """
+        The load flow calculator
+
+        .. seealso:: :mod:`gridsim.electrical.loadflow` for more details.
+        """
         return self._load_flow_calculator
 
     @load_flow_calculator.setter
-    def load_flow_calculator(self, value):
-        self._load_flow_calculator = value
+    @accepts((1, AbstractElectricalLoadFlowCalculator))
+    def load_flow_calculator(self, new_calculator):
+        self._load_flow_calculator = new_calculator
 
     @accepts((1, AbstractElectricalElement))
+    @returns(AbstractElectricalElement)
     def add(self, element):
+        """
+        add(self, element)
+
+        Add the element to the electrical simulation but do not connect it with
+        other elements. use other functions such as :func:`connect` and
+        :func:`attach` to really use the element in the simulation.
+
+        :param element: the element to add
+        :type element: :class:`.AbstractElectricalElement`
+        :return: the given element
+        """
         if isinstance(element, ElectricalSlackBus):
             if self._buses[0] is None:
                 self._buses[0] = element
@@ -129,7 +165,20 @@ class ElectricalSimulator(AbstractSimulationModule):
         return element
 
     @accepts((1, (int, str)))
+    @returns(ElectricalBus)
     def bus(self, id_or_friendly_name):
+        """
+        bus(self, id_or_friendly_name)
+
+        Retrieves the bus with the given id or friendly name.
+
+        :param id_or_friendly_name: the identifier of the bus
+        :type id_or_friendly_name: (int, str)
+        :return: the :class:`.ElectricalBus`
+
+        :raise KeyError: if the friendly name is not valid
+        :raise IndexError: if the id is not valid
+        """
         if isinstance(id_or_friendly_name, int):
             if len(self._buses) > id_or_friendly_name:
                 return self._buses[id_or_friendly_name]
@@ -142,7 +191,20 @@ class ElectricalSimulator(AbstractSimulationModule):
                 raise KeyError('Invalid key.')
 
     @accepts((1, (int, str)))
+    @returns(ElectricalNetworkBranch)
     def branch(self, id_or_friendly_name):
+        """
+        branch(self, id_or_friendly_name)
+
+        Retrieves the branch with the given id or friendly name.
+
+        :param id_or_friendly_name: the identifier of the bus
+        :type id_or_friendly_name: (int, str)
+        :return: the :class:`.ElectricalNetworkBranch`
+
+        :raise KeyError: if the friendly name is not valid
+        :raise IndexError: if the id is not valid
+        """
         if isinstance(id_or_friendly_name, int):
             if len(self._branches) > id_or_friendly_name:
                 return self._branches[id_or_friendly_name]
@@ -155,7 +217,20 @@ class ElectricalSimulator(AbstractSimulationModule):
                 raise KeyError('Invalid key.')
 
     @accepts((1, (int, str)))
+    @returns(AbstractElectricalCPSElement)
     def cps_element(self, id_or_friendly_name):
+        """
+        cps_element(self, id_or_friendly_name)
+
+        Retrieves the branch with the given id or friendly name.
+
+        :param id_or_friendly_name: the identifier of the bus
+        :type id_or_friendly_name: (int, str)
+        :return: the :class:`.AbstractElectricalCPSElement`
+
+        :raise KeyError: if the friendly name is not valid
+        :raise IndexError: if the id is not valid
+        """
         if isinstance(id_or_friendly_name, int):
             if len(self._cps_elements) > id_or_friendly_name:
                 return self._cps_elements[id_or_friendly_name]
@@ -168,13 +243,27 @@ class ElectricalSimulator(AbstractSimulationModule):
                 raise KeyError('Invalid key.')
 
     @accepts((1, str),
+             ((2, 3), ElectricalBus),
              (4, AbstractElectricalTwoPort))
+    @returns(ElectricalNetworkBranch)
     def connect(self, friendly_name, bus_a, bus_b, two_port):
-        if not isinstance(bus_a, ElectricalBus):
-            bus_a = self.bus(bus_a)
-        if not isinstance(bus_b, ElectricalBus):
-            bus_b = self.bus(bus_b)
+        """
+        connect(self, friendly_name, bus_a, bus_b, two_port)
 
+        Creates a :class:`.ElectricalNetworkBranch` with
+        the given parameters and adds it to the simulation.
+
+        .. seealso:: :func:`.ElectricalNetworkBranch`
+
+        :param friendly_name: the name of the branch
+        :type friendly_name: str
+        :param bus_a: the first bus the branch connects
+        :type bus_a: :class:`.ElectricalBus`
+        :param bus_b: the second bus the branch connects
+        :type bus_b: :class:`.ElectricalBus`
+        :param two_port: the element placed on the branch
+        :return: the new :class:`.ElectricalNetworkBranch`
+        """
         branch = self.add(
             ElectricalNetworkBranch(friendly_name, bus_a, bus_b, two_port))
         return branch
@@ -182,6 +271,19 @@ class ElectricalSimulator(AbstractSimulationModule):
     @accepts((1, (int, str, ElectricalBus)),
              (2, (int, str, AbstractElectricalCPSElement)))
     def attach(self, bus, el):
+        """
+        attach(self, bus, el)
+
+        Attaches the given bus to the given element. After this function, the
+        element is present in the simulation and will provide electrical energy
+        to the simulation
+
+        :param bus: the bus the element has to be attached
+        :type bus: :class:`.ElectricalBus`
+        :param el: the new element of the simulation
+        :type el: :class:`.AbstractElectricalCPSElement`
+        """
+
         if not isinstance(bus, ElectricalBus):
             bus = self.bus(bus)
         if bus.type == ElectricalBus.Type.SLACK_BUS:
@@ -194,13 +296,38 @@ class ElectricalSimulator(AbstractSimulationModule):
         self._hasChanges = True  # to recompute network description
         # element inherits bus position
         el.position = bus.position
-        return None
 
-    # SimulationModule implementation.
+    # AbstractSimulationModule implementation.
+
+    @returns(str)
     def attribute_name(self):
+        """
+        attribute_name(self)
+
+        Returns the name of this module.
+        This name is used to access to this electrical simulator from the
+        :class:`.Simulator`::
+
+            # Create the simulation.
+            sim = Simulator()
+            esim = sim.electrical
+
+        :return: 'electrical'
+        :rtype: str
+        """
         return 'electrical'
 
     def all_elements(self):
+        """
+        all_elements(self)
+
+        Returns a list of all :class:`.AbstractElectricalElement`
+        contained in the module.
+        The core simulator will use these lists in order to be able
+        to retrieve objects or list of objects by certain criteria using
+        :func:`gridsim.simulation.Simulator.find`.
+        """
+
         elements = []
         elements.extend(self._buses)
         elements.extend(self._branches)
@@ -208,6 +335,13 @@ class ElectricalSimulator(AbstractSimulationModule):
         return elements
 
     def reset(self):
+        """
+        reset(self)
+
+        Calls :func:`gridsim.core.AbstractSimulationElement.reset` of
+        each element in this electrical simulator, added by the
+        :func:`ElectricalSimulator.add`.
+        """
         for element in self._buses:
             element.reset()
         for element in self._branches:
@@ -280,11 +414,43 @@ class ElectricalSimulator(AbstractSimulationModule):
         self._bu.V = np.zeros(N)*units.volt
         self._bu.Th = np.zeros(N)*units.degree
 
+    @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
+        """
+        calculate(self, time, delta_time)
+
+        Calls :func:`gridsim.core.AbstractSimulationElement.calculate`
+        of each :class:`.AbstractElectricalCPSElement` in this electrical
+        simulator, added by the :func:`.ElectricalSimulator.add`.
+
+        :param time: The actual simulation time.
+        :type time: time, see :mod:`gridsim.unit`
+
+        :param delta_time: The time period for which the calculation
+            has to be done.
+        :type delta_time: time, see :mod:`gridsim.unit`
+        """
+
         for element in self._cps_elements:
             element.calculate(time, delta_time)
 
+    @accepts(((1, 2), units.Quantity))
     def update(self, time, delta_time):
+        """
+        update(self, time, delta_time)
+
+        Updates the data of each :class:`.AbstractElectricalCPSElement` in this
+        electrical simulator added by the :func:`.ElectricalSimulator.add` and
+        calculate the load flow with
+        :class:`.AbstractElectricalLoadFlowCalculator`.
+
+        :param time: The actual simulation time.
+        :type time: time, see :mod:`gridsim.unit`
+
+        :param delta_time: The time period for which the calculation
+            has to be done.
+        :type delta_time: time, see :mod:`gridsim.unit`
+        """
 
         if self._hasChanges and len(self._buses) > 1 \
                 and len(self._branches) > 0:

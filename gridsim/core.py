@@ -53,6 +53,7 @@ simulation module by typing::
 
 """
 from .decorators import accepts, returns
+from .unit import units
 
 
 class AbstractSimulationModule(object):
@@ -153,6 +154,7 @@ class AbstractSimulationModule(object):
         """
         raise NotImplementedError('Abstract method called!')
 
+    @accepts(((1, 2), units.Quantity))
     def update(self, time, delta_time):
         """
         The master simulation object executes this method on all registered
@@ -169,6 +171,7 @@ class AbstractSimulationModule(object):
         """
         raise NotImplementedError('Abstract method called!')
 
+    @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
         The master simulation object executes this method on all registered
@@ -237,6 +240,7 @@ class AbstractSimulationElement(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
+    @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
         This method is called by the core simulator or the simulator module in 
@@ -255,6 +259,7 @@ class AbstractSimulationElement(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
+    @accepts(((1, 2), units.Quantity))
     def update(self, time, delta_time):
         """
         This method will be called after all simulation elements have done their

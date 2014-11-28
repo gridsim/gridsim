@@ -1,31 +1,12 @@
 """
-.. moduleauthor:: Gilbert Maitre <gilbert.maitre@hevs.ch>
-
-The :mod:`gridsim.electrical` module implements the electrical part of the
-gridsim simulator. It basically manages Consuming-Producing-Storing (CPS)
-Elements, which consume (positive sign) and/or produce (negative sign) a
-certain amount of energy ('delta_energy') at each simulation step.
-
-CPS elements may be attach to buses of an electrical power network, which is
-also made of branches as connections between buses.
-
-*Example*:
-
-.. literalinclude:: ../../demo/loadflow.py
-    :linenos:
-
-shows a pure electrical example made of a reference 5-bus network
-(see e.g. Xi-Fan Wang, Yonghua Song, Malcolm Irving, Modern power systems
-analysis), to the non-slack buses of which are attached 4 CPS elements :
-1 with constant power, production, 3 with random gaussian distributed power
-consumption.
-
+.. moduleauthor:: Gillian Basso <gillian.basso@hevs.ch>
+.. codeauthor:: Gilbert Maitre <gilbert.maitre@hevs.ch>
 """
 import csv
 
 import numpy as np
 
-from gridsim.decorators import accepts
+from gridsim.decorators import accepts, returns
 from gridsim.unit import units
 from gridsim.timeseries import TimeSeriesObject
 from gridsim.iodata.input import Reader
@@ -38,12 +19,13 @@ class ConstantElectricalCPSElement(AbstractElectricalCPSElement):
     @accepts((1, str))
     def __init__(self, friendly_name, power):
         """
+        __init__(self, friendly_name, power)
+
         This class provides the simplest Consuming-Producing-Storing element
         having a constant behavior.
 
-        This class is based on the 'AbstractElectricalCPSElement' class.
-        At initialization, the consumed or produced constant 'power' has to
-        be provided beside the element 'friendly_name'. Power is positive, if
+        At initialization, the consumed or produced constant `power` has to
+        be provided beside the element `friendly_name`. Power is positive, if
         consumed, negative, if produced. With the 'calculate' method the
         energy consumed or produced during the simulation step is calculated
         from the constant power value.
@@ -54,22 +36,25 @@ class ConstantElectricalCPSElement(AbstractElectricalCPSElement):
 
         :param power: The constant consumed (if positive) or produced
             (if negative) power.
-        :type power: power
+        :type power: power, see :mod:`gridsim.unit`
 
         """
         super(ConstantElectricalCPSElement, self).__init__(friendly_name)
         self.power = power
 
+    @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
-        Calculate the element's the energy consumed or produced by the element
+        calculate(self, time, delta_time)
+
+        Calculates the element's the energy consumed or produced by the element
         during the simulation step.
 
         :param time: The actual time of the simulator in seconds.
-        :type time: timedelta
+        :type time: time, see :mod:`gridsim.unit`
         :param delta_time: The delta time for which the calculation has to be
             done in seconds.
-        :type delta_time: timedelta
+        :type delta_time: time, , see :mod:`gridsim.unit`
         """
         self._internal_delta_energy = self.power * delta_time
 
@@ -81,13 +66,14 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
     def __init__(self, friendly_name, cycle_delta_time, power_values,
                  cycle_start_time=0):
         """
+        __init__(self, friendly_name, cycle_delta_time, power_values, cycle_start_time=0)
+
         This class provides a Consuming-Producing-Storing element having a
         cyclic behavior.
 
-        This class is based on the 'AbstractElectricalCPSElement' class. At
-        initialization, beside the element 'friendly_name', the cycle time
-        resolution 'cycle_delta_time', the cycle sequence of 'power_values',
-        and the 'cycle_start_time' have to be given.
+        At initialization, beside the element `friendly_name`, the cycle time
+        resolution `cycle_delta_time`, the cycle sequence of `power_values`,
+        and the `cycle_start_time` have to be given.
 
         :param friendly_name: Friendly name for the element. Should be unique
             within the simulation module.
@@ -117,6 +103,7 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         self._cycle_start_time = cycle_start_time
 
     @property
+    @returns(int)
     def cycle_delta_time(self):
         """
         Gets the cycle time resolution.
@@ -127,6 +114,7 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         return self._cycle_delta_time
 
     @property
+    @returns(np.array)
     def power_values(self):
         """
         Gets the cycle power values array.
@@ -137,6 +125,7 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         return self._power_values
 
     @property
+    @returns(int)
     def cycle_length(self):
         """
         Gets the cycle length in cycle time resolution units.
@@ -147,6 +136,7 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         return self._cycle_length
 
     @property
+    @returns(int)
     def cycle_start_time(self):
         """
         Gets the cycle start time.
@@ -156,16 +146,19 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         """
         return self._cycle_start_time
 
+    @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
-        Calculate the element's the energy consumed or produced by the element
+        calculate(self, time, delta_time)
+
+        Calculates the element's the energy consumed or produced by the element
         during the simulation step.
 
         :param time: The actual time of the simulator in seconds.
-        :type time: float
+        :type time: time, see :mod:`gridsim.unit`
         :param delta_time: The delta time for which the calculation has to be
             done in seconds.
-        :type delta_time: float
+        :type delta_time: time, see :mod:`gridsim.unit`
         """
         current_cycle_pos = int((
                                 time - self._cycle_start_time) /
@@ -186,7 +179,8 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
             next_dtime += self._cycle_delta_time
             if next_dtime > delta_time:
                 next_dtime = delta_time
-# TODO: verify results
+
+        # TODO: verify results
 
 
 class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
@@ -197,12 +191,11 @@ class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
     def __init__(self, friendly_name, cycle_delta_time, power_values,
                  cycle_start_time=0*units.second):
         """
+        __init__(self, friendly_name, cycle_delta_time, power_values, cycle_start_time=0*units.second)
+
         This class provides a cyclic Consuming-Producing-Storing element for
         which the consumed or produced power values may be updated. Update
         will take place at next cycle start.
-
-        This class is based on the 'CyclicElectricalCPSElement' class.
-        At initialization, it takes the same input parameters.
 
         :param friendly_name: Friendly name for the element.
             Should be unique within the simulation module.
@@ -249,16 +242,19 @@ class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
         self._new_power_values = new_power_values
         self._update_done = False
 
+    @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
-        Calculate the element's the energy consumed or produced by the element
+        calculate(self, time, delta_time)
+
+        Calculates the element's the energy consumed or produced by the element
         during the simulation step.
 
         :param time: The actual time of the simulator in seconds.
-        :type time: float
+        :type time: time, see :mod:`gridsim.unit`
         :param delta_time: The delta time for which the calculation has to be
             done in seconds.
-        :type delta_time: float
+        :type delta_time: time, see :mod:`gridsim.unit`
         """
         if not self._update_done:
             current_cycle_pos = \
@@ -277,14 +273,15 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
     @accepts((1, str))
     def __init__(self, friendly_name, mean_power, standard_deviation):
         """
+        __init__(self, friendly_name, mean_power, standard_deviation)
+
         This class provides a Consuming-Producing-Storing element having a
         random behavior. The consecutive consumed or produced power values
         are IID (Independently and Identically Distributed). The distribution
         is Gaussian.
 
-        This class is based on the 'AbstractElectricalCPSElement' class.
-        At initialization, the 'mean_power' and 'standard_distribution' are
-        provided beside the element 'friendly_name'. If 'mean_power' is
+        At initialization, the `mean_power` and 'standard_distribution' are
+        provided beside the element `friendly_name`. If `mean_power` is
         positive, the element is in the mean a consumer. If it is negative,
         the element is in the mean a producer.
 
@@ -293,11 +290,11 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         :type friendly_name: str
 
         :param mean_power: The mean value of the Gaussian distributed power.
-        :type mean_power: power
+        :type mean_power: power, see :mod:`gridsim.unit`
 
         :param standard_deviation: The standard deviation of the Gaussian
             distributed power.
-        :type standard_deviation: power
+        :type standard_deviation: power, see :mod:`gridsim.unit`
 
         """
         super(GaussianRandomElectricalCPSElement, self).__init__(friendly_name)
@@ -305,12 +302,13 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         self._standard_deviation = standard_deviation
 
     @property
+    @returns(units.Quantity)
     def mean_power(self):
         """
         Gets the mean value of the Gaussian distributed power.
 
         :returns: mean power value.
-        :rtype: float
+        :rtype: power, see :mod:`gridsim.unit`
         """
         return self._mean_power
 
@@ -326,14 +324,16 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
 
     def calculate(self, time, delta_time):
         """
-        Calculate the element's the energy consumed or produced by the element
+        calculate(self, time, delta_time)
+
+        Calculates the element's the energy consumed or produced by the element
         during the simulation step.
 
         :param time: The actual time of the simulator in seconds.
-        :type time: timedelta
+        :type time: time, see :mod:`gridsim.unit`
         :param delta_time: The delta time for which the calculation has to be
             done in seconds.
-        :type delta_time: timedelta
+        :type delta_time: time, see :mod:`gridsim.unit`
         """
         normal_value = np.random.normal(self._mean_power.to(units.watt),
                                         self._standard_deviation.to(units.watt))
@@ -348,20 +348,19 @@ class TimeSeriesElectricalCPSElement(ConstantElectricalCPSElement):
              (2, Reader))
     def __init__(self, friendly_name, reader, stream, column_name='power'):
         """
+        __init__(self, friendly_name, reader, stream, column_name='power')
+
         This class provides a Consuming-Producing-Storing element whose consumed
-        or produced power is read in a column of a csv file.
+        or produced power is read from a stream by the given reader.
 
-        This class is based on the 'ConstantElectricalCPSElement' class.
-        At initialization, the 'file_name' and the 'attribute_name' are
-        provided.
-
-        The attribute is assumed to carry a power value.
+        The presence of a column named `column_name` is assumed in the
+        :class:`.TimeSeriesObject`.
 
         :param friendly_name: Friendly name for the element.
             Should be unique within the simulation module.
         :type friendly_name: str
         :param reader: The data reader
-        :type reader: Reader
+        :type reader: :class:`.Reader`
         :param stream: The file name
         :type stream: str
         :param column_name: The name of the column in the data with a the
@@ -369,7 +368,7 @@ class TimeSeriesElectricalCPSElement(ConstantElectricalCPSElement):
         :type column_name: str
 
         """
-        super(TimeSeriesElectricalCPSElement, self).__init__(friendly_name, 0)
+        super(TimeSeriesElectricalCPSElement, self).__init__(friendly_name)
 
         self._time_series = TimeSeriesObject(reader)
         self._time_series.load(stream)
@@ -385,22 +384,21 @@ class TimeSeriesElectricalCPSElement(ConstantElectricalCPSElement):
 
     def reset(self):
         """
-          AbstractSimulationElement implementation
-
           .. seealso:: :func:`gridsim.core.AbstractSimulationElement.reset`.
-       """
+        """
         self._time_series.set_time()
 
+    @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
-        Calculate the energy consumed or produced by the element during the
+        Calculates the energy consumed or produced by the element during the
         simulation step.
 
         :param time: The actual time of the simulator in seconds.
-        :type time: float
+        :type time: time, see :mod:`gridsim.unit`
         :param delta_time: The delta time for which the calculation has to be
             done in seconds.
-        :type delta_time: float
+        :type delta_time: time, see :mod:`gridsim.unit`
         """
         self._time_series.set_time(time)
         self._internal_delta_energy = self._time_series.power * delta_time
@@ -413,16 +411,17 @@ class AnyIIDRandomElectricalCPSElement(AbstractElectricalCPSElement):
              (3, (type(None), np.ndarray)))
     def __init__(self, friendly_name, fname_or_power_values, frequencies=None):
         """
+        __init__(self, friendly_name, fname_or_power_values, frequencies=None)
+
         This class provides a Consuming-Producing-Storing element having a
         random behavior. The consecutive consumed or produced power values
         are IID (Independently and Identically Distributed). The distribution,
         discrete and finite, is given as parameter.
 
-        This class is based on the 'AbstractElectricalCPSElement' class. Beside
-        the element 'friendly_name', the constructor parameters are either
-        the name of the file the distribution has to be read from, either the
-        potentially consumed or produced 'power_values',together with their
-        'frequencies' or probabilities. Input 'power values' has to be a
+        Beside the element `friendly_name`, the constructor parameters are
+        either the name of the file the distribution has to be read from, either
+        the potentially consumed or produced `power_values`,together with their
+        `frequencies` or probabilities. Input `power values` has to be a
         monotonically increasing sequence of float. Input 'frequencies' can be
         either integers (number of occurrences), or floats summing to 1.0
         (relative frequencies or probabilities), or monotonically increasing

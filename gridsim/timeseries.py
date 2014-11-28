@@ -3,7 +3,7 @@
 
 FIXME : review comments
 
-The timeseries module allows to import time series based data from CSV into
+The :mod:`gridsim.timeseries` module allows to import time series based data from CSV into
 objects as attributes. The format of the CSV files is common CSV syntax where
 each row starts with a new line and columns are separated using ';'. The only
 constraint to the file is the first line has to contain some meta information
@@ -76,7 +76,7 @@ class TimeSeriesObject(object):
 
         *Example*:
 
-        .. literalinclude:: ../demos/timeseries2.py
+        .. literalinclude:: ../../demo/timeseries2.py
 
         The result of the script:
 
@@ -87,11 +87,13 @@ class TimeSeriesObject(object):
 
         self._reader = reader
         self._data = None
+        self._computed_data = None
         self._index = 0
         self._time_key = 'time'
 
-    @accepts(((1, 2), str))
-    def map_attribute(self, name, mapped_name):
+    @accepts(((1, 2), str),
+             (3, bool))
+    def map_attribute(self, name, mapped_name, is_time_key=False):
         """
         If the attribute name of the file does not match the target attribute
         name for the object, you can use this method to map the original name to
@@ -123,16 +125,18 @@ class TimeSeriesObject(object):
                 'Can not map attribute {0}, as it exists already.'.format(
                     mapped_name))
 
+        if is_time_key:
+            self._time_key = name
+
         if name is self._time_key:
             self._time_key = mapped_name
 
         self._data[mapped_name] = self._data.pop(name)
+        self.compute_data()
 
     def __getattr__(self, item):
-        if self._index < 0:
-            raise IndexError("Index cannot be negative: "+str(self._index))
-        if item in self._data:
-            return self._data[item][self._index]
+        if item in self._computed_data:
+            return self._computed_data[item][self._index]
         else:
             raise AttributeError(str(item)+" attribute does not exist")
 
@@ -140,15 +144,16 @@ class TimeSeriesObject(object):
         """
         Changes the actual time on the object.
 
-        :param time: Time.
-        :type time: float, int
-
+        :param time: the new time.
+        :type time: time, see :mod:`gridsim.unit`
         """
-        tmp_value = next((t for t in reversed(self._data[self._time_key])
-                          if t <= time),
-                         -1)  # FIXME takes too long
+        time_value = units.value(units.convert(time, units.seconds))
 
-        self._index = self._data[self._time_key].index(tmp_value)
+        if time_value in self._computed_data[self._time_key]:
+            self._index = time_value
+        else:
+            self._index = min(self._computed_data[self._time_key],
+                              key=lambda i: abs(i-time_value))
 
     @accepts((1, str), (2, FunctionType))
     def convert(self, item, converter):
@@ -169,6 +174,14 @@ class TimeSeriesObject(object):
              (2, (None, types.MethodType)),
              (3, str))
     def load(self, stream, time_converter=None, time_key='time'):
+        """
+        load(self, stream, time_converter=None, time_key='time')
+
+        :param stream:
+        :param time_converter:
+        :param time_key:
+        :return:
+        """
         self._data = self._reader.load(stream, data_type=float)
 
         self._time_key = time_key
@@ -178,7 +191,33 @@ class TimeSeriesObject(object):
                 self.convert(self._time_key, lambda t: t*units.second)
             else:
                 self.convert(self._time_key, time_converter)
+
+            self.compute_data()
+
         else:
             warnings.warn("The data {0} has no '{1}' values".
                           format(stream, time_key),
                           category=SyntaxWarning)
+
+    def compute_data(self):
+        """
+        compute_data(self)
+
+        Computes data, after a call of :func:`TimeSeriesObject.load`.
+        """
+
+        self._computed_data = {}
+
+        time_list = self._data[self._time_key]
+
+        for key in self._data.keys():
+            self._computed_data[key] = {}
+            data_list = self._data[key]
+
+            computed_data = {}
+            for time, data in zip(time_list, data_list):
+                computed_data[
+                    units.value(units.convert(time, units.second))
+                ] = data
+
+            self._computed_data[key] = computed_data
