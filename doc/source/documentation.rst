@@ -75,13 +75,6 @@ Thermal elements
     :undoc-members:
     :show-inheritance:
 
-Thermal control
----------------
-.. automodule:: gridsim.thermal.controller
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 **************
 User Interface
 **************
@@ -89,6 +82,14 @@ User Interface
 Control module
 ==============
 .. automodule:: gridsim.controller
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Thermal control
+---------------
+.. automodule:: gridsim.thermal.controller
     :members:
     :undoc-members:
     :show-inheritance:
