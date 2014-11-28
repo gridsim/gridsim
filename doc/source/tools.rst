@@ -1,4 +1,4 @@
-.. _gridsim-tools-ref:
+.. _gridsim-tools:
 
 ####################
 The Simulation Tools
@@ -30,3 +30,10 @@ Decorators
     :undoc-members:
     :show-inheritance:
 
+Time series
+===========
+
+.. automodule:: gridsim.timeseries
+    :members:
+    :undoc-members:
+    :show-inheritance:

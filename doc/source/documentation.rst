@@ -1,4 +1,4 @@
-.. _gridsim-use-ref:
+.. _gridsim-use:
 
 #########################
 The Simulator General Use
@@ -24,16 +24,53 @@ Simulator module
     :undoc-members:
     :show-inheritance:
 
-Electrical module
-=================
+Electrical package
+==================
+.. automodule:: gridsim.electrical
+
+Electrical simulation
+---------------------
 .. automodule:: gridsim.electrical.simulation
     :members:
     :undoc-members:
     :show-inheritance:
 
-Thermal module
-==============
+Electrical load flow
+--------------------
+
+.. automodule:: gridsim.electrical.loadflow
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Electrical network
+------------------
+.. automodule:: gridsim.electrical.network
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Electrical elements
+-------------------
+.. automodule:: gridsim.electrical.element
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Thermal package
+===============
+.. automodule:: gridsim.thermal
+
+Thermal simulation
+------------------
 .. automodule:: gridsim.thermal.simulation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Thermal elements
+----------------
+.. automodule:: gridsim.thermal.element
     :members:
     :undoc-members:
     :show-inheritance:
@@ -45,6 +82,14 @@ User Interface
 Control module
 ==============
 .. automodule:: gridsim.controller
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Thermal control
+---------------
+.. automodule:: gridsim.thermal.controller
     :members:
     :undoc-members:
     :show-inheritance:

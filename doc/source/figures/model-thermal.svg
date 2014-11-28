@@ -1,0 +1,899 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="626"
+   height="667"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="model-thermal.svg">
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="683.74308"
+     inkscape:cy="193.80004"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1680"
+     inkscape:window-height="984"
+     inkscape:window-x="1280"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-paths="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-bbox-edge-midpoints="true"
+     inkscape:snap-bbox-midpoints="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0">
+    <inkscape:grid
+       originy="-369px"
+       originx="-105px"
+       snapvisiblegridlinesonly="true"
+       enabled="true"
+       visible="true"
+       empspacing="5"
+       type="xygrid"
+       id="grid2985" />
+  </sodipodi:namedview>
+  <defs
+     id="defs4">
+    <marker
+       style="overflow:visible"
+       id="TriangleOutL"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutL">
+      <path
+         transform="scale(0.8,0.8)"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         id="path4283"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="EmptyDiamondL"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="EmptyDiamondL"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4247"
+         d="M 0,-7.0710768 -7.0710894,0 0,7.0710589 7.0710462,0 0,-7.0710768 z"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="EmptyDiamondLu"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="EmptyDiamondLu"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4586"
+         d="M 0,-7.0710768 -7.0710894,0 0,7.0710589 7.0710462,0 0,-7.0710768 z"
+         style="fill:#878787;fill-rule:evenodd;stroke:#878787;stroke-width:1pt"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleOutLC"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutLC">
+      <path
+         transform="scale(0.8,0.8)"
+         style="fill:#878787;fill-rule:evenodd;stroke:#878787;stroke-width:1pt"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         id="path6567"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleOutLC-4"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutLC">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(0.8,0.8)"
+         style="fill:#878787;fill-rule:evenodd;stroke:#878787;stroke-width:1pt"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         id="path6567-3" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleOutLC-0"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutLC">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(0.8,0.8)"
+         style="fill:#878787;fill-rule:evenodd;stroke:#878787;stroke-width:1pt"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         id="path6567-0" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleOutLC-3"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutLC">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(0.8,0.8)"
+         style="fill:#878787;fill-rule:evenodd;stroke:#878787;stroke-width:1pt"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         id="path6567-8" />
+    </marker>
+    <marker
+       inkscape:stockid="EmptyDiamondLu"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="EmptyDiamondLu-9"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4586-8"
+         d="M 0,-7.0710768 -7.0710894,0 0,7.0710589 7.0710462,0 0,-7.0710768 z"
+         style="fill:#878787;fill-rule:evenodd;stroke:#878787;stroke-width:1pt"
+         transform="scale(0.8,0.8)" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleOutLC-3-8"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutLC">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(0.8,0.8)"
+         style="fill:#878787;fill-rule:evenodd;stroke:#878787;stroke-width:1pt"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         id="path6567-8-6" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleOutLC-3-1"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutLC">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(0.8,0.8)"
+         style="fill:#878787;fill-rule:evenodd;stroke:#878787;stroke-width:1pt"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         id="path6567-8-1" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleOutLC-3-5"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutLC">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(0.8,0.8)"
+         style="fill:#878787;fill-rule:evenodd;stroke:#878787;stroke-width:1pt"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         id="path6567-8-7" />
+    </marker>
+  </defs>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-105,-16.362177)"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-opacity:1"
+       id="rect3757"
+       width="165"
+       height="0"
+       x="125"
+       y="82.362183" />
+    <g
+       id="g4011"
+       transform="translate(-9.295654,-40.500006)">
+      <g
+         transform="translate(-10.204346,10)"
+         id="g3834">
+        <g
+           id="g3790">
+          <g
+             id="g3763">
+            <rect
+               style="fill:#878787;fill-opacity:1;stroke:#ffffff;stroke-opacity:1"
+               id="rect2987"
+               width="150"
+               height="125"
+               x="125"
+               y="47.362183" />
+            <rect
+               style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+               id="rect3761"
+               width="150"
+               height="15"
+               x="125"
+               y="77.362183" />
+          </g>
+          <text
+             sodipodi:linespacing="125%"
+             id="text3767"
+             y="60.344604"
+             x="200.18164"
+             style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+             xml:space="preserve"><tspan
+               style="font-size:8px"
+               y="60.344604"
+               x="200.18164"
+               id="tspan3769"
+               sodipodi:role="line">&lt;interface&gt;</tspan><tspan
+               id="tspan3843"
+               y="70.344604"
+               x="200.18164"
+               sodipodi:role="line">AbstractSimulationModule</tspan></text>
+        </g>
+        <rect
+           style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3832"
+           width="150"
+           height="30"
+           x="125"
+           y="47.362183" />
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text3981"
+         y="111.92078"
+         x="120"
+         style="font-size:6px;font-style:normal;font-weight:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="111.92078"
+           x="120"
+           id="tspan3983"
+           sodipodi:role="line">+ attribute_name()</tspan><tspan
+           id="tspan3985"
+           y="119.42078"
+           x="120"
+           sodipodi:role="line">+ all_elements()</tspan><tspan
+           id="tspan3987"
+           y="126.92078"
+           x="120"
+           sodipodi:role="line">+ find(uid, friendly_name, element_class, </tspan><tspan
+           id="tspan3991"
+           y="134.42078"
+           x="120"
+           sodipodi:role="line">           instance_of, has_attribute)</tspan><tspan
+           id="tspan3993"
+           y="141.92078"
+           x="120"
+           sodipodi:role="line">+ reset()</tspan><tspan
+           id="tspan3997"
+           y="149.42078"
+           x="120"
+           sodipodi:role="line">+ update(time, delta_time)</tspan><tspan
+           id="tspan4001"
+           y="156.92078"
+           x="120"
+           sodipodi:role="line">+ calculate()</tspan></text>
+    </g>
+    <g
+       id="g4030"
+       transform="translate(-174.43359,-67.517584)">
+      <g
+         transform="translate(359.81836,32.017578)"
+         id="g3834-3">
+        <g
+           transform="translate(10,5)"
+           id="g3887">
+          <g
+             id="g3790-1"
+             transform="translate(0.11523375,2.4999963e-8)">
+            <g
+               id="g3763-6">
+              <rect
+                 y="47.362183"
+                 x="125"
+                 height="125"
+                 width="150"
+                 id="rect2987-2"
+                 style="fill:#878787;fill-opacity:1;stroke:#ffffff;stroke-opacity:1" />
+              <rect
+                 y="77.362183"
+                 x="125"
+                 height="15"
+                 width="150"
+                 id="rect3761-8"
+                 style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+            </g>
+            <text
+               xml:space="preserve"
+               style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+               x="200.06641"
+               y="60.344604"
+               id="text3767-6"
+               sodipodi:linespacing="125%"><tspan
+                 sodipodi:role="line"
+                 id="tspan3769-7"
+                 x="200.06641"
+                 y="60.344604">&lt;interface&gt;</tspan><tspan
+                 sodipodi:role="line"
+                 x="200.06641"
+                 y="70.344604"
+                 id="tspan3843-5">AbstractSimulationElement</tspan></text>
+          </g>
+          <rect
+             y="47.362183"
+             x="125"
+             height="30"
+             width="150"
+             id="rect3832-3"
+             style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+        </g>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4003"
+         y="136.91492"
+         x="499.36426"
+         style="font-size:6px;font-style:normal;font-weight:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="136.91492"
+           x="499.36426"
+           id="tspan4005"
+           sodipodi:role="line">+ reset()</tspan><tspan
+           id="tspan4007"
+           y="144.41492"
+           x="499.36426"
+           sodipodi:role="line">+ update(time, delta_time)</tspan><tspan
+           id="tspan4009"
+           y="151.91492"
+           x="499.36426"
+           sodipodi:role="line">+ calculate()</tspan></text>
+    </g>
+    <g
+       transform="translate(-20,145.99999)"
+       id="g4111">
+      <g
+         id="g4062">
+        <g
+           id="g3834-2-7"
+           transform="translate(0.5,-15.5)">
+          <g
+             id="g3790-3-4">
+            <g
+               id="g3763-8-9">
+              <rect
+                 y="47.362183"
+                 x="125"
+                 height="125"
+                 width="150"
+                 id="rect2987-0-4"
+                 style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-opacity:1" />
+              <rect
+                 y="77.362183"
+                 x="125"
+                 height="15"
+                 width="150"
+                 id="rect3761-5-9"
+                 style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+            </g>
+            <text
+               xml:space="preserve"
+               style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+               x="199.74023"
+               y="65.344604"
+               id="text3767-3-6"
+               sodipodi:linespacing="125%"><tspan
+                 sodipodi:role="line"
+                 x="199.74023"
+                 y="65.344604"
+                 id="tspan3843-8-0">ThermalSimulator</tspan></text>
+          </g>
+          <rect
+             y="47.362183"
+             x="125"
+             height="30"
+             width="150"
+             id="rect3832-0-4"
+             style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+        </g>
+        <text
+           xml:space="preserve"
+           style="font-size:6px;font-style:normal;font-weight:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+           x="129.36426"
+           y="86.920776"
+           id="text4046"
+           sodipodi:linespacing="125%"><tspan
+             id="tspan6174"
+             sodipodi:role="line"
+             x="129.36426"
+             y="86.920776">+ add(element)</tspan></text>
+      </g>
+    </g>
+    <path
+       sodipodi:nodetypes="cc"
+       transform="translate(-120.68164,31.362183)"
+       inkscape:connector-curvature="0"
+       id="path6180"
+       d="m 300.68164,145.99999 0,-30"
+       style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4, 4;stroke-dashoffset:0;marker-end:url(#TriangleOutLC)" />
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path6180-9"
+       d="m 395,177.47818 0,-30"
+       style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4, 4;stroke-dashoffset:0;marker-end:url(#TriangleOutLC)" />
+    <path
+       style="fill:none;stroke:#878787;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#EmptyDiamondLu)"
+       d="m 440.68164,215.99999 -60,0"
+       id="path6920"
+       inkscape:connector-curvature="0"
+       transform="translate(-120.68164,31.362183)"
+       sodipodi:nodetypes="cc" />
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path6180-3"
+       d="m 400,337.47818 0,-30"
+       style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4, 4;stroke-dashoffset:0;marker-end:url(#TriangleOutLC)" />
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path6180-3-7"
+       d="m 655,367.86218 0,-30"
+       style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4, 4;stroke-dashoffset:0;marker-end:none" />
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path6180-3-7-6"
+       d="m 180.5,367.86218 0,-30"
+       style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4, 4;stroke-dashoffset:0;marker-end:none" />
+    <path
+       style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4, 4;stroke-dashoffset:0"
+       d="m 655,337.36218 -475,0"
+       id="path7608"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <g
+       transform="translate(-14.5,525.99999)"
+       id="g4111-6-7-6-5-2-9">
+      <g
+         id="g4062-9-3-8-7-6-0">
+        <g
+           id="g3834-2-7-7-4-9-9-6-4"
+           transform="translate(0.5,-15.5)">
+          <g
+             id="g3790-3-4-8-4-5-6-1-1">
+            <g
+               id="g3763-8-9-4-8-1-2-3-2">
+              <rect
+                 y="47.362183"
+                 x="125"
+                 height="125"
+                 width="150"
+                 id="rect2987-0-4-7-3-7-1-7-6"
+                 style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-opacity:1" />
+              <rect
+                 y="77.362183"
+                 x="125"
+                 height="15"
+                 width="150"
+                 id="rect3761-5-9-1-0-2-0-8-2"
+                 style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+            </g>
+            <text
+               xml:space="preserve"
+               style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+               x="199.80469"
+               y="65.344604"
+               id="text3767-3-6-1-4-5-1-7-5"
+               sodipodi:linespacing="125%"><tspan
+                 sodipodi:role="line"
+                 x="199.80469"
+                 y="65.344604"
+                 id="tspan6918-0-2-1-4-7">ConstantTemperatureProcess</tspan></text>
+          </g>
+          <rect
+             y="47.362183"
+             x="125"
+             height="30"
+             width="150"
+             id="rect3832-0-4-1-1-35-1-2-4"
+             style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+        </g>
+      </g>
+    </g>
+    <g
+       id="g8162"
+       transform="translate(-599.5,5.000002)">
+      <path
+         style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-end:none"
+         d="m 785.5,552.36218 0,-30"
+         id="path6180-3-7-6-09"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-end:url(#TriangleOutLC-3)"
+         d="m 785.5,522.36218 0,-30"
+         id="path6180-3-7-6-8"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-end:none"
+         d="m 975.5,552.36218 0,-30"
+         id="path6180-3-7-6-09-5"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <path
+         transform="translate(-40,16.362177)"
+         inkscape:connector-curvature="0"
+         id="path7743"
+         d="m 1015,506 -190,0"
+         style="fill:none;stroke:#878787;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <g
+       id="g9184">
+      <g
+         id="g4111-6-7"
+         transform="translate(455,335.99999)">
+        <g
+           id="g4062-9-3">
+          <g
+             transform="translate(0.5,-15.5)"
+             id="g3834-2-7-7-4">
+            <g
+               id="g3790-3-4-8-4">
+              <g
+                 id="g3763-8-9-4-8">
+                <rect
+                   style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-opacity:1"
+                   id="rect2987-0-4-7-3"
+                   width="150"
+                   height="125"
+                   x="125"
+                   y="47.362183" />
+                <rect
+                   style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+                   id="rect3761-5-9-1-0"
+                   width="150"
+                   height="15"
+                   x="125"
+                   y="77.362183" />
+              </g>
+              <text
+                 sodipodi:linespacing="125%"
+                 id="text3767-3-6-1-4"
+                 y="65.344604"
+                 x="199.80469"
+                 style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+                 xml:space="preserve"><tspan
+                   style="font-style:normal;-inkscape-font-specification:Sans"
+                   id="tspan6918-0"
+                   y="65.344604"
+                   x="199.80469"
+                   sodipodi:role="line">ThermalCoupling</tspan></text>
+            </g>
+            <rect
+               style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+               id="rect3832-0-4-1-1"
+               width="150"
+               height="30"
+               x="125"
+               y="47.362183" />
+          </g>
+        </g>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text8895"
+         y="421.91492"
+         x="584.36426"
+         style="font-size:6px;font-style:normal;font-weight:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="421.91492"
+           x="584.36426"
+           id="tspan8897"
+           sodipodi:role="line">+ contact_area()</tspan><tspan
+           y="429.41492"
+           x="584.36426"
+           sodipodi:role="line"
+           id="tspan4618">+ thickness()</tspan><tspan
+           y="436.91492"
+           x="584.36426"
+           sodipodi:role="line"
+           id="tspan4620" /><tspan
+           y="444.41492"
+           x="584.36426"
+           sodipodi:role="line"
+           id="tspan4616" /></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="161.78571"
+       y="203.78571"
+       id="text8920"
+       sodipodi:linespacing="125%"
+       transform="translate(-40,16.362177)"><tspan
+         sodipodi:role="line"
+         id="tspan8922"
+         x="161.78571"
+         y="203.78571"
+         style="font-size:6px" /></text>
+    <g
+       id="g4602">
+      <g
+         id="g4111-6"
+         transform="translate(195,145.99999)">
+        <g
+           id="g4062-9">
+          <g
+             transform="translate(0.5,-15.5)"
+             id="g3834-2-7-7">
+            <g
+               id="g3790-3-4-8">
+              <g
+                 id="g3763-8-9-4">
+                <rect
+                   style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-opacity:1"
+                   id="rect2987-0-4-7"
+                   width="150"
+                   height="125"
+                   x="125"
+                   y="47.362183" />
+                <rect
+                   style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+                   id="rect3761-5-9-1"
+                   width="150"
+                   height="15"
+                   x="125"
+                   y="77.362183" />
+              </g>
+              <text
+                 sodipodi:linespacing="125%"
+                 id="text3767-3-6-1"
+                 y="65.344604"
+                 x="200.06641"
+                 style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+                 xml:space="preserve"><tspan
+                   id="tspan6918"
+                   y="65.344604"
+                   x="200.06641"
+                   sodipodi:role="line">AbstractThermalElement</tspan></text>
+            </g>
+            <rect
+               style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+               id="rect3832-0-4-1"
+               width="150"
+               height="30"
+               x="125"
+               y="47.362183" />
+          </g>
+        </g>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text3715"
+         y="231.92078"
+         x="324.36426"
+         style="font-size:6px;font-style:normal;font-weight:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="231.92078"
+           x="324.36426"
+           id="tspan3717"
+           sodipodi:role="line">+ position()</tspan></text>
+    </g>
+    <g
+       id="g4579"
+       transform="translate(-909.5,-2.3700001e-6)">
+      <g
+         id="g4111-6-7-9"
+         transform="translate(895,335.99999)">
+        <g
+           id="g4062-9-3-6">
+          <g
+             transform="translate(0.5,-15.5)"
+             id="g3834-2-7-7-4-0">
+            <g
+               id="g3790-3-4-8-4-0">
+              <g
+                 id="g3763-8-9-4-8-8">
+                <rect
+                   style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-opacity:1"
+                   id="rect2987-0-4-7-3-3"
+                   width="150"
+                   height="125"
+                   x="125"
+                   y="47.362183" />
+                <rect
+                   style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+                   id="rect3761-5-9-1-0-3"
+                   width="150"
+                   height="15"
+                   x="125"
+                   y="77.362183" />
+              </g>
+              <text
+                 sodipodi:linespacing="125%"
+                 id="text3767-3-6-1-4-0"
+                 y="65.344604"
+                 x="199.80469"
+                 style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+                 xml:space="preserve"><tspan
+                   style="font-style:normal;-inkscape-font-specification:Sans"
+                   id="tspan8208"
+                   y="65.344604"
+                   x="199.80469"
+                   sodipodi:role="line">ThermalProcess</tspan></text>
+            </g>
+            <rect
+               style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+               id="rect3832-0-4-1-1-3"
+               width="150"
+               height="30"
+               x="125"
+               y="47.362183" />
+          </g>
+        </g>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4553"
+         y="421.92078"
+         x="1025"
+         style="font-size:6px;font-style:normal;font-weight:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="421.92078"
+           x="1025"
+           id="tspan4555"
+           sodipodi:role="line">+ add_energy(delta_energy)</tspan><tspan
+           id="tspan4567"
+           y="429.42078"
+           x="1025"
+           sodipodi:role="line">+ room(friendly_name, surface, height, </tspan><tspan
+           id="tspan4569"
+           y="436.92078"
+           x="1025"
+           sodipodi:role="line">             initial_temperature, position)</tspan><tspan
+           id="tspan4571"
+           y="444.42078"
+           x="1025"
+           sodipodi:role="line">+solid(friendly_name, </tspan><tspan
+           id="tspan4573"
+           y="451.92078"
+           x="1025"
+           sodipodi:role="line">           specific_thermal_capacity, mass, </tspan><tspan
+           id="tspan4575"
+           y="459.42078"
+           x="1025"
+           sodipodi:role="line">           initial_temperature, position)</tspan><tspan
+           id="tspan4577"
+           y="466.92078"
+           x="1025"
+           sodipodi:role="line" /></text>
+    </g>
+    <g
+       transform="translate(790.5,2.0199999e-6)"
+       id="g9066-4">
+      <g
+         id="g4111-6-7-6-5-2-9-2-1-2-4-1-0-8-51"
+         transform="translate(-615,525.99999)">
+        <g
+           id="g4062-9-3-8-7-6-0-7-4-6-9-7-0-7-8">
+          <g
+             transform="translate(0.5,-15.5)"
+             id="g3834-2-7-7-4-9-9-6-4-3-0-0-7-1-2-9-5">
+            <g
+               id="g3790-3-4-8-4-5-6-1-1-9-2-5-0-6-1-8-2">
+              <g
+                 id="g3763-8-9-4-8-1-2-3-2-6-3-8-4-3-4-9-9">
+                <rect
+                   style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-opacity:1"
+                   id="rect2987-0-4-7-3-7-1-7-6-3-4-6-2-2-2-5-0"
+                   width="150"
+                   height="125"
+                   x="125"
+                   y="47.362183" />
+                <rect
+                   style="fill:#196eaa;fill-opacity:1;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+                   id="rect3761-5-9-1-0-2-0-8-2-5-4-9-6-4-4-2-7"
+                   width="150"
+                   height="15"
+                   x="125"
+                   y="77.362183" />
+              </g>
+              <text
+                 sodipodi:linespacing="125%"
+                 id="text3767-3-6-1-4-5-1-7-5-8-3-4-4-8-4-8-1"
+                 y="65.344604"
+                 x="199.80469"
+                 style="font-size:8px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+                 xml:space="preserve"><tspan
+                   id="tspan6918-0-2-1-4-7-1-4-5-7-7-1-1-23"
+                   y="65.344604"
+                   x="199.80469"
+                   sodipodi:role="line">TimeSeriesThermalProcess</tspan></text>
+            </g>
+            <rect
+               style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+               id="rect3832-0-4-1-1-35-1-2-4-3-4-4-5-6-9-9-3"
+               width="150"
+               height="30"
+               x="125"
+               y="47.362183" />
+          </g>
+        </g>
+      </g>
+      <text
+         sodipodi:linespacing="125%"
+         id="text8932-2-5"
+         y="611.92078"
+         x="-485.63574"
+         style="font-size:6px;font-style:normal;font-weight:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           y="611.92078"
+           x="-485.63574"
+           id="tspan8934-4-1"
+           sodipodi:role="line">+ reset()</tspan><tspan
+           id="tspan8938-4-64"
+           y="619.42078"
+           x="-485.63574"
+           sodipodi:role="line">+ calculate(time, delta_time)</tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text8969-8"
+         y="596.92078"
+         x="-437.77344"
+         style="font-size:6px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           style="fill:#ffffff;fill-opacity:1"
+           y="596.92078"
+           x="-437.77344"
+           id="tspan8971-9"
+           sodipodi:role="line">- time_series: TimeSeriesObject</tspan></text>
+    </g>
+  </g>
+</svg>
