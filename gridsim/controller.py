@@ -1,11 +1,12 @@
 """
 .. moduleauthor:: Michael Clausen <clm@hevs.ch>
+.. codeauthor:: Michael Clausen <clm@hevs.ch>
 
 This module contains controlling elements. These can control any Python
 attribute of an object based on the actual values of other attributes. The
 classical example is a simple thermostat:
 
-.. literalinclude:: ../../demos/thermostat.py
+.. literalinclude:: ../../demo/thermostat.py
     :linenos:
 
 This simulation outputs the following plots:

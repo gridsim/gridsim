@@ -40,8 +40,8 @@ class AttributesGetter(object):
         be sent, the values have to be sent with the following format:
         `[(label1, data1), (label2, data2), ...]`
         with:
-            * labelX: a string representing the dataX
-            * dataX: a list of data
+        * labelX: a string representing the dataX
+        * dataX: a list of data
 
         :return: a dict of values
         :rtype: dict
@@ -62,7 +62,7 @@ class AttributesGetter(object):
 class FigureSaver(object):
 
     @accepts((1, AttributesGetter),
-             ((2, 3), str))
+             (2, str))
     def __init__(self, values, title):
         """
         A :class:`PlotRecorder` can be used to record one or multiple signals
@@ -77,58 +77,57 @@ class FigureSaver(object):
 
         *Example:*
 
-        .. literalinclude:: ../../demos/plotrecorder.py
+        .. literalinclude:: ../../demo/plotrecorder.py
             :linenos:
 
         * On line 24 we create a PlotRecorder with the title 'Temperatures'
-            which uses minutes as the unit for the x-axis. As the title already
-            suggest that the signals are temperatures, we only take the
-            element's name as the legend format.
+          which uses minutes as the unit for the x-axis. As the title already
+          suggest that the signals are temperatures, we only take the
+          element's name as the legend format.
         * On line 25 we use that recorder in order to record all elements in the
-            thermal module who have the attribute 'temperature' by using the
-            powerful :func:`gridsim.core.Simulator.find()` method by asking to
-            return a list of all elements that have the attribute 'temperature'.
-            We specify with the second argument that we like to read the
-            attribute 'temperature' from all objects returned by find().
-            Additionally we can specify the physical unit of the data when
-            adding a recorder. Note that PlotRecorders demand by their nature
-            that all recorded signals (attributes) have the same unit.
+          thermal module who have the attribute 'temperature' by using the
+          powerful :func:`gridsim.core.Simulator.find()` method by asking to
+          return a list of all elements that have the attribute 'temperature'.
+          We specify with the second argument that we like to read the
+          attribute 'temperature' from all objects returned by find().
+          Additionally we can specify the physical unit of the data when
+          adding a recorder. Note that PlotRecorders demand by their nature
+          that all recorded signals (attributes) have the same unit.
         * On line 28 and the following we create a very similar recorder as
-            before, but this time we do not want to record the temperature in
-            degrees celsius, we want the temperature in kelvin. As the
-            ThermalProcess only provides the temperature in degrees celsius we
-            have to add a conversion lambda which will be executed every time a
-            value is read from the simulation in order to give to the recorder.
-            The lambda gets a named tuple as parameter which contains the
-            following keys: "value": the value just read from the attribute,
-            "time": the actual simulation time and finally "delta_time": the
-            time interval for which the value has been calculated. As the
-            conversion between degree celsius and kelvin is linear and does
-            not depend anything other than the actual value, we can just give
-            the lambda expression
-        **lambda context: context.value + 273.15**.
+          before, but this time we do not want to record the temperature in
+          degrees celsius, we want the temperature in kelvin. As the
+          ThermalProcess only provides the temperature in degrees celsius we
+          have to add a conversion lambda which will be executed every time a
+          value is read from the simulation in order to give to the recorder.
+          The lambda gets a named tuple as parameter which contains the
+          following keys: "value": the value just read from the attribute,
+          "time": the actual simulation time and finally "delta_time": the
+          time interval for which the value has been calculated. As the
+          conversion between degree celsius and kelvin is linear and does
+          not depend anything other than the actual value, we can just give
+          the lambda expression **lambda context: context.value + 273.15**.
         * On line 33 we create a second PlotRecorder instance with the title
-            'Thermal power flows' which will show the time axis (x-axis) in
-            hours. Again we only show the name of the subject in the legend.
+          'Thermal power flows' which will show the time axis (x-axis) in
+          hours. Again we only show the name of the subject in the legend.
         * On line 34 we attach this recorder to all elements of type (class)
-            ThermalCoupling and we setup the recoder to read the 'power'
-            attribute. The unit will be Watts (W).
+          ThermalCoupling and we setup the recoder to read the 'power'
+          attribute. The unit will be Watts (W).
         * On line 37 we run the simulation for 2 hours with a resolution of a
-            second.
+          second.
         * We are saving the plots as image files on line 40 to 43.
         * It is even possible to create a PDF document using the PlotRecorder
-            and to append the different plots as new pages onto that
-            document. This is done on line 45.
+          and to append the different plots as new pages onto that
+          document. This is done on line 45.
 
         The resulting 3 images of this simulation are show here:
 
-        .. figure:: plotrecorder-temp.png
+        .. figure:: ../../demo/output/fig1.png
             :align: center
 
-        .. figure:: plotrecorder-kelvin.png
+        .. figure:: ../../demo/output/fig2.png
             :align: center
 
-        .. figure:: plotrecorder-flow.png
+        .. figure:: ../../demo/output/fig3.png
             :align: center
 
         """

@@ -29,8 +29,8 @@ class Reader(object):
         This method returns formatted data following this format
         `[(label1, data1], (label2, data2), ...]`
         with:
-            * labelX: a str
-            * dataX: a list of `data_type`
+        * labelX: a str
+        * dataX: a list of `data_type`
 
         :param: stream: a stream of data or a file name
         :type: stream: str, BufferedReader

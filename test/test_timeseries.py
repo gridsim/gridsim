@@ -11,27 +11,32 @@ class TestTimeSeries(unittest.TestCase):
     def test_default_load(self):
         time_series = TimeSeriesObject(CSVReader())
 
-        time_series.load('./test/data/datatest_with_header.csv')
+        time_series.load('./test/data/large_datatest_with_header.csv')
 
         time_series.set_time(2*units.second)
         self.assertEqual(time_series.time, 2*units.second)
-        self.assertEqual(time_series.temperature, 18.0)
-        self.assertEqual(time_series.humidity, 0.1)
+        self.assertEqual(time_series.temperature, 2.3)
+        self.assertEqual(time_series.solar_radiation, 0.0)
 
-        time_series.set_time(1.2*units.second)
-        self.assertEqual(time_series.time, 1.0*units.second)
-        self.assertEqual(time_series.temperature, 20.0)
-        self.assertEqual(time_series.humidity, 0.25)
+        time_series.set_time(12.2*units.second)
+        self.assertEqual(time_series.time, 12.0*units.second)
+        self.assertEqual(time_series.temperature, 4.8)
+        self.assertEqual(time_series.solar_radiation, 152.4)
 
-        time_series.set_time(1.0*units.second)
-        self.assertEqual(time_series.time, 1.0*units.second)
-        self.assertEqual(time_series.temperature, 20.0)
-        self.assertEqual(time_series.humidity, 0.25)
+        time_series.set_time(1551.0*units.second)
+        self.assertEqual(time_series.time, 1551.0*units.second)
+        self.assertEqual(time_series.temperature, 14.7)
+        self.assertEqual(time_series.solar_radiation, 175.8)
 
         time_series.set_time(0.0*units.second)
         self.assertEqual(time_series.time, 0.0*units.second)
-        self.assertEqual(time_series.temperature, 20.0)
-        self.assertEqual(time_series.humidity, 0.2)
+        self.assertEqual(time_series.temperature, 2.2)
+        self.assertEqual(time_series.solar_radiation, 0.0)
+
+        time_series.set_time(8759*units.second)
+        self.assertEqual(time_series.time, 8759.0*units.second)
+        self.assertEqual(time_series.temperature, 0.3)
+        self.assertEqual(time_series.solar_radiation, 0.0)
 
     def test_convert_load(self):
         time_series = TimeSeriesObject(CSVReader())
@@ -45,11 +50,11 @@ class TestTimeSeries(unittest.TestCase):
         self.assertEqual(time_series.humidity, 0.1)
 
         time_series.set_time(3.2*units.minute)
-        self.assertEqual(time_series.time, 2.0*units.minute)
-        self.assertEqual(time_series.temperature, 20.0)
-        self.assertEqual(time_series.humidity, 0.25)
+        self.assertEqual(time_series.time, 4.0*units.minute)
+        self.assertEqual(time_series.temperature, 18.0)
+        self.assertEqual(time_series.humidity, 0.1)
 
-        time_series.set_time(2.0*units.minute)
+        time_series.set_time(2.1*units.minute)
         self.assertEqual(time_series.time, 2.0*units.minute)
         self.assertEqual(time_series.temperature, 20.0)
         self.assertEqual(time_series.humidity, 0.25)
@@ -90,7 +95,7 @@ class TestTimeSeries(unittest.TestCase):
         time_series.load('./test/data/datatest_with_no_time_header.csv',
                          time_key='counter',
                          time_converter=lambda t: t*2*units.minute)
-        time_series.map_attribute('counter', 'minutes')
+        time_series.map_attribute('counter', 'minutes', is_time_key=True)
 
         time_series.set_time(4.0*units.minute)
         self.assertEqual(time_series.minutes, 4.0*units.minute)

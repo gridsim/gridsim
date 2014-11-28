@@ -2,10 +2,12 @@
 .. moduleauthor:: Michael Sequeira Carvalho <michael.sequeira@hevs.ch>
 .. moduleauthor:: Gilbert Maitre <gilbert.maitre@hevs.ch>
 
-This module provides a toolbox to the gridsim simulator to perform computation
-of electrical values within the electrical network, in other words to solve
-the so-called power-flow problem
-http://en.wikipedia.org/wiki/Power-flow_study#Power-flow_problem_formulation.
+This module provides a toolbox to Gridsim to perform computation of electrical
+values within the electrical network, in other words to solve the so-called
+power-flow problem:
+
+.. seealso::
+    http://en.wikipedia.org/wiki/Power-flow_study#Power-flow_problem_formulation
 """
 import numpy as np
 from numpy.linalg import inv
@@ -19,20 +21,20 @@ class AbstractElectricalLoadFlowCalculator(object):
 
     def __init__(self):
         """
-        **This section will be only interesting for gridsim module developers,
-        if you just use the library, you can skip this section.**
+        __init__(self)
 
         This class is the base for all calculator that have been or are going to
-        be implemented to solve the power-flow problem
-        http://en.wikipedia.org/wiki/Power-flow_study#Power-flow_problem_formulation.
+        be implemented to solve the power-flow problem.
+
         At initialization the user has to give the reference power value
-        's_base' (all power values are then given relative to this reference
-        value), the reference voltage value 'v_base' (all voltage values are
-        then given relative to this reference value), a boolean array 'is_PV'
-        specifying which one among the buses is a PV bus (the bus with 1st
-        position is slack, the others non PV buses are PQ buses), an integer
-        array 'b' specifying for each branch the bus id it is starting from and
-        the bus id it is going to, a complex array 'Yb' specifying
+        `s_base` (all power values are then given relative to this reference
+        value), the reference voltage value `v_base` (all voltage values are
+        then given relative to this reference value), a boolean array `is_PV`
+        specifying which one among the buses is a :class:`.ElectricalPVBus`
+        (the bus with 1st position is slack, the others non
+        :class:`.ElectricalPVBus` are :class:`.ElectricalPQBus`), an integer
+        array `b` specifying for each branch the bus id it is starting from and
+        the bus id it is going to, a complex array `Yb` specifying
         admittances of each network branch.
         """
         super(AbstractElectricalLoadFlowCalculator, self).__init__()
@@ -40,10 +42,12 @@ class AbstractElectricalLoadFlowCalculator(object):
         self.s_base = None
         """
         The reference power value.
+        Set by :func:`AbstractElectricalLoadFlowCalculator.update`
         """
         self.v_base = None
         """
         The reference voltage value.
+        Set by :func:`AbstractElectricalLoadFlowCalculator.update`
         """
         self._is_PV = None
         self._b = None
@@ -61,22 +65,26 @@ class AbstractElectricalLoadFlowCalculator(object):
         self._V = None
         self._Th = None
 
+    @accepts(((1, 2), (int, float)))
     def update(self, s_base, v_base, is_PV, b, Yb):
         """
-        Update values of the calculator
+        update(self, s_base, v_base, is_PV, b, Yb)
+
+        Updates values of the calculator.
 
         :param s_base: reference power value
         :type s_base: float
         :param v_base: reference voltage value
         :type v_base: float
-        :param is_PV: N-long vector specifying which bus is of type PV,
-            where N is the number of buses including slack.
+        :param is_PV: N-long vector specifying which bus is of type
+            :class:`.ElectricalPVBus`, where N is the number of buses including
+            slack.
         :type is_PV: 1-dimensional numpy array of boolean
         :param b: Mx2 table containing for each branch the ids of start and end
             buses.
         :type b: 2-dimensional numpy array of int
-        :param Yb: Mx4 table containing the admittances Yii, Yij, Yjj, and Yji
-            of each branch.
+        :param Yb: Mx4 table containing the admittances `Yii`, `Yij`, `Yjj`,
+            and `Yji` of each branch.
         :type Yb: 2-dimensional numpy array of complex
 
         """
@@ -92,8 +100,8 @@ class AbstractElectricalLoadFlowCalculator(object):
             raise RuntimeError('is_PV has to be a one-dimensional array')
         if is_PV[0]:
             raise RuntimeError(
-                'bus with 1st position is slack and therefore cannot be a '
-                'PV bus')
+                'bus with 1st position is slack and therefore '
+                'cannot be a PV bus')
         if b.dtype != int:
             raise TypeError('b has to be an integer array')
         if len(b.shape) != 2:
@@ -176,22 +184,25 @@ class AbstractElectricalLoadFlowCalculator(object):
             self._Q = self._s_sc * Q
             self._V = self._v_sc * V
 
-    @accepts(((1, 2, 3, 4), np.ndarray),
-             (5, bool))
+    @accepts((5, bool))
     def calculate(self, P, Q, V, Th, scaled):
         """
-        Compute all bus electrical values determined by the network, i.e
+        calculate(self, P, Q, V, Th, scaled)
+
+        Compute all bus electrical values determined by the network:
 
         - takes as input active powers P of all non-slack buses, reactive powers
-          of PQ buses and voltage amplitudes of PV buses; all these values
-          have to be placed by the user at the right place in the N-long
-          vectors, P, Q, and, respectively, V, passed to the 'calculate' method
+          of :class:`.ElectricalPQBus` and voltage amplitudes of
+          :class:`.ElectricalPVBus`; all these values have to be placed by the
+          user at the right place in the N-long vectors, `P`, `Q`, and,
+          respectively, `V`, passed to this method.
 
-        - outputs active power of slack bus, reactive powers of PV buses,
-          voltage amplitudes of PQ buses, and voltage angles of all buses; all
-          these values are placed by the 'calculate' method at the right place
-          in the N-long vectors P, Q, V, and, respectively, Th, passed to the
-          'calculate' method.
+        - outputs active power of slack bus, reactive powers of
+          :class:`.ElectricalPVBus`, voltage amplitudes of
+          :class:`.ElectricalPQBus`, and voltage angles of all buses; all these
+          values are placed by this method at the
+          right place in the N-long vectors `P`, `Q`, `V`, and, respectively,
+          `Th`, passed to this method.
 
         :param P: N-long vector of bus active powers, where N is the number of
             buses including slack.
@@ -219,11 +230,16 @@ class AbstractElectricalLoadFlowCalculator(object):
     @returns(tuple)
     def get_branch_power_flows(self, scaled):
         """
+        get_branch_power_flows(self, scaled)
+
         Compute all branch power flows. Cannot be called before method
-        'calculate'. Returns a tuple made of 4 1-dimensional numpy arrays:
-        Pij containing branch input active powers, Qij containing branch
-        input reactive powers, Pji containing branch output active powers,
-        Qji containing branch output reactive powers.
+        :func:`AbstractElectricalLoadFlowCalculator.calculate`.
+        Returns a tuple made of 4 1-dimensional numpy arrays:
+
+        - Pij containing branch input active powers,
+        - Qij containing branch input reactive powers,
+        - Pji containing branch output active powers,
+        - Qji containing branch output reactive powers.
 
         :param scaled: specifies whether output power flows have to be scaled or
                not
@@ -240,7 +256,7 @@ class AbstractElectricalLoadFlowCalculator(object):
             :Qji: vector of reactive powers entering the branch from the to-bus
                   termination
 
-        :type: tuple of one-dimensional numpy arrays of float
+        :rtype: tuple of one-dimensional numpy arrays of float
         """
         # compute partial results
         ViVj = self._V[self._b[:, 0]] * self._V[self._b[:, 1]]
@@ -274,8 +290,11 @@ class AbstractElectricalLoadFlowCalculator(object):
     @returns(np.ndarray)
     def get_branch_max_currents(self, scaled):
         """
+        get_branch_max_currents(self, scaled)
+
         Compute the maximal current amplitude of each branch. Cannot be called
-        before method 'calculate'. Returns a M-long vector of maximal branch
+        before method :func:`AbstractElectricalLoadFlowCalculator.calculate`.
+        Returns a M-long vector of maximal branch
         current amplitudes, where M is the number of branches.
 
         :param scaled: specifies whether output currents have to be scaled or
@@ -284,7 +303,7 @@ class AbstractElectricalLoadFlowCalculator(object):
 
         :returns: M-long vector containing for each branch the maximal current
             amplitude
-        :type: 1-dimensional numpy array of float
+        :rtype: 1-dimensional numpy array of float
 
         """
         # from-bus bus complex voltage (amplitude and phase)
@@ -317,24 +336,24 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
     def __init__(self, s_base=None, v_base=None, is_PV=None, b=None, Yb=None):
         """
         This class implements the direct load flow method to solve the
-        power-flow problem
-        http://en.wikipedia.org/wiki/Power-flow_study#Power-flow_problem_formulation.
+        power-flow problem.
+
+        .. seealso:: http://en.wikipedia.org/wiki/Power-flow_study#Power-flow_problem_formulation.
+
         The method is described for example in Hossein Seifi, Mohammad Sadegh
         Sepasian, Electric Power System Planning: Issues, Algorithms and
         Solutions, pp. 246-248
 
         At initialization the user has to give the reference power value
-        's_base' (all power values are then given relative to this reference
-        value), the reference voltage value 'v_base' (all voltage values are
-        then given relative to this reference value), a boolean array 'is_PV'
-        specifying which one among the buses is a PV bus (the bus with 1st
-        position is slack, the others non PV buses are PQ buses), an integer
-        array 'b' specifying for each branch the bus id it is starting from and
-        the bus id it is going to, a complex array 'Yb' specifying
+        `s_base` (all power values are then given relative to this reference
+        value), the reference voltage value `v_base` (all voltage values are
+        then given relative to this reference value), a boolean array `is_PV`
+        specifying which one among the buses is a :class:`.ElectricalPVBus`
+        (the bus with 1st position is slack, the others non
+        :class:`.ElectricalPVBus` buses are :class:`.ElectricalPQBus` buses), an
+        integer array `b` specifying for each branch the bus id it is starting
+        from and the bus id it is going to, a complex array `Yb` specifying
         admittances of each network branch.
-
-        *Unit tests are provided to check if the calculator performs correctly.*
-
         """
         super(DirectLoadFlowCalculator, self).__init__()
 
@@ -345,13 +364,36 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
                 and b is not None and Yb is not None:
             self.update(s_base, v_base, is_PV, b, Yb)
 
+    @accepts(((1, 2), (int, float)))
     def update(self, s_base, v_base, is_PV, b, Yb):
-        super(DirectLoadFlowCalculator, self).update(s_base, v_base,
-                                                            is_PV, b, Yb)
+        """
+        update(self, s_base, v_base, is_PV, b, Yb)
 
-        # variable names have been chosen to match the notation used in Hossein
-        # Seifi, Mohammad Sadegh Sepasian, Electric Power System Planning:
-        # Issues, Algorithms and Solutions, pp. 246-248
+        Updates values of the calculator.
+
+        :param s_base: reference power value
+        :type s_base: float
+        :param v_base: reference voltage value
+        :type v_base: float
+        :param is_PV: N-long vector specifying which bus is of type
+            :class:`.ElectricalPVBus`, where N is the number of buses including
+            slack.
+        :type is_PV: 1-dimensional numpy array of boolean
+        :param b: Mx2 table containing for each branch the ids of start and end
+            buses.
+        :type b: 2-dimensional numpy array of int
+        :param Yb: Mx4 table containing the admittances Yii, Yij, Yjj, and Yji
+            of each branch.
+        :type Yb: 2-dimensional numpy array of complex
+
+        .. note:: variable names have been chosen to match the notation used in
+                  Hossein Seifi, Mohammad Sadegh Sepasian, Electric Power System
+                  Planning: Issues, Algorithms and Solutions, pp. 246-248
+        """
+        super(DirectLoadFlowCalculator, self).update(s_base, v_base,
+                                                     is_PV, b, Yb)
+
+
 
         # compute matrix B from admittance matrix Y
         # off-diagonal elements are equal to minus imaginary part of Y elements
@@ -375,17 +417,19 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         # change sparse matrix representation
         self._bA = self._bA.tocsr()
 
+    @accepts((5, bool))
     def calculate(self, P, Q, V, Th, scaled):
         """
-        Compute all bus electrical values determined by the network, i.e
+        calculate(self, P, Q, V, Th, scaled)
+
+        Computes all bus electrical values determined by the network, i.e
 
         - takes as input active powers P of all non-slack buses.
         - outputs voltage angles of all buses.
 
         Reactive powers and voltage amplitudes are not used. However, to be
         compatible with the N-long vectors with the method of the base class,
-        all N-long vectors P, Q, V, and Th have to be passed to the
-        'calculate' method.
+        all N-long vectors P, Q, V, and Th have to be passed to this method.
 
         :param P: N-long vector of bus active powers, where N is the number of
             buses including slack.
@@ -433,14 +477,23 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
         self._calculate_done = True
 
+    @accepts((1, bool))
+    @returns(tuple)
     def get_branch_power_flows(self, scaled):
         """
-        Compute all branch power flows. Cannot be called before method
-        'calculate'. To be compatible with the generic method, returns a
-        tuple made of 4 1-dimensional numpy arrays: Pij containing branch
-        input active powers, Qij containing branch input reactive powers, Pji
-        containing branch output active powers, Qji containing branch output
-        reactive powers. Qij and Qji are None. Pji is equal to -Pij.
+        get_branch_power_flows(self, scaled)
+
+        Computes all branch power flows. Cannot be called before method
+        :func:`AbstractElectricalLoadFlowCalculator.calculate`.
+        To be compatible with the generic method, returns a
+        tuple made of 4 1-dimensional numpy arrays:
+
+        - `Pij` containing branch input active powers,
+        - `Qij` containing branch input reactive powers,
+        - `Pji` containing branch output active powers,
+        - `Qji` containing branch output reactive powers.
+
+        Here, `Qij` and `Qji` are `None`. `Pji` is equal to `-Pij`.
 
         :param scaled: specifies whether output power flows have to be scaled
             or not
@@ -454,7 +507,7 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
                   termination
             :Qji: None
 
-        :type: mixed tuple of None and one-dimensional numpy arrays of float
+        :rtype: mixed tuple of None and one-dimensional numpy arrays of float
         """
         if self._P is None:
             # calculate has not been called
@@ -468,7 +521,23 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
         return Pbr, None, -Pbr, None
 
+    @accepts((1, bool))
+    @returns(np.ndarray)
     def get_branch_max_currents(self, scaled):
+        """
+        get_branch_max_currents(self, scaled)
+
+        Returns active powers entering the branch from the from-bus termination.
+
+        :param scaled: specifies whether output power flows have to be scaled
+            or not
+        :type scaled: boolean
+        :returns: a M-long vector of active powers entering the branch from the
+                  from-bus termination, where M is the number of branches
+
+        .. warning:: This function is currently untested.
+        """
+
         if self._P is None:
             # calculate has not been called
             raise RuntimeError('The calculate method has to be called first!')
@@ -477,11 +546,11 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         # to the branch active power (Vk~=1.0)
 
         # branch active powers
-        [Pbr, Qij, Pji, Qji] = self._get_branch_power_flows(True)
+        [Pbr, _, _, _] = self.get_branch_power_flows(True)
         Ibr = Pbr  # FIXME Pij or Pji ???
 
         if not scaled:
-            Ibr *= (self.s_base * self.v_sc)
+            Ibr *= (self.s_base * self.v_sc) #
 
         return Ibr
 
@@ -492,20 +561,21 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
     def __init__(self, s_base=None, v_base=None, is_PV=None, b=None, Yb=None):
         """
         This class implements the Newton-Raphson method to solve the power-flow
-        problem
-        http://en.wikipedia.org/wiki/Power-flow_study#Power-flow_problem_formulation.
+        problem.
+
+        .. seealso::
+            http://en.wikipedia.org/wiki/Power-flow_study#Power-flow_problem_formulation.
+
         At initialization the user has to give the reference power value
-        's_base' (all power values are then given relative to this reference
-        value), the reference voltage value 'v_base' (all voltage values are
-        then given relative to this reference value), a boolean array 'is_PV'
-        specifying which one among the buses is a PV bus (the bus with 1st
-        position is slack, the others non PV buses are PQ buses), an integer
-        array 'b' specifying for each branch the bus id it is starting from and
-        the bus id it is going to, a complex array 'Yb' specifying
+        `s_base` (all power values are then given relative to this reference
+        value), the reference voltage value `v_base` (all voltage values are
+        then given relative to this reference value), a boolean array `is_PV`
+        specifying which one among the buses is a :class:`.ElectricalPVBus`
+        (the bus with 1st position is slack, the others non
+        :class:`.ElectricalPVBus` are :class:`.ElectricalPQBus`), an integer
+        array `b` specifying for each branch the bus id it is starting from and
+        the bus id it is going to, a complex array `Yb` specifying
         admittances of each network branch.
-
-        *Unit tests are provided to check if the calculator performs correctly:*
-
         """
         super(NewtonRaphsonLoadFlowCalculator, self).__init__()
 
@@ -519,8 +589,28 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
                 and b is not None and Yb is not None:
             self.update(s_base, v_base, is_PV, b, Yb)
 
+    @accepts(((1, 2), (int, float)))
     def update(self, s_base, v_base, is_PV, b, Yb):
+        """
+        update(self, s_base, v_base, is_PV, b, Yb)
 
+        Updates values of the calculator.
+
+        :param s_base: reference power value
+        :type s_base: float
+        :param v_base: reference voltage value
+        :type v_base: float
+        :param is_PV: N-long vector specifying which bus is of type
+            :class:`.ElectricalPVBus`, where N is the number of buses including
+            slack.
+        :type is_PV: 1-dimensional numpy array of boolean
+        :param b: Mx2 table containing for each branch the ids of start and end
+            buses.
+        :type b: 2-dimensional numpy array of int
+        :param Yb: Mx4 table containing the admittances `Yii`, `Yij`, `Yjj`,
+            and `Yji` of each branch.
+        :type Yb: 2-dimensional numpy array of complex
+        """
         super(NewtonRaphsonLoadFlowCalculator, self).update(s_base, v_base,
                                                             is_PV, b, Yb)
 
@@ -532,20 +622,24 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         self._residual_tolerance = 1e-12
         self._ones_vector = np.ones(self._nBu)
 
+    @accepts((5, bool))
     def calculate(self, P, Q, V, Th, scaled):
         """
+        calculate(self, P, Q, V, Th, scaled)
+
         Compute all bus electrical values determined by the network, i.e
 
-        - takes as input active powers P of all non-slack buses, reactive powers
-          of PQ buses and voltage amplitudes of PV buses; all these values
-          have to be placed by the user at the right place in the N-long
-          vectors, P, Q, and, respectively, V, passed to the 'calculate' method
+        - takes as input active powers `P` of all non-slack buses, reactive
+          powers of :class:`.ElectricalPQBus` and voltage amplitudes of
+          :class:`.ElectricalPVBus`; all these values have to be placed by the
+          user at the right place in the N-long vectors, `P`, `Q`, and,
+          respectively, `V`, passed to this method
 
-        - outputs active power of slack bus, reactive powers of PV buses,
-          voltage amplitudes of PQ buses, and voltage angles of all buses; all
-          these values are placed by the 'calculate' method at the
-          right place in the N-long vectors P, Q, V, and, respectively, Th,
-          passed to the 'calculate' method.
+        - outputs active power of slack bus, reactive powers of
+          :class:`.ElectricalPVBus`, voltage amplitudes of
+          :class:`.ElectricalPQBus`, and voltage angles of all buses; all these
+          values are placed by this method at the right place in the N-long
+          vectors `P`, `Q`, `V`, and, respectively, Th, passed to this method.
 
 
         :param P: N-long vector of bus active powers, where N is the number of

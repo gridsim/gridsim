@@ -16,7 +16,7 @@ esim.load_flow_calculator = DirectLoadFlowCalculator()
 
 # add buses to simulator
 # slack bus has been automatically added
-esim.add(ElectricalPVBus('Bus 1'))
+esim.add(ElectricalPQBus('Bus 1'))
 esim.add(ElectricalPQBus('Bus 2'))
 esim.add(ElectricalPQBus('Bus 3'))
 esim.add(ElectricalPVBus('Bus 4'))

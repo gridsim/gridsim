@@ -1,30 +1,7 @@
 """
-.. moduleauthor:: Michael Clausen (clm@hevs.ch)
+.. moduleauthor:: Gillian Basso (gillian.basso@hevs.ch)
+.. codeauthor:: Michael Clausen (clm@hevs.ch)
 
-The thermal simulation module offers a very abstract thermal simulation. The
-simulation is based on the thermal capacity of a thermal process (envelope)
-and the energy flows between those processes via thermal couplings that result
-as consequence of the temperature differences between the thermal processes and
-the thermal conductivity of the couplings between them.
-
-*Example*:
-
-.. literalinclude:: ../../demos/thermal.py
-    :linenos:
-
-* On line 7 we create a new simulation.
-* On lines 17 to 19 we create a very simple thermal process with one room and
-    the outside temperature from a data file.
-* On line 22 we create a plot recorder and on line 23 we record all temperatures
-    using the plot recorder.
-* On line 26 & 27 we initialize the simulation and start the simulation for the
-    month avril with a resolution of 1 hour.
-* On line 30 we save the figure.
-
-The figure looks like this one:
-
-.. figure:: ./figures/thermal-example.png
-            :align: center
 
 """
 from gridsim.decorators import accepts
@@ -39,7 +16,8 @@ class AbstractThermalElement(AbstractSimulationElement):
              (2, Position))
     def __init__(self, friendly_name, position=Position()):
         """
-        Base class of all elements which can be part of a thermal simulation.
+        Base class of all :class:`.AbstractSimulationElement` that have to be in
+        the :class:`.ThermalSimulator`
 
         :param friendly_name: User friendly name to give to the element.
         :type friendly_name: str
@@ -65,6 +43,7 @@ class AbstractThermalElement(AbstractSimulationElement):
 class ThermalProcess(AbstractThermalElement):
 
     @accepts((1, str),
+             ((2, 3, 4), units.Quantity),
              (5, Position))
     def __init__(self, friendly_name,
                  thermal_capacity, initial_temperature, mass=1*units.kilogram,
@@ -81,11 +60,14 @@ class ThermalProcess(AbstractThermalElement):
 
         :param thermal_capacity: The thermal capacity of the process.
             See :class:`Material`.
-        :type thermal_capacity: heat_capacity
+        :type thermal_capacity: heat_capacity, see :mod:`gridsim.unit`
 
         :param initial_temperature: The initial temperature of the process in
             degrees.
-        :type initial_temperature: kelvin
+        :type initial_temperature: kelvin, see :mod:`gridsim.unit`
+
+        :param mass: the mass of the element
+        :type mass: mass, see :mod:`gridsim.unit`
 
         :param position: The position of the process.
         :type position: :class:`Position`
@@ -187,7 +169,7 @@ class ThermalProcess(AbstractThermalElement):
     @staticmethod
     def solid(friendly_name,
               specific_thermal_capacity, mass,
-              initial_temperature=20*units.degC.to(units.kelvin),
+              initial_temperature=units(20, units.degC),
               position=Position()):
         """
         Returns the thermal process of a solid body and the given mass, initial

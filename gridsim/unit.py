@@ -4,34 +4,43 @@ This module provides as independent unit management as possible
 """
 from pint import UnitRegistry
 
-from .decorators import accepts, returns
 
-units = UnitRegistry()
-units.define('heat_capacity = J/(g*K)')
-units.define('mass_density = g/(m*m*m)')
-units.define('thermal_conductivity = W/(K*m)')
-units.define('metre = m')  # respect the BIMP
+class _Unit(object):
 
+    def __init__(self):
+        self._registry = UnitRegistry()
+        self._registry.define('heat_capacity = J/(g*K)')
+        self._registry.define('mass_density = g/(m*m*m)')
+        self._registry.define('thermal_conductivity = W/(K*m)')
 
-@accepts((0, units.Quantity))
-@returns((int, float, complex))
-def value(quantity):
-    return quantity.magnitude
+    def __call__(self, *args, **kwargs):
+        return self._registry.Quantity(args[0], args[1])
 
+    def __getattr__(self, item):
+        return getattr(self._registry, item)
 
-@accepts((0, units.Quantity))
-@returns(str)
-def unit(quantity):
-    return str(quantity.units)
+    def value(self, quantity):
+        if isinstance(quantity, self._registry.Quantity):
+            return quantity.magnitude
+        else:
+            return quantity
 
+    def unit(self, quantity):
+        if isinstance(quantity, self._registry.Quantity):
+            return str(quantity.units)
+        else:
+            return ""
 
-@accepts((0, units.Quantity))
-@returns(list)
-def dimension(quantity):
-    return quantity.dimesionality
+    def dimension(self, quantity):
+        if isinstance(quantity, self._registry.Quantity):
+            return quantity.dimensionality
+        else:
+            return ""
 
+    def convert(self, v, u):
+        if isinstance(v, (int, float)):
+            return self._registry.Quantity(v, u)
+        else:
+            return v.to(u)
 
-@accepts((0, units.Quantity), (1, units.Quantity))
-@returns(units.Quantity)
-def convert(v, u):
-    return v.to(u)
+units = _Unit()

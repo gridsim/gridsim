@@ -12,9 +12,10 @@ from gridsim.iodata.output import FigureSaver
 class MyObject(AbstractSimulationElement):
 
     def __init__(self, reader, file_name):
-        super(MyObject, self).__init__(str(file_name))
+        super(MyObject, self).__init__(file_name)
         self._time_series = TimeSeriesObject(reader)
         self._time_series.load(file_name, time_converter=lambda t: t*units.day)
+        self._time_series.compute_data()
 
     def __getattr__(self, item):
         return getattr(self._time_series, item)
@@ -64,10 +65,15 @@ Simulator.register_simulation_module(MyModule)
 # a recorder.
 sim = Simulator()
 obj = sim.my.add(MyObject(CSVReader(), './data/example_time_series.csv'))
-obj.convert("temperature", lambda t: units.Quantity(t, units.degC))
+obj.convert("temperature", lambda t: units(t, units.degC))
 
 rec = PlotRecorder('temperature')
 sim.record(rec, obj)
 
+print("Running simulation...")
+
 sim.run(units.year, units.day)
+
+print("Saving data...")
+
 FigureSaver(rec, "Temperature").save('./output/timeseries2-example.pdf')
