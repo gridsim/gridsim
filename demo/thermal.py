@@ -3,6 +3,7 @@ from gridsim.simulation import Simulator
 from gridsim.recorder import PlotRecorder
 from gridsim.thermal.core import ThermalProcess, ThermalCoupling
 from gridsim.thermal.element import TimeSeriesThermalProcess
+from gridsim.timeseries import SortedConstantStepTimeSeriesObject
 from gridsim.iodata.input import CSVReader
 from gridsim.iodata.output import FigureSaver, CSVSaver
 
@@ -24,7 +25,7 @@ room = sim.thermal.add(ThermalProcess.room('room',
                                            2.5*units.metre,
                                            celsius.to(units.kelvin)))
 outside = sim.thermal.add(
-    TimeSeriesThermalProcess('outside', CSVReader(),
+    TimeSeriesThermalProcess('outside', SortedConstantStepTimeSeriesObject(CSVReader()),
                              './data/example_time_series.csv',
                              lambda t: t*units.hours,
                              temperature_calculator=

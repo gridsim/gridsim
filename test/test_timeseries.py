@@ -2,7 +2,7 @@ import unittest
 import warnings
 
 from gridsim.unit import units
-from gridsim.timeseries import TimeSeriesObject
+from gridsim.timeseries import TimeSeriesObject, SortedConstantStepTimeSeriesObject
 from gridsim.iodata.input import CSVReader
 
 
@@ -112,6 +112,25 @@ class TestTimeSeries(unittest.TestCase):
 
         self.assertRaises(AttributeError, time_series.map_attribute,
                           'toto', 'titi')
+
+    def test_stored_constant_time_series(self):
+        time_series = SortedConstantStepTimeSeriesObject(CSVReader())
+
+        time_series.load('./test/data/large_datatest_with_header.csv')
+
+        self.assertEqual(time_series._data["time"],
+                         [x*units.seconds for x in range(8760)])
+
+        time_series.set_time(4.0*units.minute)
+        self.assertEqual(time_series.time, 240*units.second)
+        self.assertEqual(time_series.temperature, 2.0)
+        self.assertEqual(time_series.solar_radiation, 0.0)
+
+        time_series.set_time(249*units.second)
+        self.assertEqual(time_series.time, 249*units.second)
+        self.assertEqual(time_series.temperature, 2.2)
+        self.assertEqual(time_series.solar_radiation, 20.3)
+
 
     def test_already_present_key(self):
 

@@ -1,10 +1,8 @@
 from gridsim.decorators import accepts
 from gridsim.util import Position
 from gridsim.unit import units
-from gridsim.timeseries import TimeSeriesObject
-from gridsim.iodata.input import Reader
-
-from .core import ThermalProcess
+from gridsim.thermal.core import ThermalProcess
+from gridsim.timeseries import TimeSeries
 
 
 class ConstantTemperatureProcess(ThermalProcess):
@@ -48,10 +46,10 @@ class ConstantTemperatureProcess(ThermalProcess):
 class TimeSeriesThermalProcess(ThermalProcess):
 
     @accepts(((1, 3), str),
-             (2, Reader),
+             (2, TimeSeries),
              (5, Position))
-    def __init__(self, friendly_name, reader, stream, time_converter=None,
-                 temperature_calculator=lambda t: t*units.kelvin,
+    def __init__(self, friendly_name, time_series, stream, time_converter=None,
+                 temperature_calculator=lambda t: units.convert(t, units.kelvin),
                  position=Position()):
         """
         Thermal process that reads the temperature out of a time series object
@@ -61,11 +59,11 @@ class TimeSeriesThermalProcess(ThermalProcess):
 
             It is important that the given data contains the
             field 'temperature' or you map a field to the attribute
-            'temperature' using the function :func:`.TimeSeriesObject.map()`.
+            'temperature' using the function :func:`.TimeSeriesObject.map_attribute()`.
 
         :param friendly_name: Friendly name to give to the process.
         :type friendly_name: str, unicode
-        :type reader: Reader
+        :type time_series: :class:`gridsim.timeseries.TimeSeries`
         :param stream: The stream
         :type stream: str or stream
         :param temperature_calculator:
@@ -78,10 +76,12 @@ class TimeSeriesThermalProcess(ThermalProcess):
                      1*units.kilogram,
                      position)
 
-        self._time_series = TimeSeriesObject(reader)
+        self._time_series = time_series
         self._time_series.load(stream, time_converter=time_converter)
 
         self._temperature_calculator = temperature_calculator
+
+        self._time_series.convert('temperature', self._temperature_calculator)
 
         self.calculate(0*units.second, 0*units.second)
 
@@ -107,7 +107,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
         self._time_series.set_time(time)
         # the parent (ThermalProcess) already has a 'temperature' in
         # its local params
-        self.temperature = self._temperature_calculator(self._time_series.temperature)
+        self.temperature = self._time_series.temperature
 
     def update(self, time, delta_time):
         """
