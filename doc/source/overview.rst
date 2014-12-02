@@ -15,7 +15,7 @@ is kept in a separate package and the simulation is driven from the main package
 
 The following illustration shows the idea behind this concept:
 
-.. figure:: ./figures/drawing.svg
+.. figure:: ./figures/drawing.png
     :align: center
 
     Gridsim organisation
@@ -194,7 +194,7 @@ Packages
 
 The following figure shows the structure of the gridsim framework:
 
-.. figure:: ./figures/model-packages.svg
+.. figure:: ./figures/model-packages.png
     :align: center
     :scale: 100 %
 
@@ -230,7 +230,7 @@ contains a detailed UML diagram of that module.
 
 We refer to the :ref:`gridsim-use` for more details...
 
-.. figure:: ./figures/model-core.svg
+.. figure:: ./figures/model-core.png
     :align: center
     :scale: 100 %
 
@@ -247,7 +247,7 @@ gridsim simulator. It basically manages Consuming-Producing-Storing (CPS)
 Elements, which consume (positive sign) and/or produce (negative sign) a certain
 amount of energy ('delta_energy') at each simulation step.
 
-.. figure:: ./figures/model-electrical.svg
+.. figure:: ./figures/model-electrical.png
     :align: center
     :scale: 100 %
 
@@ -257,7 +257,7 @@ gridsim.thermal
 Enables the simulation of thermal processes and their interactions. The
 following illustration shows a detailed UML diagram:
 
-.. figure:: ./figures/model-thermal.svg
+.. figure:: ./figures/model-thermal.png
     :align: center
     :scale: 100 %
 
