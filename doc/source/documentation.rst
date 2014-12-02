@@ -86,14 +86,6 @@ Control module
     :undoc-members:
     :show-inheritance:
 
-
-Thermal control
----------------
-.. automodule:: gridsim.thermal.controller
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Record module
 =============
 .. automodule:: gridsim.recorder
