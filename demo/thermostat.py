@@ -1,5 +1,3 @@
-from gridsim.decorators import timed
-
 from gridsim.unit import units
 from gridsim.util import Position
 from gridsim.simulation import Simulator
@@ -10,6 +8,7 @@ from gridsim.electrical.core import AbstractElectricalCPSElement
 from gridsim.electrical.network import ElectricalPQBus, \
     ElectricalTransmissionLine
 from gridsim.electrical.loadflow import DirectLoadFlowCalculator
+from gridsim.timeseries import SortedConstantStepTimeSeriesObject
 from gridsim.iodata.input import CSVReader
 from gridsim.iodata.output import FigureSaver
 
@@ -113,7 +112,6 @@ class Thermostat(AbstractControllerElement):
         """
         pass
 
-    @timed
     def calculate(self, time, delta_time):
         """
         AbstractSimulationElement implementation
@@ -127,7 +125,6 @@ class Thermostat(AbstractControllerElement):
         elif actual_temperature > (self.target_temperature + self.hysteresis / 2.):
             self._output_value = self.off_value
 
-    @timed
     def update(self, time, delta_time):
         """
         AbstractSimulationElement implementation
@@ -172,13 +169,11 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement):
         super(ElectroThermalHeaterCooler, self).reset()
         self.on = False
 
-    @timed
     def calculate(self, time, delta_time):
         self._internal_delta_energy = self.power * delta_time
         if not self.on:
             self._internal_delta_energy = 0*units.joule
 
-    @timed
     def update(self, time, delta_time):
         super(ElectroThermalHeaterCooler, self).update(time, delta_time)
         self._thermal_process.add_energy(
@@ -205,9 +200,9 @@ room = sim.thermal.add(ThermalProcess.room('room',
                                            units.convert(celsius, units.kelvin)))
 
 outside = sim.thermal.add(
-    TimeSeriesThermalProcess('outside', CSVReader(),
+    TimeSeriesThermalProcess('outside', SortedConstantStepTimeSeriesObject(CSVReader()),
                              './data/example_time_series.csv',
-                             lambda t: t*units.hours,
+                             lambda t: t*units.hour,
                              temperature_calculator=
                                 lambda t: units.convert(units(t, units.degC),
                                                         units.kelvin)))

@@ -49,7 +49,6 @@ simulation module by typing::
     :func:`.AbstractSimulationModule.attribute_name`.
     Refer to the module you want to use to retrieve the module name.
 """
-import inspect
 import types
 from collections import namedtuple
 
@@ -366,9 +365,6 @@ class Simulator(object):
         for recorder_binding in self._recorderBindings:
             recorder_binding.update(self.time, delta_time)
 
-    from gridsim.decorators import timed
-
-    @timed
     @accepts((1, units.Quantity))
     @returns(type(None))
     def step(self, delta_time):

@@ -86,7 +86,6 @@ class ThermalSimulator(AbstractSimulationModule):
         for coupling in self._couplings:
             coupling.reset()
 
-    @timed
     @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
@@ -134,7 +133,6 @@ class ThermalSimulator(AbstractSimulationModule):
                 #                   interval [J]
                 #               dt: Time interval [s]
 
-    @timed
     @accepts(((1, 2), units.Quantity))
     def update(self, time, delta_time):
         """

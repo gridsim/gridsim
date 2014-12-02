@@ -359,8 +359,6 @@ class ElectricalSimulator(AbstractSimulationModule):
 
     def _prepare_matrices(self):
 
-        # TODO verify unit
-
         L = len(self._cps_elements)  # number of elements
         M = len(self._branches)  # number of branches
         N = len(self._buses)  # number of buses
@@ -414,7 +412,6 @@ class ElectricalSimulator(AbstractSimulationModule):
         self._bu.V = np.zeros(N)*units.volt
         self._bu.Th = np.zeros(N)*units.degree
 
-    @timed
     @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
@@ -435,7 +432,6 @@ class ElectricalSimulator(AbstractSimulationModule):
         for element in self._cps_elements:
             element.calculate(time, delta_time)
 
-    @timed
     @accepts(((1, 2), units.Quantity))
     def update(self, time, delta_time):
         """

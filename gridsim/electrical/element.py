@@ -8,8 +8,7 @@ import numpy as np
 
 from gridsim.decorators import accepts, returns
 from gridsim.unit import units
-from gridsim.timeseries import TimeSeriesObject
-from gridsim.iodata.input import Reader
+from gridsim.timeseries import TimeSeries
 
 from .core import AbstractElectricalCPSElement
 
@@ -345,8 +344,8 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
 class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
 
     @accepts(((1, 3), str),
-             (2, Reader))
-    def __init__(self, friendly_name, reader, stream, column_name='power'):
+             (2, TimeSeries))
+    def __init__(self, friendly_name, time_series, stream, column_name='power'):
         """
         __init__(self, friendly_name, reader, stream, column_name='power')
 
@@ -354,13 +353,13 @@ class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
         or produced power is read from a stream by the given reader.
 
         The presence of a column named `column_name` is assumed in the
-        :class:`.TimeSeriesObject`.
+        :class:`.TimeSeries`.
 
         :param friendly_name: Friendly name for the element.
             Should be unique within the simulation module.
         :type friendly_name: str
-        :param reader: The data reader
-        :type reader: :class:`.Reader`
+        :param reader: The time series
+        :type reader: :class:`.TimeSeries`
         :param stream: The file name
         :type stream: str
         :param column_name: The name of the column in the data with a the
@@ -370,7 +369,7 @@ class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
         """
         super(TimeSeriesElectricalCPSElement, self).__init__(friendly_name)
 
-        self._time_series = TimeSeriesObject(reader)
+        self._time_series = time_series
         self._time_series.load(stream)
 
         # Check whether the file has the requested attribute
