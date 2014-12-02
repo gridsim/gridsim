@@ -35,11 +35,13 @@ setup(name=config.get('Project', 'name').lower(),
       maintainer=config.get('Project', 'maintainer'),
       maintainer_email=config.get('Project', 'maintainer_email'),
       url=config.get('Project', 'url'),
-      version=config.get('Project', 'version'),
+      version=config.get('Project', 'release'),
       platforms=[platform.platform()],  # TODO indicate really tested platforms
 
       packages=find_packages(),
       install_requires=config.get('Project', 'required').split(),
+
+      # metadata
 
       description=config.get('Project', 'summary'),
       long_description=open(
@@ -47,9 +49,13 @@ setup(name=config.get('Project', 'name').lower(),
 
       license=config.get('Project', 'licence'),
 
+      keywords=config.get('Project', 'keywords'),
+
+      classifiers=config.get('Project', 'classifiers').split(),
+
+      # tests
+
       tests_require=config.get('Test', 'required'),
-
       test_suite=config.get('Test', 'dir'),
-
       cmdclass={config.get('Test', 'tox_cmd'): Tox}
       )
