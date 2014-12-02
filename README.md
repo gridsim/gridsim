@@ -51,6 +51,7 @@ Warning : Gridsim requires these packages to be used in full :
  * scipy
  * matplotlib
  * pint
+ * enum34
 
 
 4. Documentation
