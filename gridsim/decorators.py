@@ -5,6 +5,7 @@ Gridsim decorators module. Defines all decorators used in the Gridsim simulator.
 
 """
 
+import time
 import warnings
 from functools import wraps
 
@@ -133,71 +134,67 @@ def deprecated(func):
     return new_func
 
 
-if __debug__:
+class _Timed(object):
 
-    import time
+    def __init__(self):
+        """
+        This is a decorator which can be used to register the execution
+        time of class methods.
 
-    class _Timed(object):
+        *Example:*
+        ::
+            class MyClass(object):
+                @timed
+                def func(arg1, arg2):
+                    return arg1 * arg2
 
-        def __init__(self):
-            """
-            This is a decorator which can be used to register the execution
-            time of class methods.
+            [...]
 
-            *Example:*
-            ::
-                class MyClass(object):
-                    @timed
-                    def func(arg1, arg2):
-                        return arg1 * arg2
+        .. warning:: This decorator only works with class methods and not
+                     with functions.
 
-                [...]
+        """
+        self._data = {}
 
-            .. warning:: This decorator only works with class methods and not
-                         with functions.
+    def __call__(self, func):
 
-            .. warning:: only reachable in debug mode (if `__debug__` is `True`).
-            """
-            self._data = {}
+        @wraps(func)
+        def store_time(inst, *args, **kwargs):
 
-        def __call__(self, func):
+            start_time = time.time()
 
-            @wraps(func)
-            def store_time(inst, *args, **kwargs):
+            ret = func(inst, *args, **kwargs)
 
-                start_time = time.time()
+            elapsed_time = time.time() - start_time
 
-                ret = func(inst, *args, **kwargs)
+            func_id = inst.__class__.__name__+'.'+func.__name__
+            if func_id not in self._data:
+                self._data[func_id] = [0, []]
+            self._data[func_id][0] += 1
+            self._data[func_id][1].append(elapsed_time)
 
-                elapsed_time = time.time() - start_time
+            return ret
 
-                func_id = inst.__class__.__name__+'.'+func.__name__
-                if func_id not in self._data:
-                    self._data[func_id] = [0, []]
-                self._data[func_id][0] += 1
-                self._data[func_id][1].append(elapsed_time)
+        return store_time
 
-                return ret
+    def print_time_registered(self):
+        """
+        Display registered time of function with :func:`timed` decorator.
 
-            return store_time
+        Automatically called at exit.
 
-        def print_time_registered(self):
-            """
-            Display registered time of function with :func:`timed` decorator.
+        .. warning:: only reachable in debug mode (if `__debug__` is `True`).
 
-            Automatically called at exit.
-
-            .. warning:: only reachable in debug mode (if `__debug__` is `True`).
-            """
-            for func_name, data in self._data.items():
-                max_time = max(data[1])
-                sum_time = sum(data[1])
-                avg_time = sum_time / len(data[1])
-                print "Function %s called %d times. " % (func_name, data[0]),
-                print 'Execution time max: %.7f, average: %.7f' % (max_time, avg_time),
-                print "Total time: %.7f" % sum_time
-    timed = _Timed()
+        """
+        for func_name, data in self._data.items():
+            max_time = max(data[1])
+            sum_time = sum(data[1])
+            avg_time = sum_time / len(data[1])
+            print "Function %s called %d times. " % (func_name, data[0]),
+            print 'Execution time max: %.7f, average: %.7f' % (max_time, avg_time),
+            print "Total time: %.7f" % sum_time
+timed = _Timed()
 
 
-    import atexit
-    atexit.register(timed.print_time_registered)
+import atexit
+atexit.register(timed.print_time_registered)

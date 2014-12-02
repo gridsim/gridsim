@@ -13,7 +13,7 @@ import numpy as np
 from numpy.linalg import inv
 from scipy.sparse import lil_matrix
 
-from gridsim.decorators import accepts, returns, timed
+from gridsim.decorators import accepts, returns
 from gridsim.unit import units
 
 
@@ -417,7 +417,6 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         # change sparse matrix representation
         self._bA = self._bA.tocsr()
 
-    @timed
     @accepts((5, bool))
     def calculate(self, P, Q, V, Th, scaled):
         """
