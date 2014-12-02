@@ -51,7 +51,7 @@ setup(name=config.get('Project', 'name').lower(),
 
       keywords=config.get('Project', 'keywords'),
 
-      classifiers=config.get('Project', 'classifiers').split(),
+      classifiers=config.get('Project', 'classifiers').splitlines,
 
       # tests
 
