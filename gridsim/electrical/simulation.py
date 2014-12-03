@@ -10,7 +10,7 @@ import warnings
 import numpy as np
 from scipy.sparse import lil_matrix
 
-from gridsim.decorators import accepts, returns, timed
+from gridsim.decorators import accepts, returns
 from gridsim.unit import units
 from gridsim.core import AbstractSimulationModule
 
@@ -253,7 +253,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         Creates a :class:`.ElectricalNetworkBranch` with
         the given parameters and adds it to the simulation.
 
-        .. seealso:: :func:`.ElectricalNetworkBranch`
+        .. seealso:: :class:`.ElectricalNetworkBranch`
 
         :param friendly_name: the name of the branch
         :type friendly_name: str

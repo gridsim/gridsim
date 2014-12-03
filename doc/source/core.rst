@@ -14,8 +14,7 @@ useful for developers.
 
 .. note::
     This part is the low level of the simulator, Gridsim also provides
-    tools to help the development of modules or element
-    (:ref:`gridsim-tools`).
+    tools to help the development of modules or elements: :ref:`gridsim-tools`.
 
 ***********
 Core module

@@ -4,7 +4,7 @@
 The :mod:`gridsim.electrical` module implements the electrical part of the
 gridsim simulator. It basically manages Consuming-Producing-Storing (CPS)
 Elements, which consume (positive sign) and/or produce (negative sign) a
-certain amount of energy (`delta_energy`) at each simulation step.
+certain amount of energy (``delta_energy``) at each simulation step.
 
 CPS elements may be attach to buses of an electrical power network, which is
 also made of branches as connections between buses.

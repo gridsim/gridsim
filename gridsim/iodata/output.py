@@ -1,3 +1,41 @@
+"""
+.. moduleauthor:: Gillian Basso <gillian.basso@hevs.ch>
+
+.. codeauthor:: Michael Clausen <clm@hevs.ch>
+.. codeauthor:: Gillian Basso <gillian.basso@hevs.ch>
+
+This module provides interfaces to save data.
+
+To use the :class:`Saver` a class has to implement the :class:`.AttributesGetter`
+interface.
+
+*Example:*
+
+.. literalinclude:: ../../demo/plotrecorder.py
+    :linenos:
+
+* On lines 46, 51 and 85, we create :class:`.Recorder` objects.
+* On lines 47, 52 and 86, we add the recorders to the simulation.
+* On lines 69 to 71, we use the recorders as :class:`AttributeGetter` to
+  save them in figure. Here, the 3 images file saved:
+
+.. figure:: ../../demo/output/fig1.png
+    :align: center
+
+.. figure:: ../../demo/output/fig2.png
+    :align: center
+
+.. figure:: ../../demo/output/fig3.png
+    :align: center
+
+* On line 73, we use a second saver to save in a csv file the a recorder we
+  already saved, here the 20th first lines:
+
+.. literalinclude:: ../../demo/output/fig2.csv
+    :linenos:
+    :lines: 1-20
+
+"""
 import os
 
 import matplotlib.pyplot as plot
@@ -6,16 +44,20 @@ from gridsim.decorators import accepts, returns
 
 
 class AttributesGetter(object):
-    """
-
-    """
 
     def __init__(self):
+        """
+        __init__(self)
+
+        This is the based class for all data which have to be saved.
+        """
         super(AttributesGetter, self).__init__()
 
     @returns(list)
     def get_x_values(self):
         """
+        get_x_values(self)
+
         This method returns x values of data stored.
 
         :return: a list of values
@@ -26,6 +68,8 @@ class AttributesGetter(object):
     @returns(str)
     def get_x_unit(self):
         """
+        get_x_unit(self)
+
         This method returns x unit of data stored.
 
         :return: a string representing the unit.
@@ -36,9 +80,11 @@ class AttributesGetter(object):
     @returns(dict)
     def get_y_values(self):
         """
+        get_y_values(self)
+
         This method returns y values of data stored. As more than one data can
         be sent, the values have to be sent with the following format:
-        `[(label1, data1), (label2, data2), ...]`
+        ``[(label1, data1), (label2, data2), ...]``
         with:
         * labelX: a string representing the dataX
         * dataX: a list of data
@@ -51,6 +97,8 @@ class AttributesGetter(object):
     @returns(str)
     def get_y_unit(self):
         """
+        get_y_unit(self)
+
         This method returns y unit of data stored.
 
         :return: a string representing the unit.
@@ -65,71 +113,16 @@ class FigureSaver(object):
              (2, str))
     def __init__(self, values, title):
         """
-        A :class:`PlotRecorder` can be used to record one or multiple signals
-        and plot them at the end of the simulation either to a image file,
-        add them to a PDF or show them on a window.
+        __init__(self, values, title)
+
+        A :class:`FigureSaver` can be used to record a class:`.AttributesGetter`
+        and plot it in a file.
 
         :param values: The values to display
         :type values: AttributesGetter
 
         :param title: The title of the plot.
         :type title: str
-
-        *Example:*
-
-        .. literalinclude:: ../../demo/plotrecorder.py
-            :linenos:
-
-        * On line 24 we create a PlotRecorder with the title 'Temperatures'
-          which uses minutes as the unit for the x-axis. As the title already
-          suggest that the signals are temperatures, we only take the
-          element's name as the legend format.
-        * On line 25 we use that recorder in order to record all elements in the
-          thermal module who have the attribute 'temperature' by using the
-          powerful :func:`gridsim.core.Simulator.find()` method by asking to
-          return a list of all elements that have the attribute 'temperature'.
-          We specify with the second argument that we like to read the
-          attribute 'temperature' from all objects returned by find().
-          Additionally we can specify the physical unit of the data when
-          adding a recorder. Note that PlotRecorders demand by their nature
-          that all recorded signals (attributes) have the same unit.
-        * On line 28 and the following we create a very similar recorder as
-          before, but this time we do not want to record the temperature in
-          degrees celsius, we want the temperature in kelvin. As the
-          ThermalProcess only provides the temperature in degrees celsius we
-          have to add a conversion lambda which will be executed every time a
-          value is read from the simulation in order to give to the recorder.
-          The lambda gets a named tuple as parameter which contains the
-          following keys: "value": the value just read from the attribute,
-          "time": the actual simulation time and finally "delta_time": the
-          time interval for which the value has been calculated. As the
-          conversion between degree celsius and kelvin is linear and does
-          not depend anything other than the actual value, we can just give
-          the lambda expression **lambda context: context.value + 273.15**.
-        * On line 33 we create a second PlotRecorder instance with the title
-          'Thermal power flows' which will show the time axis (x-axis) in
-          hours. Again we only show the name of the subject in the legend.
-        * On line 34 we attach this recorder to all elements of type (class)
-          ThermalCoupling and we setup the recoder to read the 'power'
-          attribute. The unit will be Watts (W).
-        * On line 37 we run the simulation for 2 hours with a resolution of a
-          second.
-        * We are saving the plots as image files on line 40 to 43.
-        * It is even possible to create a PDF document using the PlotRecorder
-          and to append the different plots as new pages onto that
-          document. This is done on line 45.
-
-        The resulting 3 images of this simulation are show here:
-
-        .. figure:: ../../demo/output/fig1.png
-            :align: center
-
-        .. figure:: ../../demo/output/fig2.png
-            :align: center
-
-        .. figure:: ../../demo/output/fig3.png
-            :align: center
-
         """
         super(FigureSaver, self).__init__()
 
@@ -144,11 +137,9 @@ class FigureSaver(object):
     @property
     def figure(self):
         """
-        Returns the matplotlib figure identifier. If the figure was not already
+        The matplotlib figure identifier. If the figure was not already
         rendered, it will do this by calling :func:`render()` automatically
         before actually returning the figure.
-
-        :returns: matplotlib figure.
         """
         if self._figure is None:
             self.render()
@@ -157,11 +148,15 @@ class FigureSaver(object):
     @accepts(((1, 2), (type(None), int, float)))
     def render(self, y_min=None, y_max=None):
         """
+        render(self, y_min=None, y_max=None)
+
         Does the actual figure and returns the matplotlib figure identifier.
-        Note that you do not need to call this method explicitly as it will
-        get called as soon as needed by other methods like :func:`save()` or the
-        property getter **figure** are called. This method offers some
-        fine tuning parameters to control the look of the figure.
+
+        .. note:: you do not need to call this method explicitly as it will get
+                  called as soon as needed by other methods like :func:`save()`
+                  or the property getter **figure** are called. This method
+                  offers some fine tuning parameters to control the look of the
+                  figure.
 
         :param y_min: Minimal value on the y-axis.
         :type y_min: float
@@ -183,10 +178,12 @@ class FigureSaver(object):
     @accepts((1, str))
     def save(self, file_name):
         """
-        Saves the figure in the given file (file_name). The format is deduced
-        from the file name extension. The output supported formats available
-        depend on the backend being used. On Unix systems these formats are
-        normally supported:
+        save(self, file_name)
+
+        Saves the figure in the given file (``file_name``). The format is
+        deduced from the file name extension. The output supported formats
+        available depend on the backend being used. On Unix systems these
+        formats are normally supported:
 
             **Scalable Vector Graphics** - \*.svg, \*.svgz (zip \*.svg)
 
@@ -219,8 +216,14 @@ class CSVSaver(object):
              (2, str))
     def __init__(self, values, separator=','):
         """
+        __init__(self, values, separator=',')
+
+        This saver save data as a text file with the csv format with the given.
+
         :param values: The values to display
         :type values: AttributesGetter
+        :param separator: the separator of two data in the same line
+        :type separator: str
 
         """
         super(CSVSaver, self).__init__()
@@ -235,6 +238,18 @@ class CSVSaver(object):
 
     @accepts((1, str))
     def save(self, file_name):
+        """
+        save(self, file_name)
+
+        Saves the data in the given file (``file_name``). The format is a text
+        file regardless the extension of the file.
+        The data is store with the csv format and the header are the data
+        returned by :func:`gridsim.iodata.output.AttributesGetter.get_x_unit()`
+        and :func:`gridsim.iodata.output.AttributesGetter.get_y_unit()`
+
+        :param file_name: File name (path) where to save the file.
+        :type file_name: str
+        """
 
         save_file = open(file_name, 'w')
 

@@ -35,9 +35,9 @@ class ElectricalTransmissionLine(AbstractElectricalTwoPort):
                     |                                           |
                    ---                                         ---
 
-        At initialization, in addition to the line `friendly_name`,
-        the line length, the line reactance (`X`), line resistance (`R`) and
-        line charging (B) have to be given. `R` and `B` default to zero.
+        At initialization, in addition to the line ``friendly_name``,
+        the line length, the line reactance (``X``), line resistance (``R``) and
+        line charging (B) have to be given. ``R`` and ``B`` default to zero.
 
         :param friendly_name: Friendly name for the line. Should be unique
             within the simulation module, i.e. different for example from the
@@ -94,13 +94,13 @@ class ElectricalGenTransformer(AbstractElectricalTwoPort):
                                                            -   -
 
         While the transformer changes the voltage amplitude, the phase shifter
-        changes the voltage phase. Accepting a complex `K_factor` parameter,
+        changes the voltage phase. Accepting a complex ``K_factor`` parameter,
         the :class:`.ElectricalGenTransformer` is a common representation for a
         transformer and a phase shifter.
 
-        At initialization, in addition to the line `friendly_name`, the
-        `K-factor`, the reactance (`X`), and the resistance (`R`) have to be
-        given. `R` defaults to zero.
+        At initialization, in addition to the line ``friendly_name``, the
+        ``K-factor``, the reactance (``X``), and the resistance (``R``) have to be
+        given. ``R`` defaults to zero.
 
         :param friendly_name: Friendly name for the transformer or phase
             shifter. Should be unique within the simulation module, i.e.

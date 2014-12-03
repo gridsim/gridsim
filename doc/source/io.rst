@@ -1,8 +1,8 @@
 .. _io-ref:
 
-#########################
-The Simulator General Use
-#########################
+########################
+The Gridsim Input/Output
+########################
 
 .. automodule:: gridsim.iodata
 

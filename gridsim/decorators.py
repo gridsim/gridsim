@@ -3,6 +3,33 @@
 
 Gridsim decorators module. Defines all decorators used in the Gridsim simulator.
 
+
+.. method:: timed
+
+This decorator can be used to register the execution time of
+class methods.
+
+*Example*::
+
+    class MyClass(object):
+        @timed
+        def my_short_func(arg1, arg2):
+            return arg1 * arg2
+
+        @timed
+        def my_long_func(arg1, arg2):
+            # long section of code
+            ...
+
+.. warning:: This decorator only works with class methods and not
+             with functions.
+
+At the end of the execution, the console prompt the time for each function::
+
+    Function MyClass.my_short_func 1 times.  Execution time max: 0.0000119, average: 0.0000119 Total time: 0.0000119
+    Function MyClass.my_long_func called 13 times.  Execution time max: 0.0001291, average: 0.0001177 Total time: 0.0015298
+
+
 """
 
 import time
@@ -12,6 +39,8 @@ from functools import wraps
 
 def accepts(*atypes):
     """
+    accepts()
+
     Type Enforcement. Verifies types of parameters given to the function.
     
     *Example:*
@@ -80,6 +109,8 @@ def accepts(*atypes):
 
 def returns(rtype=type(None)):
     """
+    returns()
+
     Type Enforcement. Verifies return type of the function.
     
     *Example:*
@@ -112,6 +143,8 @@ def returns(rtype=type(None)):
 
 def deprecated(func):
     """
+    deprecated()
+
     This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
     when the function is used.
@@ -138,6 +171,8 @@ class _Timed(object):
 
     def __init__(self):
         """
+        Also commented in top of file for website.
+
         This is a decorator which can be used to register the execution
         time of class methods.
 
@@ -182,9 +217,6 @@ class _Timed(object):
         Display registered time of function with :func:`timed` decorator.
 
         Automatically called at exit.
-
-        .. warning:: only reachable in debug mode (if `__debug__` is `True`).
-
         """
         for func_name, data in self._data.items():
             max_time = max(data[1])
@@ -194,7 +226,6 @@ class _Timed(object):
             print 'Execution time max: %.7f, average: %.7f' % (max_time, avg_time),
             print "Total time: %.7f" % sum_time
 timed = _Timed()
-
 
 import atexit
 atexit.register(timed.print_time_registered)

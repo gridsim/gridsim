@@ -19,11 +19,11 @@ sim = Simulator()
 #   |           |]- 3 W/K
 #   |___________|
 #
-celsius = units.Quantity(20, units.degC)
+celsius = units(20, units.degC)
 room = sim.thermal.add(ThermalProcess.room('room',
                                            50*units.meter*units.meter,
                                            2.5*units.metre,
-                                           celsius.to(units.kelvin)))
+                                           units.convert(celsius, units.kelvin)))
 outside = sim.thermal.add(
     TimeSeriesThermalProcess('outside', SortedConstantStepTimeSeriesObject(CSVReader()),
                              './data/example_time_series.csv',

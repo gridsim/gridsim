@@ -417,10 +417,10 @@ class AnyIIDRandomElectricalCPSElement(AbstractElectricalCPSElement):
         are IID (Independently and Identically Distributed). The distribution,
         discrete and finite, is given as parameter.
 
-        Beside the element `friendly_name`, the constructor parameters are
+        Beside the element ``friendly_name``, the constructor parameters are
         either the name of the file the distribution has to be read from, either
-        the potentially consumed or produced `power_values`,together with their
-        `frequencies` or probabilities. Input `power values` has to be a
+        the potentially consumed or produced ``power_values``,together with their
+        ``frequencies`` or probabilities. Input ``power values`` has to be a
         monotonically increasing sequence of float. Input 'frequencies' can be
         either integers (number of occurrences), or floats summing to 1.0
         (relative frequencies or probabilities), or monotonically increasing

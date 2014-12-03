@@ -92,7 +92,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
 
     def reset(self):
         """
-        Sets the time to default.
+        Sets the time to default (``0``).
 
         .. seealso:: :func:`gridsim.timeseries.TimeSeriesObject.set_time`
         """

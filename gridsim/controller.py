@@ -11,13 +11,13 @@ classical example is a simple thermostat:
 
 This simulation outputs the following plots:
 
-.. figure:: ./figures/thermostat-fig1.png
+.. figure:: ../../demo/output/thermostat-fig1.png
             :align: center
 
-.. figure:: ./figures/thermostat-fig2.png
+.. figure:: ../../demo/output/thermostat-fig2.png
             :align: center
 
-.. figure:: ./figures/thermostat-fig3.png
+.. figure:: ../../demo/output/thermostat-fig3.png
             :align: center
 
 """

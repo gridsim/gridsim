@@ -17,7 +17,7 @@ elements are in a defined state. Then you can either do a simple step using the
 method :func:`Simulator.step()` or run a simulation until a given time with a
 given step size using the method :func:`Simulator.run()`.
 
-Example::
+*Example*::
 
     from gridsim.unit import units
     from gridsim.simulation import Simulator
@@ -46,7 +46,7 @@ simulation module by typing::
 
 ..  note::
     Actually, the name of the module is the returned value of
-    :func:`.AbstractSimulationModule.attribute_name`.
+    :func:`gridsim.core.AbstractSimulationModule.attribute_name`.
     Refer to the module you want to use to retrieve the module name.
 """
 import types
@@ -97,7 +97,7 @@ class Recorder(object):
         on_simulation_reset(self, subjects)
 
         This method is called by the simulation on order to inform the recorder
-        that the simulation has been reset. The parameter `subjects` is a list
+        that the simulation has been reset. The parameter ``subjects`` is a list
         of all subjects that are observer by the actual recorder. The method is
         called for each binding the recorder has with the simulation. This means
         that you do 3 calls to :func:`Simulator.record()`
@@ -134,7 +134,7 @@ class Recorder(object):
         Any recorder is required to implement this method.
 
         :param subject: The object that will be observed by the recorder.
-        :type subject: :class:`.AbstractSimulationElement`.
+        :type subject: :class:`.AbstractSimulationElement`
 
         :param time: The actual time of the simulation.
         :type time: time, see :mod:`gridsim.unit`
@@ -247,7 +247,7 @@ class Simulator(object):
         :type module: str
         
         :param uid: ID of the element. Note that these ID's are only unique for
-            a given class inside a module , so you should never search just for
+            a given class inside a module, so you should never search just for
             an ID without specifying either the class or at least the module.
         :type uid: int
         
@@ -264,7 +264,7 @@ class Simulator(object):
         
         :param has_attribute: The object should have an attribute with the given
             name. This can be used in order to find all objects that have a 
-            `power` attribute.
+            ``power`` attribute.
         :type has_attribute: str
         
         :param close_to: The object's position should be closer to the given one
@@ -336,7 +336,7 @@ class Simulator(object):
         Resets (re-initializes) the simulation.
 
         :param initial_time: The initial time from which the simulation starts.
-            Defaults to 0.
+            Defaults to ``0``.
         :type initial_time: time, see :mod:`gridsim.unit`
         """
         self.time = initial_time
@@ -460,7 +460,7 @@ class Simulator(object):
 
         :param conversion: Lambda function to convert the actual value taken
             from the attribute before recording. The lambda function gets a
-            single parameter `context` which is a named tuple with the following
+            single parameter ``context`` which is a named tuple with the following
             elements:
             
             **value**: The actual value just read from the simulation element's

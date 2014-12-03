@@ -1,5 +1,7 @@
 """
-.. moduleauthor:: Michael Clausen <clm@hevs.ch>
+.. moduleauthor:: Gillian Basso <gillian.basso@hevs.ch>
+.. codeauthor:: Michael Clausen <clm@hevs.ch>
+.. codeauthor:: Gillian Basso <gillian.basso@hevs.ch>
 
 The :mod:`gridsim.timeseries` module allows to import time series based on data
 :class:`.Reader` as attributes.
@@ -7,16 +9,16 @@ The :mod:`gridsim.timeseries` module allows to import time series based on data
 The data are translated into attributes of the :class:`TimeSeries` by calling
 the :func:`TimeSeries.load` method on a TimeSeriesObject or any subclass of it::
 
-    obj = TimeSeriesObject()
+    obj = TimeSeries()
     obj.load('../../data/examples/example.csv')
 
 This will call the :func:`gridsim.iodata.input.Reader.load` function and process the data to simplify
 the access from the simulator.
 
-It is important to have a `time` data or to identify the data representing the
+It is important to have a ``time`` data or to identify the data representing the
 time.
 
-If the data contain a `temperature` data, it can be access with:
+If the data contain a ``temperature`` data, it can be access with:
 
 .. literalinclude:: ../../demo/timeseries.py
     :linenos:
@@ -115,7 +117,7 @@ class TimeSeries(object):
         """
         convert(self, item, converter)
 
-        Convert each element of the list mapped by `item` with the `convert`
+        Convert each element of the list mapped by ``item`` with the ``convert``
         function.
 
         :param item: the key of the list to convert
