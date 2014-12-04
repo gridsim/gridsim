@@ -222,9 +222,9 @@ class _Timed(object):
             max_time = max(data[1])
             sum_time = sum(data[1])
             avg_time = sum_time / len(data[1])
-            print "Function %s called %d times. " % (func_name, data[0]),
-            print 'Execution time max: %.7f, average: %.7f' % (max_time, avg_time),
-            print "Total time: %.7f" % sum_time
+            print("Function %s called %d times. " % (func_name, data[0]),)
+            print('Execution time max: %.7f, average: %.7f' % (max_time, avg_time),)
+            print("Total time: %.7f" % sum_time)
 timed = _Timed()
 
 import atexit

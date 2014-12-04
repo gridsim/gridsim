@@ -21,11 +21,11 @@ from .network import AbstractElectricalTwoPort, ElectricalTransmissionLine, \
     ElectricalGenTransformer, ElectricalSlackBus
 
 
-class BusElectricalValues(object):
+class _BusElectricalValues(object):
     pass
 
 
-class BranchElectricalValues(object):
+class _BranchElectricalValues(object):
     pass
 
 
@@ -79,10 +79,10 @@ class ElectricalSimulator(AbstractSimulationModule):
         self._b = None
 
         # bus electrical values
-        self._bu = BusElectricalValues()
+        self._bu = _BusElectricalValues()
 
         # branches electrical values
-        self._br = BranchElectricalValues()
+        self._br = _BranchElectricalValues()
 
 
     @property
