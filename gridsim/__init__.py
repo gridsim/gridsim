@@ -1,1 +1,2 @@
-__version__ = '0.1.1-rc+dev'
+import pkg_resources  # part of setuptools
+__version__ = pkg_resources.require("Gridsim")[0].version
