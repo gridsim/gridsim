@@ -76,4 +76,4 @@ sim.run(units.year, units.day)
 
 print("Saving data...")
 
-FigureSaver(rec, "Temperature").save('./output/timeseries2-example.pdf')
+FigureSaver(rec, "Temperature").save('./output/timeseries2-example.png')

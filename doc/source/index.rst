@@ -4,6 +4,13 @@
 The Gridsim simulator
 #####################
 
+.. figure:: ./figures/logo.png
+            :align: center
+
+****************
+Table of Content
+****************
+
 This documentation is separated into four parts:
 
 .. toctree::
@@ -15,6 +22,7 @@ This documentation is separated into four parts:
     core.rst
     tools.rst
     io.rst
+    copyright.rst
 
 *********************
 Context and objective
