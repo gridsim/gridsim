@@ -7,6 +7,14 @@ The Simulation Tools
 The following section describes the tools provide by Gridsim to develop in a
 better way.
 
+This page contains information about:
+
+* :ref:`gridsim-tool-timeseries`
+* :ref:`gridsim-tool-decorator`
+* :ref:`gridsim-tool-util`
+
+.. _gridsim-tool-timeseries:
+
 ***********
 Time series
 ***********
@@ -16,6 +24,8 @@ Time series
     :undoc-members:
     :show-inheritance:
 
+.. _gridsim-tool-decorator:
+
 **********
 Decorators
 **********
@@ -23,6 +33,8 @@ Decorators
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. _gridsim-tool-util:
 
 *****
 Utils
