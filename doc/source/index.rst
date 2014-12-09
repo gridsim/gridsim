@@ -21,6 +21,7 @@ This documentation is separated into four parts:
     documentation.rst
     core.rst
     tools.rst
+    unit.rst
     io.rst
     copyright.rst
 
