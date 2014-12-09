@@ -8,28 +8,34 @@ The following section describes the first steps to use the Gridsim simulator
 and its built-in modules.
 
 Currently, the simulator provides:
-    * electrical simulation
-    * thermal simulation
-    * control of simulation element
-    * record of simulation element
+
+* :ref:`gridsim-simu`
+* :ref:`gridsim-electrical-simu`
+* :ref:`gridsim-thermal-simu`
+* :ref:`gridsim-control`
+* :ref:`gridsim-record`
 
 **********
 Simulation
 **********
 
-Simulator module
-================
+.. _gridsim-simu:
+
+Global simulation
+=================
 .. automodule:: gridsim.simulation
     :members:
     :undoc-members:
     :show-inheritance:
 
-Electrical package
-==================
-.. automodule:: gridsim.electrical
+.. _gridsim-electrical-simu:
 
 Electrical simulation
----------------------
+=====================
+.. automodule:: gridsim.electrical
+
+Electrical package
+------------------
 .. automodule:: gridsim.electrical.simulation
     :members:
     :undoc-members:
@@ -57,12 +63,14 @@ Electrical elements
     :undoc-members:
     :show-inheritance:
 
-Thermal package
-===============
-.. automodule:: gridsim.thermal
+.. _gridsim-thermal-simu:
 
 Thermal simulation
-------------------
+==================
+.. automodule:: gridsim.thermal
+
+Thermal package
+---------------
 .. automodule:: gridsim.thermal.simulation
     :members:
     :undoc-members:
@@ -79,15 +87,19 @@ Thermal elements
 User Interface
 **************
 
-Control module
-==============
+.. _gridsim-control:
+
+Control of simulation elements
+==============================
 .. automodule:: gridsim.controller
     :members:
     :undoc-members:
     :show-inheritance:
 
-Record module
-=============
+.. _gridsim-record:
+
+Record of simulation elements
+=============================
 .. automodule:: gridsim.recorder
     :members:
     :undoc-members:

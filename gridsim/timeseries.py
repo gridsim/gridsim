@@ -56,7 +56,7 @@ class TimeSeries(object):
 
         The result of the script:
 
-        .. figure:: ./figures/timeseries-example.png
+        .. figure:: ../../demo/output/timeseries2-example.png
             :align: center
         """
         super(TimeSeries, self).__init__()

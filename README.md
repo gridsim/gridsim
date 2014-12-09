@@ -58,6 +58,7 @@ Warning : Gridsim requires these packages to be used in full :
 ===
 You can find the full documentation on :
     http://gridsim.hevs.ch
+    
 A documentation also is provided with this release in './doc' folder.
 
 
