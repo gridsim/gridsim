@@ -25,13 +25,6 @@ Decorators
     :show-inheritance:
 
 *****
-Units
-*****
-.. automodule:: gridsim.unit
-    :members:
-    :undoc-members:
-
-*****
 Utils
 *****
 .. automodule:: gridsim.util
