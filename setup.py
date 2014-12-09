@@ -55,7 +55,7 @@ setup(name=config.get('Project', 'name').lower(),
 
       # tests
 
-      tests_require=config.get('Test', 'required'),
+      tests_require=config.get('Test', 'required').split(),
       test_suite=config.get('Test', 'dir'),
       cmdclass={config.get('Test', 'tox_cmd'): Tox}
       )
