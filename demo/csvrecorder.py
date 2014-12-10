@@ -3,7 +3,7 @@ from gridsim.unit import units
 from gridsim.simulation import Simulator
 from gridsim.recorder import PlotRecorder
 from gridsim.thermal.core import ThermalProcess, ThermalCoupling
-from gridsim.iodata.output import CSVSaver
+from gridsim.iodata.output import CSVSaver, FigureSaver
 
 # Create a simulation.
 sim = Simulator()

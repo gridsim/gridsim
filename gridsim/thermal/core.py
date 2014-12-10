@@ -1,30 +1,7 @@
 """
-.. moduleauthor:: Michael Clausen (clm@hevs.ch)
+.. moduleauthor:: Gillian Basso (gillian.basso@hevs.ch)
+.. codeauthor:: Michael Clausen (clm@hevs.ch)
 
-The thermal simulation module offers a very abstract thermal simulation. The
-simulation is based on the thermal capacity of a thermal process (envelope)
-and the energy flows between those processes via thermal couplings that result
-as consequence of the temperature differences between the thermal processes and
-the thermal conductivity of the couplings between them.
-
-*Example*:
-
-.. literalinclude:: ../../demos/thermal.py
-    :linenos:
-
-* On line 7 we create a new simulation.
-* On lines 17 to 19 we create a very simple thermal process with one room and
-    the outside temperature from a data file.
-* On line 22 we create a plot recorder and on line 23 we record all temperatures
-    using the plot recorder.
-* On line 26 & 27 we initialize the simulation and start the simulation for the
-    month avril with a resolution of 1 hour.
-* On line 30 we save the figure.
-
-The figure looks like this one:
-
-.. figure:: ./figures/thermal-example.png
-            :align: center
 
 """
 from gridsim.decorators import accepts
@@ -39,14 +16,17 @@ class AbstractThermalElement(AbstractSimulationElement):
              (2, Position))
     def __init__(self, friendly_name, position=Position()):
         """
-        Base class of all elements which can be part of a thermal simulation.
+        __init__(self, friendly_name, position=Position())
+
+        Base class of all :class:`.AbstractSimulationElement` that have to be in
+        the :class:`.ThermalSimulator`
 
         :param friendly_name: User friendly name to give to the element.
         :type friendly_name: str
 
         :param position: The position of the thermal element.
             Defaults to [0,0,0].
-        :type position: :class:`Position`
+        :type position: :class:`.Position`
         """
         super(AbstractThermalElement, self).__init__(friendly_name)
 
@@ -55,6 +35,8 @@ class AbstractThermalElement(AbstractSimulationElement):
     @property
     def position(self):
         """
+        position(self)
+
         Returns the thermal simulation element's position.
 
         :returns: Position of the element.
@@ -65,11 +47,14 @@ class AbstractThermalElement(AbstractSimulationElement):
 class ThermalProcess(AbstractThermalElement):
 
     @accepts((1, str),
+             ((2, 3, 4), units.Quantity),
              (5, Position))
     def __init__(self, friendly_name,
                  thermal_capacity, initial_temperature, mass=1*units.kilogram,
                  position=Position()):
         """
+        __init__(self, friendly_name, thermal_capacity, initial_temperature, mass=1*units.kilogram, position=Position()):
+
         The very basic element of a thermal simulation. A thermal process
         represents a closed thermal envelope like a room or a amount of
         matter which has an uniform thermal capacity and and stores an amount of
@@ -80,15 +65,18 @@ class ThermalProcess(AbstractThermalElement):
         :type friendly_name: str
 
         :param thermal_capacity: The thermal capacity of the process.
-            See :class:`Material`.
-        :type thermal_capacity: heat_capacity
+            See :class:`.Material`.
+        :type thermal_capacity: heat_capacity, see :mod:`gridsim.unit`
 
         :param initial_temperature: The initial temperature of the process in
             degrees.
-        :type initial_temperature: kelvin
+        :type initial_temperature: kelvin, see :mod:`gridsim.unit`
+
+        :param mass: the mass of the element
+        :type mass: mass, see :mod:`gridsim.unit`
 
         :param position: The position of the process.
-        :type position: :class:`Position`
+        :type position: :class:`.Position`
         """
         super(ThermalProcess, self).__init__(friendly_name, position)
         self._initial_temperature = initial_temperature
@@ -115,15 +103,19 @@ class ThermalProcess(AbstractThermalElement):
 
     def add_energy(self, delta_energy):
         """
+        add_energy(self, delta_energy)
+
         Adds a given amount of energy to the thermal process.
 
         :param delta_energy: The energy to add to the thermal process.
-        :type delta_energy: joule
+        :type delta_energy: joule, see :mod:`gridsim.unit`
         """
         self._internal_thermal_energy += delta_energy
 
     def reset(self):
         """
+        reset(self)
+
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.reset`.
@@ -137,6 +129,8 @@ class ThermalProcess(AbstractThermalElement):
 
     def calculate(self, time, delta_time):
         """
+        calculate(self, time, delta_time)
+
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.calculate`.
@@ -145,6 +139,8 @@ class ThermalProcess(AbstractThermalElement):
 
     def update(self, time, delta_time):
         """
+        update(self, time, delta_time)
+
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.update`.
@@ -158,23 +154,24 @@ class ThermalProcess(AbstractThermalElement):
              (4, Position))
     def room(friendly_name,
              surface, height,
-             initial_temperature=293.15*units.kelvin,
+             initial_temperature=units(20, units.degC),
              position=Position()):
         """
+        room(friendly_name, surface, height, initial_temperature=293.15*units.kelvin, position=Position()):
+
         Returns the thermal process of a room filled with air and the given
         surface, height and initial temperature.
 
         :param friendly_name: Friendly name to give to the returned object.
         :type friendly_name: str
-        :param surface: The room's surface in m2.
-        :type surface: square_meter
-        :param height: The room's height in m.
-        :type height: meter
-        :param initial_temperature: The initial temperature inside the room in
-            degrees celsius.
-        :type initial_temperature: kelvin
+        :param surface: The room's surface.
+        :type surface: square_meter, see :mod:`gridsim.unit`
+        :param height: The room's height.
+        :type height: meter, see :mod:`gridsim.unit`
+        :param initial_temperature: The initial temperature inside the room.
+        :type initial_temperature: kelvin, see :mod:`gridsim.unit`
         :param position: The position of the process.
-        :type position: :class:`Position`
+        :type position: :class:`.Position`
         :return: A new thermal process object representing the room or None on
             error.
         """
@@ -187,22 +184,24 @@ class ThermalProcess(AbstractThermalElement):
     @staticmethod
     def solid(friendly_name,
               specific_thermal_capacity, mass,
-              initial_temperature=20*units.degC.to(units.kelvin),
+              initial_temperature=units(20, units.degC),
               position=Position()):
         """
+        solid(friendly_name, specific_thermal_capacity, mass, initial_temperature=units(20, units.degC), position=Position()):
+
         Returns the thermal process of a solid body and the given mass, initial
         temperature.
 
         :param friendly_name: Friendly name to give to the returned object.
         :type friendly_name: str
-        :param specific_thermal_capacity: The thermal capacity per g.
-        :type specific_thermal_capacity: thermal_capacity
-        :param mass: The solid's mass in g.
-        :type mass: mass
+        :param specific_thermal_capacity: The thermal capacity.
+        :type specific_thermal_capacity: thermal_capacity, see :mod:`gridsim.unit`
+        :param mass: The solid's mass.
+        :type mass: mass, see :mod:`gridsim.unit`
         :param initial_temperature: The initial temperature of the solid.
-        :type initial_temperature: temperature
+        :type initial_temperature: temperature, see :mod:`gridsim.unit`
         :param position: The position of the solid.
-        :type position: :class:`Position`
+        :type position: :class:`.Position`
         :return: A new thermal process object representing the solid or None
             on error.
         """
@@ -220,6 +219,8 @@ class ThermalCoupling(AbstractThermalElement):
                  contact_area=1*units.metre*units.metre,
                  thickness=1*units.metre):
         """
+        __init__(self, friendly_name, thermal_conductivity, from_process, to_process, contact_area=1*units.metre*units.metre, thickness=1*units.metre)
+
         A thermal coupling connects two thermal processes allowing them to
         exchange thermal energy.
 
@@ -227,8 +228,8 @@ class ThermalCoupling(AbstractThermalElement):
         :type friendly_name: str
 
         :param thermal_conductivity: The thermal conductivity of the thermal
-            element in W/K.
-        :type thermal_conductivity: thermal conductivity units
+            element.
+        :type thermal_conductivity: thermal conductivity, see :mod:`gridsim.unit`
 
         :param from_process: The first process coupled or the ID of the first
             process.
@@ -257,11 +258,11 @@ class ThermalCoupling(AbstractThermalElement):
 
         self._contact_area = contact_area
         """
-        The size of the contact area between the two `class::ThermalProcess`
+        The size of the contact area between the two :class:`ThermalProcess`
         """
         self._thickness = thickness
         """
-        The thickness of the material between the two `class::ThermalProcess`
+        The thickness of the material between the two :class:`ThermalProcess`
         """
 
         if isinstance(from_process, ThermalProcess) \
@@ -299,6 +300,8 @@ class ThermalCoupling(AbstractThermalElement):
 
     def reset(self):
         """
+        reset(self)
+
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.reset`.
@@ -308,6 +311,8 @@ class ThermalCoupling(AbstractThermalElement):
 
     def calculate(self, time, delta_time):
         """
+        calculate(self, time, delta_time)
+
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.calculate`.
@@ -317,6 +322,8 @@ class ThermalCoupling(AbstractThermalElement):
 
     def update(self, time, delta_time):
         """
+        update(self, time, delta_time)
+
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.update`.

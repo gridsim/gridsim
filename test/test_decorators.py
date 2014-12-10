@@ -10,9 +10,6 @@ import unittest
 from gridsim.decorators import accepts, returns, deprecated
 
 
-# TODO manage __debug__
-
-
 class Animal(object):
     @accepts((1, str))
     def __init__(self, race):

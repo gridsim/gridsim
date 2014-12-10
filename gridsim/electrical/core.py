@@ -1,25 +1,6 @@
 """
 .. moduleauthor:: Gilbert Maitre <gilbert.maitre@hevs.ch>
 
-The :mod:`gridsim.electrical` module implements the electrical part of the
-gridsim simulator. It basically manages Consuming-Producing-Storing (CPS)
-Elements, which consume (positive sign) and/or produce (negative sign) a
-certain amount of energy ('delta_energy') at each simulation step.
-
-CPS elements may be attach to buses of an electrical power network, which is
-also made of branches as connections between buses.
-
-*Example*:
-
-.. literalinclude:: ../../demo/loadflow.py
-    :linenos:
-
-shows a pure electrical example made of a reference 5-bus network
-(see e.g. Xi-Fan Wang, Yonghua Song, Malcolm Irving, Modern power systems
-analysis), to the non-slack buses of which are attached 4 CPS elements :
-1 with constant power, production, 3 with random gaussian distributed power
-consumption.
-
 """
 from enum import Enum
 
@@ -34,13 +15,12 @@ class AbstractElectricalElement(AbstractSimulationElement):
     @accepts((1, str))
     def __init__(self, friendly_name):
         """
-        **This section will be only interesting for gridsim module developers,
-        if you just use the library, you can skip this section.**
+        __init__(self, friendly_name)
 
         This class is the base for all elements that can take place in the
         electrical simulator. It is based on the general
-        'AbstractSimulationElement' class from the 'core' module. At
-        initialization the user has to give the element 'friendly_name'.
+        :class:`gridsim.core.AbstractSimulationElement`. At
+        initialization the user has to give the element ``friendly_name``.
 
         :param friendly_name: Friendly name for the element.
             Should be unique within the simulation module.
@@ -77,19 +57,18 @@ class ElectricalBus(AbstractElectricalElement):
     @accepts((1, str), (2, Type), (3, Position))
     def __init__(self, friendly_name, bus_type, position=Position()):
         """
-        **This section will be only interesting for gridsim module developers,
-        if you just use the library, you can skip this section.**
+        __init__(self, friendly_name, bus_type, position=Position())
 
         This class is the base for all type of buses (i.e. nodes) in the
         considered electrical network. It is based on the general
-        'AbstractElectricalElement' class. At initialization the user has to
-        give the bus 'friendly_name'.
+        :class:`AbstractElectricalElement` class. At initialization the user
+        has to give the bus ``friendly_name``.
 
-        If there is interest for the geographical 'position' of the element,
-        defined by the 'Position' class from the 'core' module. Apart from
-        the methods provided by the superclass 'AbstractElectricalElement',
-        this class provides the method 'position' for getting the position
-        property of the object.
+        If there is interest for the geographical ``position`` of the element,
+        defined by the :class:`gridsim.util.Position` class. Apart from
+        the methods provided by the superclass
+        :class:`.AbstractElectricalElement`, this class provides the method
+        ``position`` for getting the position property of the object.
 
         The chosen representation for bus electrical values is :
         active power (P), reactive power (Q), voltage amplitude
@@ -101,11 +80,11 @@ class ElectricalBus(AbstractElectricalElement):
 
         :param bus_type: The type of the bus. Note that Slack Bus is
             automatically added to the simulation
-        :type bus_type: ElectricalBus.Type
+        :type bus_type: :class:`ElectricalBus.Type`
 
         :param position: Bus geographical position.
             Defaults to Position default value.
-        :type position: Position
+        :type position: :class:`.Position`
 
         """
         super(ElectricalBus, self).__init__(friendly_name)
@@ -138,6 +117,8 @@ class ElectricalBus(AbstractElectricalElement):
 
     def reset(self):
         """
+        reset(self)
+
         Reset bus electrical values to their default values: None
         """
         self.P = None
@@ -151,24 +132,23 @@ class AbstractElectricalTwoPort(AbstractElectricalElement):
     @accepts((1, str))
     def __init__(self, friendly_name, X, R=0*units.ohm):
         """
-        **This section will be only interesting for gridsim module developers,
-        if you just use the library, you can skip this section.**
+        __init__(self, friendly_name, X, R=0*units.ohm)
 
         This class is the base for all electrical elements that can be placed
         on a network branch, e.g. transmission lines, transformers,
         phase shifters,... It is based on the general
-        'AbstractElectricalElement' class. At initialization the user has to
-        give the two-port 'friendly_name'.
+        :class:`.AbstractElectricalElement` class. At initialization the user
+        has to give the two-port ``friendly_name``.
 
         :param friendly_name: Friendly name for the element.
             Should be unique within the simulation module.
         :type friendly_name: str
 
         :param X: reactance of the element
-        :type X: ohm
+        :type X: ohm, see :mod:`gridsim.unit`
 
         :param R: resistance of the element
-        :type R: ohm
+        :type R: ohm, see :mod:`gridsim.unit`
 
         """
         super(AbstractElectricalTwoPort, self).__init__(friendly_name)
@@ -195,17 +175,19 @@ class ElectricalNetworkBranch(AbstractElectricalElement):
              (4, AbstractElectricalTwoPort))
     def __init__(self, friendly_name, from_bus, to_bus, two_port):
         """
+        __init__(self, friendly_name, from_bus, to_bus, two_port)
+
         Class for a branch of an electrical network, i.e. connection between two
         buses (or nodes). It is oriented from one bus to the other. It is
-        based on the general 'AbstractElectricalElement' class. At
+        based on the general :class:`AbstractElectricalElement` class. At
         initialization, in addition to the 'friendly_name', the bus it is
         starting from, and the bus it is going to, have to be given, together
         with the two-port, e.g. transmission line, transformer,... it is made
         of.
 
-        The chosen representation for branch electrical values is : active power
-        Pi and reactive power Qi flowing into the branch at branch start,
-        and active power Po and reactive power Qo flowing out of the branch at
+        The chosen representation for branch electrical values is: active power
+        ``Pi`` and reactive power ``Qi`` flowing into the branch at branch start,
+        and active power Po and reactive power ``Qo`` flowing out of the branch at
         branch end. Their default values are None.
 
         :param friendly_name: Friendly name for the branch.
@@ -214,14 +196,14 @@ class ElectricalNetworkBranch(AbstractElectricalElement):
         :type friendly_name: str
 
         :param from_bus: Electrical bus from which branch is starting.
-        :type from_bus: AbstractElectricalBus
+        :type from_bus: :class:`.ElectricalBus`
 
         :param to_bus: Electrical bus to which branch is going.
-        :type to_bus: AbstractElectricalBus
+        :type to_bus: :class:`.ElectricalBus`
 
         :param two_port: Electrical two-port on the branch,
             e.g. transmission line, transformer, ...
-        :type two_port: AbstractElectricalTwoPort
+        :type two_port: :class:`.AbstractElectricalTwoPort`
         """
         if from_bus.id is None:
             raise RuntimeError('From_bus bus has not been added to simulator.')
@@ -252,25 +234,31 @@ class ElectricalNetworkBranch(AbstractElectricalElement):
     @property
     def from_bus_id(self):
         """
+        from_bus_id(self)
+
         Gets the id of the bus the branch is starting from.
 
         :returns: id of the bus the branch is starting from.
-        :type: int
+        :rtype: int
         """
         return self._from_bus_id
 
     @property
     def to_bus_id(self):
         """
+        to_bus_id(self)
+
         Gets the id of the bus the branch is going to.
 
         :returns: id of the bus the branch is going to.
-        :type: int
+        :rtype: int
         """
         return self._to_bus_id
 
     def reset(self):
         """
+        reset(self)
+
         Reset branch electrical values to their default : None
         """
         self.Pij = None
@@ -284,20 +272,20 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
     @accepts((1, str))
     def __init__(self, friendly_name):
         """
-        **This section will be only interesting for gridsim module developers,
-        if you just use the library, you can skip this section.**
+        __init__(self, friendly_name)
 
         CPS stands for "Consuming-Producing-Storing".
 
-        This class is based on the 'AbstractElectricalElement' class. It has the
-        same initialization parameters : 'friendly_name'. It differs from the
-        superclass 'AbstractElectricalElement' in giving access to the property
-        'delta_energy', which is the amount of energy consumed or stored
-        (if positive), produced or un-stored (if negative) during a simulation
-        step. The class also implements the methods 'reset' and 'update' defined
-        by the 'AbstractSimulationElement'. With 'reset' the 'delta_energy'
-        property is set to 0. With 'update', the 'delta_energy' property is
-        updated to its current value.
+        This class is based on the :class:`AbstractElectricalElement` class.
+        It has the same initialization parameters : ``friendly_name``.
+        It differs from the superclass :class:`AbstractElectricalElement` in
+        giving access to the property ``delta_energy``, which is the amount of
+        energy consumed or stored (if positive), produced or un-stored (if
+        negative) during a simulation step. The class also implements the
+        methods :func:`gridsim.core.AbstractSimulationElement.reset`
+        to set the ``delta_energy`` property to 0 and
+        :func:`gridsim.core.AbstractSimulationElement.update` to update the
+        ``delta_energy`` property to its current value.
 
         :param friendly_name: Friendly name for the element. Should be unique
             within the simulation module.
@@ -311,11 +299,13 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
     @property
     def delta_energy(self):
         """
+        delta_energy(self)
+
         Gets the element consumed energy during last simulation step. Getting a
         negative value means that. the element has produced energy.
 
         :returns: energy consumed by element during last simulation step.
-        :rtype: float
+        :rtype: time, see :mod:`gridsim.unit`
         """
         return self._delta_energy
 
@@ -325,6 +315,8 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
 
     def reset(self):
         """
+        reset(self)
+
         Resets the element to its initial state.
         """
         self._delta_energy = 0*units.joule
@@ -332,12 +324,13 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
 
     def update(self, time, delta_time):
         """
-        Update 'delta_energy' property to ist current value.
+        update(self, time, delta_time)
 
-        :param time: The actual time of the simulator in seconds.
-        :type time: float
-        :param delta_time: The delta time for which the update has to be done
-            in seconds.
-        :type delta_time: float
+        Updates ``delta_energy`` property to ist current value.
+
+        :param time: The actual time of the simulator.
+        :type time: time, see :mod:`gridsim.unit`
+        :param delta_time: The delta time for which the update has to be done.
+        :type delta_time: time, see :mod:`gridsim.unit`
         """
         self._delta_energy = self._internal_delta_energy

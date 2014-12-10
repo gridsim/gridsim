@@ -1,4 +1,4 @@
-.. _gridsim-tools-ref:
+.. _gridsim-tools:
 
 ####################
 The Simulation Tools
@@ -7,26 +7,38 @@ The Simulation Tools
 The following section describes the tools provide by Gridsim to develop in a
 better way.
 
-****
-Test
-****
+This page contains information about:
 
-Units
-=====
-.. automodule:: gridsim.unit
+* :ref:`gridsim-tool-timeseries`
+* :ref:`gridsim-tool-decorator`
+* :ref:`gridsim-tool-util`
+
+.. _gridsim-tool-timeseries:
+
+***********
+Time series
+***********
+
+.. automodule:: gridsim.timeseries
     :members:
     :undoc-members:
+    :show-inheritance:
 
-Tools
-=====
-.. automodule:: gridsim.util
-    :members:
-    :undoc-members:
+.. _gridsim-tool-decorator:
 
+**********
 Decorators
-==========
+**********
 .. automodule:: gridsim.decorators
     :members:
     :undoc-members:
     :show-inheritance:
 
+.. _gridsim-tool-util:
+
+*****
+Utils
+*****
+.. automodule:: gridsim.util
+    :members:
+    :undoc-members:

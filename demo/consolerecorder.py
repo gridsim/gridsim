@@ -2,6 +2,7 @@ from gridsim.simulation import Simulator
 from gridsim.unit import units
 from gridsim.recorder import Recorder
 from gridsim.thermal.core import ThermalProcess, ThermalCoupling
+from gridsim.decorators import timed
 
 
 #Custom recorder.
@@ -10,9 +11,11 @@ class ConsoleRecorder(Recorder):
     def __init__(self, attribute_name):
         super(ConsoleRecorder, self).__init__(attribute_name)
 
+    @timed
     def on_simulation_reset(self, subjects):
         print 'RESET, observing: ' + str(subjects)
 
+    @timed
     def on_simulation_step(self, time):
         print 'time = ' + str(time) + ':'
 

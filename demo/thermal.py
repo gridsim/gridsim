@@ -3,6 +3,7 @@ from gridsim.simulation import Simulator
 from gridsim.recorder import PlotRecorder
 from gridsim.thermal.core import ThermalProcess, ThermalCoupling
 from gridsim.thermal.element import TimeSeriesThermalProcess
+from gridsim.timeseries import SortedConstantStepTimeSeriesObject
 from gridsim.iodata.input import CSVReader
 from gridsim.iodata.output import FigureSaver, CSVSaver
 
@@ -18,17 +19,17 @@ sim = Simulator()
 #   |           |]- 3 W/K
 #   |___________|
 #
-celsius = units.Quantity(20, units.degC)
+celsius = units(20, units.degC)
 room = sim.thermal.add(ThermalProcess.room('room',
                                            50*units.meter*units.meter,
                                            2.5*units.metre,
-                                           celsius.to(units.kelvin)))
+                                           units.convert(celsius, units.kelvin)))
 outside = sim.thermal.add(
-    TimeSeriesThermalProcess('outside',
-                             CSVReader(),
+    TimeSeriesThermalProcess('outside', SortedConstantStepTimeSeriesObject(CSVReader()),
                              './data/example_time_series.csv',
                              lambda t: t*units.hours,
-                             temperature_calculator=lambda t: t*units.degC))
+                             temperature_calculator=
+                                lambda t: units.convert(units(t, units.degC), units.kelvin)))
 
 sim.thermal.add(ThermalCoupling('room to outside', 1*units.thermal_conductivity,
                                 room, outside))
@@ -48,4 +49,5 @@ print("Saving data...")
 # Create a PDF document, add the two figures of the plot recorder to the
 # document and close the document.
 FigureSaver(temp, "Temperature").save('./output/thermal-example.pdf')
+FigureSaver(temp, "Temperature").save('./output/thermal-example.png')
 CSVSaver(temp).save('./output/thermal-example.csv')

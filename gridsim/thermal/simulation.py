@@ -1,4 +1,5 @@
-from gridsim.decorators import accepts
+from gridsim.decorators import accepts, returns, timed
+from gridsim.unit import units
 from gridsim.core import AbstractSimulationModule
 
 from .core import AbstractThermalElement, ThermalProcess, ThermalCoupling
@@ -8,7 +9,19 @@ class ThermalSimulator(AbstractSimulationModule):
 
     def __init__(self):
         """
-        Simulation module for all thermal simulation aspects.
+        __init__(self)
+
+        Gridsim main simulation class for thermal part. This module is
+        automatically added to the :class:`.Simulator` when
+        importing any class or module of :mod:`gridsim.thermal` package.
+
+        To access this class from simulation, use
+        :class:`.Simulator` as follow::
+
+            # Create the simulation.
+            sim = Simulator()
+            thsim = sim.thermal
+
         """
         super(ThermalSimulator, self).__init__()
 
@@ -27,19 +40,33 @@ class ThermalSimulator(AbstractSimulationModule):
             raise TypeError
 
     # SimulationModule implementation.
+    @returns(str)
     def attribute_name(self):
         """
-        AbstractSimulationModule implementation
+        attribute_name(self)
 
-        .. seealso:: :func:`gridsim.core.AbstractSimulationModule.attribute_name`.
+        Returns the name of this module.
+        This name is used to access to this electrical simulator from the
+        :class:`.Simulator`::
+
+            # Create the simulation.
+            sim = Simulator()
+            thsim = sim.thermal
+
+        :return: 'thermal'
+        :rtype: str
         """
         return 'thermal'
 
     def all_elements(self):
         """
-        AbstractSimulationModule implementation
+        all_elements(self)
 
-        .. seealso:: :func:`gridsim.core.AbstractSimulationModule.all_elements`.
+        Returns a list of all :class:`.AbstractThermalElement`
+        contained in the module.
+        The core simulator will use these lists in order to be able
+        to retrieve objects or list of objects by certain criteria using
+        :func:`gridsim.simulation.Simulator.find`.
         """
         elements = []
         elements.extend(self._processes)
@@ -48,20 +75,33 @@ class ThermalSimulator(AbstractSimulationModule):
 
     def reset(self):
         """
-        AbstractSimulationModule implementation
+        reset(self)
 
-        .. seealso:: :func:`gridsim.core.AbstractSimulationModule.reset`.
+        Calls :func:`gridsim.core.AbstractSimulationElement.reset` of
+        each element in this thermal simulator, added by the
+        :func:`ThermalSimulator.add`.
         """
         for process in self._processes:
             process.reset()
         for coupling in self._couplings:
             coupling.reset()
 
+    @accepts(((1, 2), units.Quantity))
     def calculate(self, time, delta_time):
         """
-        AbstractSimulationModule implementation
+        calculate(self, time, delta_time)
 
-        .. seealso:: :func:`gridsim.core.AbstractSimulationModule.calculate`.
+        Calls :func:`gridsim.core.AbstractSimulationElement.calculate`
+        of each :class:`.ThermalProcess` in this thermal
+        simulator, added by the :func:`ThermalSimulator.add` then apply
+        the :class:`.ThermalCoupling` to update the energy of each process.
+
+        :param time: The actual simulation time.
+        :type time: time, see :mod:`gridsim.unit`
+
+        :param delta_time: The time period for which the calculation
+            has to be done.
+        :type delta_time: time, see :mod:`gridsim.unit`
         """
 
         for process in self._processes:
@@ -70,6 +110,7 @@ class ThermalSimulator(AbstractSimulationModule):
         for coupling in self._couplings:
             process_a = self._process(coupling.from_process_id)
             process_b = self._process(coupling.to_process_id)
+
             if process_a is not None and process_b is not None:
 
                 coupling._delta_energy = \
@@ -92,12 +133,22 @@ class ThermalSimulator(AbstractSimulationModule):
                 #                   interval [J]
                 #               dt: Time interval [s]
 
-
+    @accepts(((1, 2), units.Quantity))
     def update(self, time, delta_time):
         """
-        AbstractSimulationModule implementation
+        update(self, time, delta_time)
 
-        .. seealso:: :func:`gridsim.core.AbstractSimulationModule.update`.
+        Updates the data of each :class:`.AbstractThermalElement` in this
+        electrical simulator added by the :func:`ThermalSimulator.add` and
+        calculate the load flow with
+        :class:`.AbstractElectricalLoadFlowCalculator`.
+
+        :param time: The actual simulation time.
+        :type time: time, see :mod:`gridsim.unit`
+
+        :param delta_time: The time period for which the calculation
+            has to be done.
+        :type delta_time: time, see :mod:`gridsim.unit`
         """
         for process in self._processes:
             process.update(time, delta_time)
@@ -107,7 +158,9 @@ class ThermalSimulator(AbstractSimulationModule):
     @accepts((1, AbstractThermalElement))
     def add(self, element):
         """
-        Adds the thermal process or thermal coupling to the thermal simulation
+        add(self, element)
+
+        Adds the :class:`.ThermalProcess` or :class:`.ThermalCoupling` to the thermal simulation
         module.
 
         :param element: Element to add to the thermal simulator module.

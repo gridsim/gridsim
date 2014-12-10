@@ -17,7 +17,7 @@ elements are in a defined state. Then you can either do a simple step using the
 method :func:`Simulator.step()` or run a simulation until a given time with a
 given step size using the method :func:`Simulator.run()`.
 
-Example::
+*Example*::
 
     from gridsim.unit import units
     from gridsim.simulation import Simulator
@@ -32,7 +32,7 @@ Example::
     sim.run(1*units.hours, 100*units.milliseconds)
 
 
-As the Gridsim simulator is based on modules. You can get access to the
+As Gridsim is based on modules. You can get access to the
 simulation modules by using special attributes of the core simulation object::
 
     sim = Simulation()
@@ -44,8 +44,11 @@ simulation module by typing::
     sim = Simulator()
     el = sim.electrical
 
+..  note::
+    Actually, the name of the module is the returned value of
+    :func:`gridsim.core.AbstractSimulationModule.attribute_name`.
+    Refer to the module you want to use to retrieve the module name.
 """
-import inspect
 import types
 from collections import namedtuple
 
@@ -67,6 +70,8 @@ class Recorder(object):
         object, the name of the attribute/property, the actual time and the
         actual value of the observed attribute/property.
 
+        To add a recorder to the simulation, use :func:`Simulator.record`.
+
         :param attribute_name: The name of the attribute observed by this
             recorder.
         :type attribute_name: str
@@ -82,7 +87,7 @@ class Recorder(object):
     @returns(str)
     def attribute_name(self):
         """
-        The name of the attribute observed by this recorder
+        The name of the attribute observed by this recorder.
         """
         return self._attribute_name
 
@@ -92,40 +97,47 @@ class Recorder(object):
         on_simulation_reset(self, subjects)
 
         This method is called by the simulation on order to inform the recorder
-        that the simulation has been reset. The parameter **subjects** is a list
+        that the simulation has been reset. The parameter ``subjects`` is a list
         of all subjects that are observer by the actual recorder. The method is
         called for each binding the recorder has with the simulation. This means
-        that you made 3 calls to Sim.record() with the same recorder,
-        this method is called 3 times. This method is optional.
+        that you do 3 calls to :func:`Simulator.record()`
+        with the same recorder, this method is called 3 times.
 
-        :param subjects: List of all observed objects.
-        :type subjects: List or tuple of :class:`AbstractSimulationElement`
+        :param subjects: list of all observed objects.
+        :type subjects: list or tuple of
+            :class:`gridsim.core.AbstractSimulationElement`
         """
         raise NotImplementedError('Pure abstract method!')
 
+    @accepts((1, units.Quantity))
     def on_simulation_step(self, time):
         """
+        on_simulation_step(self, time)
+
         This method is called each time the simulation just completed a step.
         This method is optional and not required to re-implement a recorder.
 
         :param time: The actual simulation time.
-        :type time: unit
+        :type time: time, see :mod:`gridsim.unit`
         """
         raise NotImplementedError('Pure abstract method!')
 
-    @accepts((1, AbstractSimulationElement))
+    @accepts((1, AbstractSimulationElement),
+             (2, units.Quantity))
     def on_observed_value(self, subject, time, value):
         """
+        on_observed_value(self, subject, time, value)
+
         Called by the main simulation engine between each simulation step in
         order the recorder can save the time-value pair of one or multiple
-        AbstractSimulationElement subclass(es).
+        :class:`.AbstractSimulationElement` subclass(es).
         Any recorder is required to implement this method.
 
         :param subject: The object that will be observed by the recorder.
-        :type subject: :class:`gridsim.core.AbstractSimulationElement`.
+        :type subject: :class:`.AbstractSimulationElement`
 
         :param time: The actual time of the simulation.
-        :type time: unit
+        :type time: time, see :mod:`gridsim.unit`
 
         :param value: The actual value of the attribute/property of the subject.
         :type value: Depends attribute...
@@ -145,31 +157,31 @@ class Simulator(object):
     _RecorderContext = namedtuple('RecorderContext', 'value time delta_time')
 
     @staticmethod
+    @accepts((1, types.ClassType))
     def register_simulation_module(module_class):
         """
+        register_simulation_module(module_class)
+
         Registers a simulation module class within the main simulator class.
         Note that you register the class, the simulator automatically
         instantiates an object of the class in its own constructor every time an
         instance of the simulator is created.
 
         :param module_class: The class to register as a simulation module.
-        :type module_class: :class:`.AbstractSimulationModule`
+        :type module_class: :class:`gridsim.core.AbstractSimulationModule`
         """
-        if not inspect.isclass(module_class) \
-                or not issubclass(module_class, AbstractSimulationModule):
-            raise TypeError(
-                'A simulation module class has to derive from \
-                    the base class AbstractSimulationModule.')
         Simulator._simulation_modules.append(module_class)
 
     def __init__(self):
         """
-        The Gridsim main simulation class. Moves the simulation of all modules
-            on in time and groups all simulation modules. The constructor 
-            creates automatically an instance of each registered simulation 
-            module. The fact to import a simulation module to the user's project
-            registers the module automatically within the main simulation class.
-            So only modules really used by the simulation are instantiated.
+        __init__(self)
+
+        Gridsim main simulation class. Moves the simulation of all modules
+        on in time and groups all simulation modules. The constructor creates
+        automatically an instance of each registered simulation module. The fact
+        to import a simulation module to the user's project registers the module
+        automatically within the main simulation class. So only modules really
+        used by the simulation are instantiated.
         """
         super(Simulator, self).__init__()
 
@@ -191,6 +203,8 @@ class Simulator(object):
     @returns(AbstractSimulationModule)
     def __getattr__(self, item):
         """
+        __getattr__(self, item)
+
         If the main simulation object does not own an attribute with the given
         name <sim>.<name>, this method gets called. If there exists a simulation
         module with the given attribute name, we return the reference to that
@@ -201,7 +215,7 @@ class Simulator(object):
             can be a potential simulation module.
         :type item: str
         
-        :returns: AbstractSimulationModule - The module corresponding to the 
+        :returns: :class:`AbstractSimulationModule` - The module corresponding to the
             item or None of no such module was found.
         """
         if item in self._modules.keys():
@@ -219,19 +233,21 @@ class Simulator(object):
              element_class=None, instance_of=None,
              has_attribute=None, close_to=None):
         """
-        Finds all AbstractSimulationElement derived objects matching the given
-        criteria by searching on either the given Gridsim simulation module or
-        by searching the whole simulation of the module was not specified. 
-        Note that the method returns always a list of elements, even if only a 
-        single instance is found. All parameters are optional, if find() will be
-        called without any parameters, the list of all elements in the actual
-        simulation will be returned.
+        find(self, module=None, uid=None, friendly_name=None, element_class=None, instance_of=None, has_attribute=None, close_to=None)
+
+        Finds all :class:`.AbstractSimulationElement` derived
+        objects matching the given criteria by searching on either the given
+        Gridsim simulation module or by searching the whole simulation of the
+        module was not specified. Note that the method returns always a list of
+        elements, even if only a single instance is found. All parameters are
+        optional, if :func:`find()` will be called without any parameters,
+        the list of all elements in the actual simulation will be returned.
 
         :param module: The module to search for elements.
         :type module: str
         
         :param uid: ID of the element. Note that these ID's are only unique for
-            a given class inside a module , so you should never search just for
+            a given class inside a module, so you should never search just for
             an ID without specifying either the class or at least the module.
         :type uid: int
         
@@ -248,7 +264,7 @@ class Simulator(object):
         
         :param has_attribute: The object should have an attribute with the given
             name. This can be used in order to find all objects that have a 
-            'power' attribute.
+            ``power`` attribute.
         :type has_attribute: str
         
         :param close_to: The object's position should be closer to the given one
@@ -256,7 +272,8 @@ class Simulator(object):
             the position and the radius in meters [m]
         :type close_to: (Position, float)
         
-        :return: List of objects matching the given criteria.
+        :return: List of :class:`.AbstractSimulationElement`
+            matching the given criteria.
 
         *Example:*
 
@@ -310,14 +327,17 @@ class Simulator(object):
 
         return elements
 
+    @accepts((1, units.Quantity))
     @returns(type(None))
     def reset(self, initial_time=0*units.second):
         """
+        reset(self, initial_time=0*units.second)
+
         Resets (re-initializes) the simulation.
 
         :param initial_time: The initial time from which the simulation starts.
-            Defaults to 0.
-        :type initial_time: unit
+            Defaults to ``0``.
+        :type initial_time: time, see :mod:`gridsim.unit`
         """
         self.time = initial_time
         for module in self._modules.values():
@@ -326,11 +346,13 @@ class Simulator(object):
         for recorder_binding in self._recorderBindings:
             recorder_binding.reset()
 
+    @accepts((1, units.Quantity))
     @returns(type(None))
     def _calculate(self, delta_time):
         for module in self._modules.values():
             module.calculate(self.time, delta_time)
 
+    @accepts((1, units.Quantity))
     @returns(type(None))
     def _update(self, delta_time):
 
@@ -343,21 +365,26 @@ class Simulator(object):
         for recorder_binding in self._recorderBindings:
             recorder_binding.update(self.time, delta_time)
 
+    @accepts((1, units.Quantity))
     @returns(type(None))
     def step(self, delta_time):
         """
+        step(self, delta_time)
+
         Executes a single simulation step on all modules.
 
         :param delta_time: The delta time for the single step.
-        :type delta_time: unit
+        :type delta_time: time, see :mod:`gridsim.unit`
         """
-
         self._calculate(delta_time)
         self.time += delta_time
         self._update(delta_time)
 
+    @accepts(((1, 2), units.Quantity))
     def run(self, run_time, delta_time):
         """
+        run(self, run_time, delta_time)
+
         Runs the simulation for a given time.
 
         The run_time parameter defines the duration the simulation has to run.
@@ -365,12 +392,13 @@ class Simulator(object):
         run in addition.
 
         :param run_time: Total run time.
-        :type run_time: unit
+        :type run_time: time, see :mod:`gridsim.unit`
         
         :param delta_time: Time interval for the simulation.
-        :type delta_time: unit
+        :type delta_time: time, see :mod:`gridsim.unit`
         """
-        self.reset()
+        if self.time is None:
+            self.reset()
 
         end_time = self.time + run_time
         self._update(delta_time)
@@ -398,17 +426,16 @@ class Simulator(object):
             # This method is called by the simulation after each simulation step
             #   in order to update the recorder.
             for subject in self._subjects:
-                try:
-                    value = getattr(subject, self._recorder.attribute_name)
 
-                    if self._conversion is not None:
-                        value = self._conversion(
-                            Simulator._RecorderContext(value, time, delta_time))
+                value = getattr(subject, self._recorder.attribute_name)
 
-                    self._recorder.on_observed_value(subject.friendly_name,
-                                                     time, value)
-                except AttributeError:
-                    pass
+                if self._conversion is not None:
+                    value = self._conversion(
+                    Simulator._RecorderContext(value, time, delta_time))
+
+                self._recorder.on_observed_value(subject.friendly_name,
+                                                 time, value)
+
 
     @accepts((1, Recorder),
              (2, (list, tuple, AbstractSimulationElement)),
@@ -416,30 +443,35 @@ class Simulator(object):
     @returns(Recorder)
     def record(self, recorder, subjects, conversion=None):
         """
+        record(self, recorder, subjects, conversion=None)
+
         Adds a recorder to an attribute of an object. The recorder has to
-        implement the :class:`core.RecorderInterface` interface in order to
+        implement the :class:`Recorder` interface in order to
         receive the data of the given attribute after each simulation step.
 
         :param recorder: Reference to the recorder object. This object gets
             notified about the changes of the object's attribute at each
             simulation step.
-        :type recorder: :class:`core.RecorderInterface`
+        :type recorder: :class:`Recorder`
         
         :param subjects: The subjects of the recorder, in other words the 
             objects which is attributes has to be recorded.
-        :type subjects: :list or tuple of class:`AbstractSimulationElement`
+        :type subjects: list or tuple of :class:`.AbstractSimulationElement`
 
         :param conversion: Lambda function to convert the actual value taken
             from the attribute before recording. The lambda function gets a
-            single parameter 'context' which is a named tuple with the following
+            single parameter ``context`` which is a named tuple with the following
             elements:
             
-            **value**: The actual value just read from the simulation
-                element's attribute.
+            **value**: The actual value just read from the simulation element's
+            attribute.
+
             **time**: The actual simulation time.
-            **delta_time**:The time step just simulated before updating the
-                recorder. This can be handy in order to calculate for example
-                the power of a delta-energy value.
+
+            **delta_time**: The time step just simulated before updating the
+            recorder. This can be handy in order to calculate for example the
+            power of a delta-energy value.
+
         :type conversion: lambda context
         
         :returns: Reference to the recoder.

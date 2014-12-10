@@ -1,4 +1,4 @@
-.. _gridsim-use-ref:
+.. _gridsim-use:
 
 #########################
 The Simulator General Use
@@ -8,32 +8,77 @@ The following section describes the first steps to use the Gridsim simulator
 and its built-in modules.
 
 Currently, the simulator provides:
-    * electrical simulation
-    * thermal simulation
-    * control of simulation element
-    * record of simulation element
+
+* :ref:`gridsim-simu`
+* :ref:`gridsim-electrical-simu`
+* :ref:`gridsim-thermal-simu`
+* :ref:`gridsim-control`
+* :ref:`gridsim-record`
 
 **********
 Simulation
 **********
 
-Simulator module
-================
+.. _gridsim-simu:
+
+Global simulation
+=================
 .. automodule:: gridsim.simulation
     :members:
     :undoc-members:
     :show-inheritance:
 
-Electrical module
-=================
+.. _gridsim-electrical-simu:
+
+Electrical simulation
+=====================
+.. automodule:: gridsim.electrical
+
+Electrical package
+------------------
 .. automodule:: gridsim.electrical.simulation
     :members:
     :undoc-members:
     :show-inheritance:
 
-Thermal module
-==============
+Electrical load flow
+--------------------
+
+.. automodule:: gridsim.electrical.loadflow
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Electrical network
+------------------
+.. automodule:: gridsim.electrical.network
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Electrical elements
+-------------------
+.. automodule:: gridsim.electrical.element
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. _gridsim-thermal-simu:
+
+Thermal simulation
+==================
+.. automodule:: gridsim.thermal
+
+Thermal package
+---------------
 .. automodule:: gridsim.thermal.simulation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Thermal elements
+----------------
+.. automodule:: gridsim.thermal.element
     :members:
     :undoc-members:
     :show-inheritance:
@@ -42,15 +87,19 @@ Thermal module
 User Interface
 **************
 
-Control module
-==============
+.. _gridsim-control:
+
+Control of simulation elements
+==============================
 .. automodule:: gridsim.controller
     :members:
     :undoc-members:
     :show-inheritance:
 
-Record module
-=============
+.. _gridsim-record:
+
+Record of simulation elements
+=============================
 .. automodule:: gridsim.recorder
     :members:
     :undoc-members:

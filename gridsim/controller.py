@@ -1,22 +1,23 @@
 """
 .. moduleauthor:: Michael Clausen <clm@hevs.ch>
+.. codeauthor:: Michael Clausen <clm@hevs.ch>
 
 This module contains controlling elements. These can control any Python
 attribute of an object based on the actual values of other attributes. The
 classical example is a simple thermostat:
 
-.. literalinclude:: ../../demos/thermostat.py
+.. literalinclude:: ../../demo/thermostat.py
     :linenos:
 
 This simulation outputs the following plots:
 
-.. figure:: ./figures/thermostat-fig1.png
+.. figure:: ../../demo/output/thermostat-fig1.png
             :align: center
 
-.. figure:: ./figures/thermostat-fig2.png
+.. figure:: ../../demo/output/thermostat-fig2.png
             :align: center
 
-.. figure:: ./figures/thermostat-fig3.png
+.. figure:: ../../demo/output/thermostat-fig3.png
             :align: center
 
 """
@@ -96,7 +97,7 @@ class ControllerSimulator(AbstractSimulationModule):
         for controller in self._controllers:
             controller.update(time, delta_time)
 
-    @accepts((1,AbstractControllerElement))
+    @accepts((1, AbstractControllerElement))
     def add(self, element):
         """
         Adds the control element to the controller simulation module.

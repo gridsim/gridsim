@@ -2,20 +2,23 @@ import csv
 import warnings
 from io import BufferedReader
 
-
 from gridsim.decorators import accepts, returns
 
 
 class Reader(object):
-    """
-    Based class of all readers.
-    """
 
     def __init__(self):
+        """
+        __init__(self)
+
+        This class is the based class of all readers/loaders.
+        """
         super(Reader, self).__init__()
 
     def clear(self):
         """
+        clear(self)
+
         Empties the data of the Reader.
         """
         raise NotImplementedError('Pure abstract method.')
@@ -26,21 +29,25 @@ class Reader(object):
     @returns(dict)
     def load(self, stream, data_type=str, clear_data=False):
         """
-        This method returns formatted data following this format
-        `[(label1, data1], (label2, data2), ...]`
+        load(self, stream, data_type=str, clear_data=False)
+
+        This method MUST returns formatted data following this format
+        ``[(label1, data1], (label2, data2), ...]``
+
         with:
-            * labelX: a str
-            * dataX: a list of `data_type`
 
-        :param: stream: a stream of data or a file name
-        :type: stream: str, BufferedReader
+        * ``labelX``: a str
+        * ``dataX``: a list of ``data_type``
 
-        :param clear_data: if clear data is `True` load the file even if the
+        :param stream: a stream of data or a file name
+        :type stream: str, BufferedReader
+
+        :param data_type: the type of stored data
+        :type data_type: type (default str)
+
+        :param clear_data: if clear data is ``True`` load the file even if the
             file is already loaded.
         :type clear_data: bool
-
-        :param: data_type: the type of stored data
-        :type: data_type: type (default str)
 
         :return: a dict of values
         :rtype: dict
@@ -51,12 +58,37 @@ class Reader(object):
 class CSVReader(Reader):
 
     DEFAULT_DATA_NAME = "DATA_"
+    """
+    If no header, the label of the ``dict`` returned by
+    :func:`gridsim.iodata.input.CSVReader.load` will be ``DATA_X`` with ``X`` an
+    integer representing the column in the file:
+
+    ``0 <= X < column number - 1``
+    """
 
     def __init__(self):
+        """
+        __init__(self)
+
+        This class reads a CSV file and stores the data as follow:
+
+        ``[(label1, data1], (label2, data2), ...]``
+
+        with:
+
+        * ``labelX``: a str
+        * ``dataX``: a list of ``data_type``
+
+        """
         super(CSVReader, self).__init__()
         self._data = dict()
 
     def clear(self):
+        """
+        clear(self)
+
+        :return:
+        """
         self._data.clear()
 
     @accepts((1, (str, BufferedReader)),
@@ -65,9 +97,17 @@ class CSVReader(Reader):
     @returns(dict)
     def load(self, stream, data_type=str, clear_data=False):
         """
+        load(self, stream, data_type=str, clear_data=False)
+
         Loads the data from the given CSV data file.
 
         :param stream: A stream of the CSV data to read
+        :type stream: str, BufferedReader
+        :param data_type: the type of the stored data
+        :type data_type: type
+        :param clear_data: if ``True`` clear the data if the reader already
+            loads a file.
+        :type clear_data: bool
         """
 
         # empty the data if already filled

@@ -1,4 +1,4 @@
-from gridsim.unit import units, convert
+from gridsim.unit import units
 from gridsim.simulation import Simulator
 from gridsim.thermal.core import ThermalCoupling, ThermalProcess
 from gridsim.thermal.element import ConstantTemperatureProcess
@@ -17,20 +17,20 @@ sim = Simulator()
 #  10 W/K -[|          |                      |           |]- 10 W/K
 #           |__________|                      |___________|
 #
-celsius = units.Quantity(18, units.degC)
+celsius = units(18, units.degC)
 room1 = sim.thermal.add(ThermalProcess.room('room1',
                                             50*units.meter*units.meter,
                                             2.5*units.metre,
-                                            celsius.to(units.kelvin)))
-celsius = units.Quantity(25, units.degC)
+                                            units.convert(celsius, units.kelvin)))
+celsius = units(25, units.degC)
 room2 = sim.thermal.add(ThermalProcess.room('room2',
                                             50*units.meter*units.meter,
                                             2.5*units.metre,
-                                            celsius.to(units.kelvin)))
+                                            units.convert(celsius, units.kelvin)))
 
-celsius = units.Quantity(5, units.degC)
+celsius = units(5, units.degC)
 outside = sim.thermal.add(
-    ConstantTemperatureProcess('outside', celsius.to(units.kelvin)))
+    ConstantTemperatureProcess('outside', units.convert(celsius, units.kelvin)))
 
 sim.thermal.add(ThermalCoupling('room1 to outside',
                                 10*units.thermal_conductivity,
@@ -50,7 +50,7 @@ sim.record(kelvin, sim.thermal.find(has_attribute='temperature'))
 # processes in Kelvin.
 celsius = PlotRecorder('temperature')
 sim.record(celsius, sim.thermal.find(has_attribute='temperature'),
-           lambda context: convert(context.value, units.degC))
+           lambda context: units.convert(context.value, units.degC))
 
 # Create a second plot recorder which records all energy flows
 # (thermal couplings) between the different processes.
@@ -66,8 +66,8 @@ sim.run(2*units.hour, 1*units.second)
 print("Saving data...")
 
 # Save the figures as images.
-FigureSaver(kelvin, "Temperature (K)").save('./output/fig1.pdf')
-FigureSaver(celsius, "Temperature (C)").save('./output/fig2.pdf')
-FigureSaver(flow, "Flow").save('./output/fig3.pdf')
+FigureSaver(kelvin, "Temperature (K)").save('./output/fig1.png')
+FigureSaver(celsius, "Temperature (C)").save('./output/fig2.png')
+FigureSaver(flow, "Flow").save('./output/fig3.png')
 
 CSVSaver(celsius).save('./output/fig2.csv')

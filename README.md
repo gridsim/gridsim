@@ -34,10 +34,7 @@ element(s) types are typically designed by specialising existing elements.
 2. Latest Version
 ===
 You can find the latest version of Gridsim on :
-    http://
-
-The current release of Gridsim is 0.1 and you can download it on pypi at :
-    http://
+    https://github.com/gridsim/
 
 
 3. Installation
@@ -48,18 +45,20 @@ file should be) and run :
     python setup.py install
 In some systems you need Administrator right to run this command.
 
-/!\ Warning : Gridsim requires these packages to be used in full :
+Warning : Gridsim requires these packages to be used in full :
 
  * numpy
  * scipy
  * matplotlib
  * pint
+ * enum34
 
 
 4. Documentation
 ===
 You can find the full documentation on :
     http://gridsim.hevs.ch
+    
 A documentation also is provided with this release in './doc' folder.
 
 
@@ -67,7 +66,7 @@ A documentation also is provided with this release in './doc' folder.
 ===
 If you find any bugs, or if you want new features you can put your request on
 github at the following address :
-    http://
+    https://github.com/gridsim/
 
 
 6. Contributors

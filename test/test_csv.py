@@ -8,9 +8,9 @@ class TestCSVReader(unittest.TestCase):
 
     def test_default_load_with_header(self):
 
-        ref_data = {'humidity': ['0.2', '0.25', '0.1'],
-                    'temperature': ['20.0', '20.0', '18'],
-                    'time': ['0', '1', '2']}
+        ref_data = {'humidity': ['0.2', '0.25', '0.1', '0.7'],
+                    'temperature': ['20.0', '20.0', '18', '4.1'],
+                    'time': ['0', '1', '2', '3']}
 
         cvs_reader = CSVReader()
 
@@ -20,9 +20,9 @@ class TestCSVReader(unittest.TestCase):
 
     def test_convert_load_with_header(self):
 
-        ref_data = {'humidity': [0.2, 0.25, 0.1],
-                    'temperature': [20.0, 20.0, 18],
-                    'time': [0, 1, 2]}
+        ref_data = {'humidity': [0.2, 0.25, 0.1, 0.7],
+                    'temperature': [20.0, 20.0, 18, 4.1],
+                    'time': [0, 1, 2, 3]}
 
         cvs_reader = CSVReader()
 
