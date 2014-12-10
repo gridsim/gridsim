@@ -193,7 +193,7 @@ sim.electrical.load_flow_calculator = DirectLoadFlowCalculator()
 #   |___________|
 #
 # The room has a surface of 50m2 and a height of 2.5m.
-celsius = units.Quantity(20, units.degC)
+celsius = units(20, units.degC)
 room = sim.thermal.add(ThermalProcess.room('room',
                                            50*units.meter*units.meter,
                                            2.5*units.metre,
@@ -241,7 +241,7 @@ sim.electrical.attach(bus0, heater)
 #                __|__    |__________________________|
 #                 ---
 #
-target = units.Quantity(18, units.degC)
+target = units(18, units.degC)
 # the hysteresis is a delta of temperature
 hysteresis = 1*units.delta_degC
 

@@ -6,12 +6,17 @@ The Gridsim simulator
 
 .. figure:: ./figures/logo.png
             :align: center
+            :target: https://github.com/gridsim/gridsim
+
+You can find the source code of Gridsim here_.
+
+.. _here: https://github.com/gridsim/gridsim
 
 ****************
 Table of Content
 ****************
 
-This documentation is separated into four parts:
+This documentation is separated into:
 
 .. toctree::
     :numbered:
