@@ -47,6 +47,18 @@ and::
                                            2.5*units.metre,                       # define metre
                                            units.convert(celsius, units.kelvin))) # convert celsius to kelvin for the simulation
 
+             Also, there is a delta counterpart to specify temperature
+             differences. Absolute units have no delta counterpart.
+             For example, the change in celsius is equal to the change
+             in kelvin, but not in fahrenheit (as the scaling factor is
+             different)::
+
+                >>> hysteresis = 2.4*units.delta_degC
+                >>> print(hysteresis.to(units.kelvin))
+                2.4 kelvin
+                >>> print(hysteresis.to(units.delta_degF))
+                4.32 delta_degF
+
 .. method:: units(value, unit)
 
     Creates a measurement of ``value`` times ``unit``
@@ -423,6 +435,19 @@ Temperature
 .. warning:: As temperature can have an offset, it could be necessary to :func:`units.convert`
              degree to kelvin to avoid errors.
 
+Delta temperature
+-----------------
+
+There is a delta counterpart to specify temperature differences. Absolute
+units have no delta counterpart. For example, the change in celsius is equal to
+the change in kelvin, but not in fahrenheit (as the scaling factor is
+different).
+
+* ``delta_degC``
+* ``delta_degF``
+* ``kelvin``
+* ``rankine``
+
 Time
 ----
 
@@ -548,6 +573,19 @@ class _Unit(object):
                                                    50*units.meter*units.meter,            # define square metre
                                                    2.5*units.metre,                       # define metre
                                                    units.convert(celsius, units.kelvin))) # convert celsius to kelvin for the simulation
+
+                     Also, there is a delta counterpart to specify temperature
+                     differences. Absolute units have no delta counterpart.
+                     For example, the change in celsius is equal to the change
+                     in kelvin, but not in fahrenheit (as the scaling factor is
+                     different)::
+
+                         >>> hysteresis = 2.4*units.delta_degC
+                         >>> print(hysteresis.to(units.kelvin))
+                         2.4 kelvin
+                         >>> print(hysteresis.to(units.delta_degF))
+                         4.32 delta_degF
+
 
         """
         self._registry = UnitRegistry()

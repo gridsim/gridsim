@@ -242,7 +242,9 @@ sim.electrical.attach(bus0, heater)
 #                 ---
 #
 target = units.Quantity(18, units.degC)
+# the hysteresis is a delta of temperature
 hysteresis = 1*units.delta_degC
+
 thermostat = sim.controller.add(Thermostat('thermostat',
                                            units.convert(target, units.kelvin),
                                            hysteresis,
