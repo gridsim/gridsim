@@ -56,7 +56,7 @@ class TestDLF2(unittest.TestCase):
 
         # compute buses other electrical values
         #--------------------------------------
-        dlf.calculate(P, Q, V, Th, True)
+        [P, Q, V, Th] = dlf.calculate(P, Q, V, Th, True)
 
         # check results against reference values
         p_slack = P[0]
