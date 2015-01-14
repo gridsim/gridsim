@@ -48,7 +48,7 @@ This module takes care of all connections between electrical nodes. The module
 currently supports 2 calculation methods:
 
 * **Direct Load Flow Computing:** for fast results.
-* **Newton-Rhapsody Flow Computing:** for a detailed simulation.
+* **Newton-Raphson Load Flow Computing:** for a detailed simulation.
 
 Thermal
 -------
