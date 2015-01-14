@@ -475,8 +475,10 @@ class ElectricalSimulator(AbstractSimulationModule):
 
             # perform network computations
             #------------------------------
-            self.load_flow_calculator.calculate(self._bu.P, self._bu.Q,
-                                                self._bu.V, self._bu.Th, True)
+            [self._bu.P, self._bu.Q, self._bu.V, self._bu.Th] = \
+                self.load_flow_calculator.calculate(self._bu.P, self._bu.Q,
+                                                    self._bu.V, self._bu.Th,
+                                                    True)
 
             [self._br.Pij, self._br.Qij, self._br.Pji, self._br.Qji] = \
                 self.load_flow_calculator.get_branch_power_flows(True)

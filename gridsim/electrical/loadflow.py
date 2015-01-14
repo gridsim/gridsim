@@ -223,6 +223,9 @@ class AbstractElectricalLoadFlowCalculator(object):
         :param scaled: specifies whether electrical input values are scaled or
             not
         :type scaled: boolean
+
+        :return: modified [P, Q, V, Th]
+        :rtype: a list of 4 element
         """
         raise NotImplementedError('Pure abstract method!')
 
@@ -446,12 +449,14 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         :param scaled: specifies whether electrical input values are scaled or
             not
         :type scaled: boolean
+
+        :return: modified [P, Q, V, Th]
+        :rtype: a list of 4 element
         """
         # check input arguments and save them to internal
         # variables _P, _Q, and _V
         # variables _P, _Q, and _V
-        super(DirectLoadFlowCalculator, self)._read_calculate_args(P, Q, V, Th,
-                                                                   scaled)
+        self._read_calculate_args(P, Q, V, Th, scaled)
         # initialize voltage angles internal variable _Th to 0.0
         self._Th = np.zeros([self._nBu, 1])
 
@@ -472,10 +477,12 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         # vector of voltage angles
         # update intern variable
         self._Th = np.concatenate(([0.0], np.dot(self._invBvq, self._P[1:])))*units.degree
-        # update external variable
-        Th[:] = self._Th
 
+
+        # return external variable
         self._calculate_done = True
+
+        return [self._P, self._Q, self._V, self._Th]
 
     @accepts((1, bool))
     @returns(tuple)
@@ -660,8 +667,7 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         """
         # check input arguments and save them to internal variables _P, _Q,
         # and _V
-        super(NewtonRaphsonLoadFlowCalculator, self)\
-            ._read_calculate_args(P, Q, V, Th, scaled)
+        self._read_calculate_args(P, Q, V, Th, scaled)
         # initialize voltage amplitudes of PQ buses to 1.0
         self._V[self._is_PQ] = 1.0
         # initialize voltage angles of all buses to 0.0
@@ -809,13 +815,9 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         # Update reactive power for slack and all PV buses
         self._Q[~self._is_PQ] = q_calc[~self._is_PQ]
 
-        if scaled:
-            P[:] = self._P
-            Q[:] = self._Q
-            V[:] = self._V
-        else:
-            P[:] = self.s_base * self._P
-            Q[:] = self.s_base * self._Q
-            V[:] = self.v_base * self._V
+        if not scaled:
+            self._P *= self.s_base
+            self._Q *= self.s_base
+            self._V *= self.v_base
 
-        Th[:] = self._Th
+        return [self._P, self._Q, self._V, self._Th]
