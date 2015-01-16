@@ -8,7 +8,7 @@ class TestRecorder(unittest.TestCase):
 
     def test_plot_recorder(self):
 
-        recorder = PlotRecorder('power')
+        recorder = PlotRecorder('power', units.minute, units.watt)
 
         recorder.on_simulation_reset(['foo', 'bar'])
 
@@ -33,11 +33,11 @@ class TestRecorder(unittest.TestCase):
         recorder.on_observed_value('bar', delta_time, 9*units.watt)
 
         self.assertEqual(recorder.get_x_values(), [1.0, 2.0, 3.0, 4.0])
-        self.assertEqual(recorder.get_x_unit(), units.unit(units.minute))
+        self.assertEqual(recorder.get_x_unit(), units.minute)
         self.assertDictEqual(recorder.get_y_values(),
                              {'bar': [12, 12.1, 14.2, 9],
                               'foo': [14.2, 12, 16.1, 18.4]})
-        self.assertEqual(recorder.get_y_unit(), units.unit(units.watt))
+        self.assertEqual(recorder.get_y_unit(), units.watt)
 
 if __name__ == '__main__':
     unittest.main()

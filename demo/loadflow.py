@@ -54,11 +54,11 @@ esim.attach('Bus 3', GaussianRandomElectricalCPSElement('Load3',
 esim.attach('Bus 4', ConstantElectricalCPSElement('Gen', -5.0*units.watt))
 
 # Create a plot recorder which records power on each bus.
-bus_pwr = PlotRecorder('P')
+bus_pwr = PlotRecorder('P', units.second, units.watt)
 sim.record(bus_pwr, esim.find(element_class=ElectricalPQBus))
 
 # Create a plot recorder which records power on transmission lines.
-line_pwr = PlotRecorder('Pij')
+line_pwr = PlotRecorder('Pij', units.second, units.watt)
 sim.record(line_pwr, [tl1, tl2, tl3])
 
 # It is recommended to perform the simulator reset operation.

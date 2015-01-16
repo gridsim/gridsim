@@ -231,31 +231,23 @@ class ThermalCoupling(AbstractThermalElement):
             element.
         :type thermal_conductivity: thermal conductivity, see :mod:`gridsim.unit`
 
-        :param from_process: The first process coupled or the ID of the first
+        :param from_process: The first process coupled
             process.
-        :type from_process: int (ID), :class:`ThermalProcess`
+        :type from_process: :class:`ThermalProcess`
 
-        :param to_process: The second process coupled or the ID of the second
+        :param to_process: The second process coupled
             process.
-        :type to_process: int (ID), :class:`ThermalProcess`
+        :type to_process: :class:`ThermalProcess`
         """
         super(ThermalCoupling, self).__init__(friendly_name)
+
+        self.from_process = from_process
+        self.to_process = to_process
 
         self.thermal_conductivity = thermal_conductivity
         """
         The thermal conductivity of the coupling in W/K.
         """
-
-        self.from_process_id = None
-        """
-        The ID of the first process.
-        """
-
-        self.to_process_id = None
-        """
-        The ID of the second process.
-        """
-
         self._contact_area = contact_area
         """
         The size of the contact area between the two :class:`ThermalProcess`
@@ -264,27 +256,10 @@ class ThermalCoupling(AbstractThermalElement):
         """
         The thickness of the material between the two :class:`ThermalProcess`
         """
-
-        if isinstance(from_process, ThermalProcess) \
-                and not from_process is None \
-                and not from_process.id is None:
-            self.from_process_id = from_process.id
-        elif isinstance(from_process, int):
-            self.from_process_id = from_process
-        else:
-            raise RuntimeError('Missing or invalid from_process reference.')
-        if isinstance(to_process, ThermalProcess) \
-                and not to_process is None \
-                and not to_process.id is None:
-            self.to_process_id = to_process.id
-        elif isinstance(to_process, int):
-            self.to_process_id = to_process
-        else:
-            raise RuntimeError('Missing or invalid to_process reference.')
-        self._simulator = None
-
         self._delta_energy = 0*units.joule
-
+        """
+        The energy variation
+        """
         self.power = None
         """
         Thermal power that gets conducted by the thermal coupling.
@@ -307,7 +282,6 @@ class ThermalCoupling(AbstractThermalElement):
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.reset`.
         """
         self._delta_energy = 0*units.joule
-        pass
 
     def calculate(self, time, delta_time):
         """
@@ -317,8 +291,23 @@ class ThermalCoupling(AbstractThermalElement):
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.calculate`.
         """
-        # Nothing to do, we do all calculations in simulator main module.
-        pass
+        #
+        # Q = C * T     Q: Thermal energy [J]
+        #               C: Thermal conductivity [J/K]
+        # dT = Rth * I  T: Temperature [K]
+        #               dT: Temperature difference [K]
+        # dQ = dt * I   Rth: Thermal resistance [K/W]
+        #               I: Thermal flow [W]
+        #               dQ: Change of thermal energy per time
+        #                   interval [J]
+        #               dt: Time interval [s]
+        self._delta_energy = \
+            ((self.from_process.temperature - self.to_process.temperature) * \
+            self.thermal_conductivity * \
+            self.contact_area / self.thickness)*delta_time
+
+        self.from_process.add_energy(-self._delta_energy)
+        self.to_process.add_energy(self._delta_energy)
 
     def update(self, time, delta_time):
         """
@@ -329,4 +318,3 @@ class ThermalCoupling(AbstractThermalElement):
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.update`.
         """
         self.power = self._delta_energy / delta_time
-        pass

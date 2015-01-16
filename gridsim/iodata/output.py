@@ -170,8 +170,8 @@ class FigureSaver(object):
             plot.ylim(y_min, y_max)
         for meta, data in self._y.iteritems():
             plot.plot(self._x, data, label=meta)
-        plot.xlabel('[' + self._x_unit + ']')
-        plot.ylabel('[' + self._y_unit + ']')
+        plot.xlabel('[' + str(self._x_unit) + ']')
+        plot.ylabel('[' + str(self._y_unit) + ']')
         plot.legend(loc='best', prop={'size': 8})
         return self._figure
 

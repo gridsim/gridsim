@@ -3,7 +3,7 @@ from gridsim.unit import units
 from gridsim.simulation import Simulator
 from gridsim.recorder import PlotRecorder
 from gridsim.thermal.core import ThermalProcess, ThermalCoupling
-from gridsim.iodata.output import CSVSaver, FigureSaver
+from gridsim.iodata.output import CSVSaver
 
 # Create a simulation.
 sim = Simulator()
@@ -34,12 +34,12 @@ sim.thermal.add(ThermalCoupling('coupling',
                                 hot_room, cold_room))
 
 # Add the temperature recorder.
-temperature_recorder = PlotRecorder('temperature')
+temperature_recorder = PlotRecorder('temperature', units.second, units.degC)
 sim.record(temperature_recorder,
            sim.thermal.find(instance_of=ThermalProcess))
 
 # Add the power recorder.
-power_recorder = PlotRecorder('power')
+power_recorder = PlotRecorder('power', units.second, units.watt)
 sim.record(power_recorder, sim.thermal.find(instance_of=ThermalCoupling))
 
 # Simulate

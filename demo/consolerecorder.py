@@ -2,20 +2,17 @@ from gridsim.simulation import Simulator
 from gridsim.unit import units
 from gridsim.recorder import Recorder
 from gridsim.thermal.core import ThermalProcess, ThermalCoupling
-from gridsim.decorators import timed
 
 
 #Custom recorder.
 class ConsoleRecorder(Recorder):
 
-    def __init__(self, attribute_name):
-        super(ConsoleRecorder, self).__init__(attribute_name)
+    def __init__(self, attribute_name, x_unit, y_unit):
+        super(ConsoleRecorder, self).__init__(attribute_name, x_unit, y_unit)
 
-    @timed
     def on_simulation_reset(self, subjects):
         print 'RESET, observing: ' + str(subjects)
 
-    @timed
     def on_simulation_step(self, time):
         print 'time = ' + str(time) + ':'
 
@@ -53,7 +50,7 @@ sim.thermal.add(ThermalCoupling('coupling',
 
 # Add a custom console recorder to the attribute "temperature" of the hot
 # room thermal process.
-sim.record(ConsoleRecorder("temperature"),
+sim.record(ConsoleRecorder("temperature", units.second, units.degC),
            sim.thermal.find(element_class=ThermalProcess))
 
 # Simulate

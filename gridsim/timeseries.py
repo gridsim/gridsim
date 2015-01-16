@@ -173,6 +173,24 @@ class TimeSeriesObject(TimeSeries):
                                                     is_time_key)
         self.compute_data()
 
+    @accepts((1, str), (2, FunctionType))
+    def convert(self, item, converter):
+        """
+        convert(self, item, converter)
+
+        Convert each element of the list mapped by ``item`` with the ``convert``
+        function.
+
+        :param item: the key of the list to convert
+        :type item: str
+
+        :param converter: the conversion function
+        :type converter: function
+
+        """
+        super(TimeSeriesObject, self).convert(item, converter)
+        self.compute_data()
+
     def __getattr__(self, item):
 
         if self._computed_data is None:

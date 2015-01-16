@@ -1,4 +1,4 @@
-from gridsim.decorators import accepts, returns, timed
+from gridsim.decorators import accepts, returns
 from gridsim.unit import units
 from gridsim.core import AbstractSimulationModule
 
@@ -108,30 +108,7 @@ class ThermalSimulator(AbstractSimulationModule):
             process.calculate(time, delta_time)
 
         for coupling in self._couplings:
-            process_a = self._process(coupling.from_process_id)
-            process_b = self._process(coupling.to_process_id)
-
-            if process_a is not None and process_b is not None:
-
-                coupling._delta_energy = \
-                    (process_a.temperature - process_b.temperature) * \
-                    coupling.thermal_conductivity * \
-                    coupling.contact_area / coupling.thickness
-
-                process_a.add_energy(-coupling._delta_energy * delta_time)
-
-                process_b.add_energy(coupling._delta_energy * delta_time)
-
-                #
-                # Q = C * T     Q: Thermal energy [J]
-                #               C: Thermal conductivity [J/K]
-                # dT = Rth * I  T: Temperature [K]
-                #               dT: Temperature difference [K]
-                # dQ = dt * I   Rth: Thermal resistance [K/W]
-                #               I: Thermal flow [W]
-                #               dQ: Change of thermal energy per time
-                #                   interval [J]
-                #               dt: Time interval [s]
+            coupling.calculate(time, delta_time)
 
     @accepts(((1, 2), units.Quantity))
     def update(self, time, delta_time):
@@ -179,10 +156,10 @@ class ThermalSimulator(AbstractSimulationModule):
             if element.friendly_name in self._couplingsDict.keys():
                 raise RuntimeError(
                     'Duplicate thermal coupling friendly name, must be unique.')
-            elif element.from_process_id > len(self._processes):
-                raise RuntimeError('Invalid from process or from process ID.')
-            elif element.to_process_id > len(self._processes):
-                raise RuntimeError('Invalid to process or to process ID.')
+            elif element.from_process is None:
+                raise RuntimeError('Invalid from process.')
+            elif element.to_process is None:
+                raise RuntimeError('Invalid to process.')
             element.id = len(self._couplings)
             self._couplings.append(element)
             self._couplingsDict[element.friendly_name] = element
