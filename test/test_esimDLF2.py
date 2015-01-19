@@ -78,13 +78,13 @@ class TestEsimDLF2(unittest.TestCase):
         # create recorders to collect output data
         #-----------------------------------------
         # Create a plot recorder which records active power on slack bus.
-        bus_pwr = PlotRecorder('P')
+        bus_pwr = PlotRecorder('P', units.second, units.watt)
         sim.record(bus_pwr, esim.find(element_class=ElectricalSlackBus))
         # Create a plot recorder which records theta angle on each bus.
-        bus_th = PlotRecorder('Th')
+        bus_th = PlotRecorder('Th', units.second, units.degree)
         sim.record(bus_th, esim.find(has_attribute='Th'))
         # Create a plot recorder which records power flow on each branch.
-        bra_pwr = PlotRecorder('Pij')
+        bra_pwr = PlotRecorder('Pij', units.second, units.watt)
         sim.record(bra_pwr, esim.find(element_class=ElectricalNetworkBranch))
 
         # make one simulation step

@@ -60,10 +60,11 @@ from .unit import units
 
 class Recorder(object):
 
-    @accepts((1, str))
-    def __init__(self, attribute_name):
+    @accepts((1, str),
+             ((2, 3), (units.Quantity, type)))
+    def __init__(self, attribute_name, x_unit, y_unit):
         """
-        __init__(self, attribute_name)
+        __init__(self, attribute_name, x_unit=None, y_unit=None)
 
         Defines the interface an object has to implement in order to get
         notified between simulation steps with a reference to the observed
@@ -75,12 +76,26 @@ class Recorder(object):
         :param attribute_name: The name of the attribute observed by this
             recorder.
         :type attribute_name: str
+        :param x_unit: The unit of the horizontal axis
+        :type x_unit: type or unit see :mod:`gridsim.unit`
+        :param y_unit: The unit of the vertical axis
+        :type y_unit: type or unit see :mod:`gridsim.unit`
         """
         super(Recorder, self).__init__()
 
         self._attribute_name = attribute_name
         """
         The name of the attribute observed by this recorder
+        """
+
+        self._x_unit = x_unit
+        """
+        The unit of the horizontal axis
+        """
+
+        self._y_unit = y_unit
+        """
+        The unit of the vertical axis
         """
 
     @property
@@ -409,13 +424,12 @@ class Simulator(object):
     # attribute of an object.
     class _RecorderBinding(object):
 
-        def __init__(self, recorder, subjects, conversion):
+        def __init__(self, recorder, subjects):
             super(Simulator._RecorderBinding, self).__init__()
 
             # Save the recorder instance and the subject's attribute.
             self._recorder = recorder
             self._subjects = subjects
-            self._conversion = conversion
 
         def reset(self):
             # Call the reset handler of the recorder.
@@ -429,19 +443,16 @@ class Simulator(object):
 
                 value = getattr(subject, self._recorder.attribute_name)
 
-                if self._conversion is not None:
-                    value = self._conversion(
-                    Simulator._RecorderContext(value, time, delta_time))
+                Simulator._RecorderContext(value, time, delta_time)
 
                 self._recorder.on_observed_value(subject.friendly_name,
                                                  time, value)
 
 
     @accepts((1, Recorder),
-             (2, (list, tuple, AbstractSimulationElement)),
-             (3, (types.FunctionType, type(None))))
+             (2, (list, tuple, AbstractSimulationElement)))
     @returns(Recorder)
-    def record(self, recorder, subjects, conversion=None):
+    def record(self, recorder, subjects):
         """
         record(self, recorder, subjects, conversion=None)
 
@@ -479,8 +490,7 @@ class Simulator(object):
         if isinstance(subjects, AbstractSimulationElement):
             subjects = (subjects,)
 
-        self._recorderBindings.append(self._RecorderBinding(recorder, subjects,
-                                                            conversion))
+        self._recorderBindings.append(self._RecorderBinding(recorder, subjects))
 
         if not recorder in self._recorders:
             self._recorders.append(recorder)

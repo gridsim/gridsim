@@ -67,7 +67,7 @@ sim = Simulator()
 obj = sim.my.add(MyObject(CSVReader(), './data/example_time_series.csv'))
 obj.convert("temperature", lambda t: units(t, units.degC))
 
-rec = PlotRecorder('temperature')
+rec = PlotRecorder('temperature', units.month, units.kelvin)
 sim.record(rec, obj)
 
 print("Running simulation...")

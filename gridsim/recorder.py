@@ -17,38 +17,39 @@ recorders are added to the simulation:*
 .. literalinclude:: ../../demo/consolerecorder.py
     :linenos:
 
-- On line 7 to 21 we implement our custom recorder.
+- On line 9 to 24 we implement our custom recorder.
 
-  - On line 13 we re-implement the abstract method
+  - On line 15 we re-implement the abstract method
     :func:`gridsim.simulation.Recorder.on_simulation_reset`.
     We log which objects we observe.
-  - On line 16 we implement the
+  - On line 19 we implement the
     :func:`gridsim.simulation.Recorder.on_simulation_step` method.
     We just output the current time.
-  - On line 19 we re-implement the abstract method
+  - On line 22 we re-implement the abstract method
     :func:`gridsim.simulation.Recorder.on_observed_value()`.
     Basically we just output the value to the console.
 
-- On line 24 we create the gridsim simulation object.
-- On line 35 to 48 we setup a very simple thermal process, where we define 2
+- On line 27 we create the gridsim simulation object.
+- On line 38 to 52 we setup a very simple thermal process, where we define 2
   rooms and a thermal coupling between them:
 
-  - hot_room (line 36) has a **surface** of ``50m2`` and a **height** of
-    ``2.5m``, so the **volume** is ``125m3``. The room is filled with
-    :class:`gridsim.util.Air` (specific thermal capacity=`1.005 J/gK``) with the **initial temperature of 60
-    degree celsius**.
-  - cold_room (line 42) has the same volume, but an initial **temperature of 20
-    degree celsius**.
-  - the two rooms are coupled with a thermal conductivity of **100 Watts per
-    Kelvin** (line 47).
+  - hot_room (line 39) has a ``surface`` of ``50m2`` and a ``height`` of
+    ``2.5m``, so the ``volume`` is ``125m3``. The room is filled with
+    :class:`gridsim.util.Air` (specific thermal capacity=`1.005 J/gK``) with
+    the initial temperature of 60 degree celsius (line 38).
+  - cold_room (line 45) has the same volume, but an initial temperature of 20
+    degree celsius (line 44).
+  - the two rooms are coupled with a thermal conductivity of ``100 Watts per
+    Kelvin`` (line 51).
 
-- On line 53 we add a new recorder (of our custom recorder class) to the
-    attribute **temperature** of all ThermalProcesses. That is all we have
-    actually to do to add a recorder, the simulation will call the recorder's
-    **on_simulation_step()** and **on_observed_value()** method each time the
-    simulation did a step.
+- On line 56 we add the recorder to the simulation. The recorder will listen all
+  all :class:`ThermalProcess` and record their ``temperature`` parameter.
+  The horizontal unit will be in second and the vertical unit in degree celsius.
+  The simulation will call the recorder's
+  **on_simulation_step()** and **on_observed_value()** method each time the
+  simulation did a step.
 
-- On line 57 we actually start the simulation for 1 hour with a resolution
+- On line 60 we actually start the simulation for 1 hour with a resolution
   of 5 minutes.
 
 *The output of the console logger should be something like this*::
@@ -105,10 +106,11 @@ from .simulation import Recorder
 
 class PlotRecorder(Recorder, AttributesGetter):
 
-    @accepts((1, str))
-    def __init__(self, attribute_name):
+    @accepts((1, str),
+             ((2, 3), (units.Quantity, type)))
+    def __init__(self, attribute_name, x_unit, y_unit):
         """
-        __init__(self, attribute_name)
+        __init__(self, attribute_name, x_unit=None, y_unit=None)
 
         A :class:`PlotRecorder` can be used to record one or multiple signals
         and plot them at the end of the simulation either to a image file,
@@ -118,6 +120,10 @@ class PlotRecorder(Recorder, AttributesGetter):
             :class:`.AbstractSimulationElement` with a param of this name can
             be recorded
         :type attribute_name: str
+        :param x_unit: The unit of the horizontal axis
+        :type x_unit: type or unit see :mod:`gridsim.unit`
+        :param y_unit: The unit of the vertical axis
+        :type y_unit: type or unit see :mod:`gridsim.unit`
 
         *Example:*
 
@@ -126,34 +132,24 @@ class PlotRecorder(Recorder, AttributesGetter):
 
         * In this example, only new concept are detailed.
         * On line 46, we create a :class:`PlotRecorder` which recorder the
-          ``temperature`` attribute.
+          ``temperature`` attribute in Kelvin.
         * On line 47, we use that recorder in order to record all elements in
           the thermal module who have the attribute 'temperature' by using the
           powerful :func:`gridsim.simulation.Simulator.find()` method by asking
           to return a list of all elements that have the attribute 'temperature'.
         * On line 51, we create a very similar recorder as before,
         * On line 52, this time we do not want to record the temperature in
-          kelvin, we want the temperature in degrees celsius. As the
+          Kelvin, we want the temperature in degrees celsius. As the
           simulator needs temperatures in kelvin (see :mod:`gridsim.unit` for
-          mor information), we have to add a conversion lambda function
+          mor information), we only have to give this information to the recorder,
           which will convert the temperature in degrees celsius.
-          The lambda gets a named tuple as parameter which contains the
-          following keys:
-
-          * "value": the value just read from the attribute,
-          * "time": the actual simulation time and
-          * "delta_time": the time interval for which the value has been
-            calculated.
-
-          The :mod:`gridsim.unit` module provides a simple way to convert
-          data, thus we use it.
-        * On line 69, we create a first :class:`.FigureSaver` instance with the
+        * On line 68, we create a first :class:`.FigureSaver` instance with the
           title 'Temperature (K)' which will use the data returned by the
           :class:`.Recorder` to :func:`save` the data in a figure.
-        * On line 70, we also save the data of the other :class:`.Recorder`.
+        * On line 69, we also save the data of the other :class:`.Recorder`.
           The figures below show that the result is quite the same except that
           the y-coordinates have the right unit.
-        * On line 73, we save the data using another saver: :class:`.CSVSaver`.
+        * On line 72, we save the data using another saver: :class:`.CSVSaver`.
 
         The resulting 3 images of this simulation are show here:
 
@@ -167,12 +163,10 @@ class PlotRecorder(Recorder, AttributesGetter):
             :align: center
 
         """
-        super(PlotRecorder, self).__init__(attribute_name)
+        super(PlotRecorder, self).__init__(attribute_name, x_unit, y_unit)
 
         self._x = []
-        self._x_unit = None
         self._y = {}
-        self._y_unit = None
 
     def on_simulation_reset(self, subjects):
         """
@@ -195,9 +189,10 @@ class PlotRecorder(Recorder, AttributesGetter):
         .. seealso:: :func:`gridsim.simulation.Recorder.on_simulation_step()`
                      for details.
         """
-        self._x.append(units.value(time))
-        if self._x_unit is None:
-            self._x_unit = units.unit(time)
+        if isinstance(self._x_unit, type):
+            self._x.append(self._x_unit(time))
+        else:
+            self._x.append(units.value(units.convert(time, self._x_unit)))
 
     def on_observed_value(self, subject, time, value):
         """
@@ -209,10 +204,10 @@ class PlotRecorder(Recorder, AttributesGetter):
         .. seealso:: :func:`gridsim.simulation.Recorder.on_observed_value()`
                      for details.
         """
-        self._y[subject].append(units.value(value))
-
-        if self._y_unit is None:
-            self._y_unit = units.unit(value)
+        if isinstance(self._y_unit, type):
+            self._y[subject].append(self._y_unit(value))
+        else:
+            self._y[subject].append(units.value(units.convert(value, self._y_unit)))
 
     def get_x_values(self):
         """
@@ -286,8 +281,9 @@ class PlotRecorder(Recorder, AttributesGetter):
 class HistogramRecorder(Recorder, AttributesGetter):
 
     @accepts((1, str),
-             (4, int))
-    def __init__(self, attribute_name, x_min, x_max, nb_bins):
+             (4, int),
+             ((5, 6), type))
+    def __init__(self, attribute_name, x_min, x_max, nb_bins, x_unit, y_unit):
         """
         .. warning:: This class is currently not tested...
 
@@ -295,12 +291,16 @@ class HistogramRecorder(Recorder, AttributesGetter):
         :param x_min:
         :param x_max:
         :param nb_bins:
+        :param x_unit: The unit of the horizontal axis
+        :type x_unit: type or unit see :mod:`gridsim.unit`
+        :param y_unit: The unit of the vertical axis
+        :type y_unit: type
         :return:
         """
         if x_max <= x_min:
             raise TypeError("'x_max' must be larger than 'x_min'.")
 
-        super(HistogramRecorder, self).__init__(attribute_name)
+        super(HistogramRecorder, self).__init__(attribute_name, x_unit, y_unit)
 
         self._x_min = x_min
         self._x_max = x_max
@@ -359,4 +359,4 @@ class HistogramRecorder(Recorder, AttributesGetter):
         return self._y
 
     def get_y_unit(self):
-        return "count"
+        return self._y_unit

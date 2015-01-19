@@ -35,7 +35,7 @@ sim.thermal.add(ThermalCoupling('room to outside', 1*units.thermal_conductivity,
                                 room, outside))
 
 # Create a plot recorder that records the temperatures of all thermal processes.
-temp = PlotRecorder('temperature')
+temp = PlotRecorder('temperature', units.second, units.degC)
 sim.record(temp, sim.thermal.find(has_attribute='temperature'))
 
 print("Running simulation...")

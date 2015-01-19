@@ -251,18 +251,17 @@ thermostat = sim.controller.add(Thermostat('thermostat',
                                            room, heater, 'on'))
 
 # Create a plot recorder that records the temperatures of all thermal processes.
-temp = PlotRecorder('temperature')
+temp = PlotRecorder('temperature', units.second, units.degC)
 sim.record(temp, sim.thermal.find(has_attribute='temperature'))
 
 # Create a plot recorder that records the control value of the thermostat given
 # to the heater.
-control = PlotRecorder('on')
+control = PlotRecorder('on', units.second, bool)
 sim.record(control, sim.electrical.find(has_attribute='on'))
 
 # Create a plot recorder that records the power used by the electrical heater.
-power = PlotRecorder('delta_energy')
-sim.record(power, sim.find(friendly_name='heater'),
-           lambda context: context.value / context.delta_time)
+power = PlotRecorder('delta_energy', units.second, units.joule)
+sim.record(power, sim.find(friendly_name='heater'))
 
 print("Running simulation...")
 
