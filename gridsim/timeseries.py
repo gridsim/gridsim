@@ -310,23 +310,19 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
             map_attribute(name, mapped_name, is_time_key)
 
         if is_time_key:
-            self._start = min(self._data[self._time_key])
-            self._count = len(self._data[self._time_key])
-            self._interval = self._data[self._time_key][1] - \
-                             self._data[self._time_key][0]
+            self._update_parameters()
 
 
 
     @accepts((1, units.Quantity))
     def set_time(self, time=0*units.second):
         time_value = units.value(units.convert(time, units.seconds))
-        self._index = time_value
 
-        if time < self._start:
+        if time_value < self._start:
             self._index = -1
         else:
             self._index = int(
-                (time - self._start) / self._interval) % self._count
+                (time_value - self._start) / self._interval) % self._count
 
     @accepts((1, (str, BufferedReader)),
              (2, (None, types.MethodType)),
@@ -342,12 +338,24 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
             else:
                 self.convert(self._time_key, time_converter)
 
-            self._start = min(self._data[self._time_key])
-            self._count = len(self._data[self._time_key])
-            self._interval = self._data[self._time_key][1] - \
-                             self._data[self._time_key][0]
+            self._update_parameters()
 
         else:
             warnings.warn("The data {0} has no '{1}' values".
                           format(stream, time_key),
                           category=SyntaxWarning)
+
+    def _update_parameters(self):
+        """
+        This function update the internal parameters of the class.
+
+        Currently, converting in int instead of using units to improve execution
+        speed.
+        """
+        self._start = units.value(units.convert(min(self._data[self._time_key]),
+                                                units.seconds))
+        self._count = units.value(units.convert(len(self._data[self._time_key]),
+                                                units.seconds))
+        self._interval = units.value(units.convert(
+            self._data[self._time_key][1] - self._data[self._time_key][0],
+            units.seconds))
