@@ -75,12 +75,12 @@ and::
 
     Returns the value of the ``measurement`` without any conversion::
 
-        >>> size = 1*units.meter
+        >>> size = 1.2*units.meter
         >>> print units.value(size)
-        meter
-        >>> size = 1*units.kilometer
+        1.2
+        >>> size = 34*units.kilometer
         >>> print units.value(size)
-        kilometer
+        34
 
     :returns: the value of the measurement
     :rtype: float
