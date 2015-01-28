@@ -129,7 +129,7 @@ class TimeSeries(object):
         """
         self._data[item] = map(converter, self._data[item])
 
-    @accepts((1, units.Quantity))
+    @accepts((1, (int, float)))
     def set_time(self, time=0*units.second):
         raise NotImplementedError('Pure abstract method!')
 
@@ -201,7 +201,6 @@ class TimeSeriesObject(TimeSeries):
         else:
             raise AttributeError(str(item)+" attribute does not exist")
 
-    @accepts((1, units.Quantity))
     def set_time(self, time=0*units.second):
         """
         set_time(self, time=0*units.second)
@@ -312,9 +311,6 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
         if is_time_key:
             self._update_parameters()
 
-
-
-    @accepts((1, units.Quantity))
     def set_time(self, time=0*units.second):
         time_value = units.value(units.convert(time, units.seconds))
 

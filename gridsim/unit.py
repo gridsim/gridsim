@@ -599,11 +599,16 @@ class _Unit(object):
     def __getattr__(self, item):
         return getattr(self._registry, item)
 
-    def value(self, measurement):
-        if isinstance(measurement, self._registry.Quantity):
-            return measurement.magnitude
+    def value(self, measurement, unit=None):
+        if unit is not None:
+            _measurement = self.convert(measurement, unit)
         else:
-            return measurement
+            _measurement = measurement
+
+        if isinstance(_measurement, self._registry.Quantity):
+            return _measurement.magnitude
+        else:
+            return _measurement
 
     def unit(self, measurement):
         if isinstance(measurement, self._registry.Quantity):

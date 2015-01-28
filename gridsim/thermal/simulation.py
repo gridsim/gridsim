@@ -73,7 +73,7 @@ class ThermalSimulator(AbstractSimulationModule):
         elements.extend(self._couplings)
         return elements
 
-    def reset(self):
+    def _p_reset(self):
         """
         reset(self)
 
@@ -82,12 +82,12 @@ class ThermalSimulator(AbstractSimulationModule):
         :func:`ThermalSimulator.add`.
         """
         for process in self._processes:
-            process.reset()
+            process._p_reset()
         for coupling in self._couplings:
-            coupling.reset()
+            coupling._p_reset()
 
-    @accepts(((1, 2), units.Quantity))
-    def calculate(self, time, delta_time):
+    @accepts(((1, 2), (int, float)))
+    def _p_calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -105,13 +105,13 @@ class ThermalSimulator(AbstractSimulationModule):
         """
 
         for process in self._processes:
-            process.calculate(time, delta_time)
+            process._p_calculate(time, delta_time)
 
         for coupling in self._couplings:
-            coupling.calculate(time, delta_time)
+            coupling._p_calculate(time, delta_time)
 
-    @accepts(((1, 2), units.Quantity))
-    def update(self, time, delta_time):
+    @accepts(((1, 2), (int, float)))
+    def _p_update(self, time, delta_time):
         """
         update(self, time, delta_time)
 
@@ -128,9 +128,9 @@ class ThermalSimulator(AbstractSimulationModule):
         :type delta_time: time, see :mod:`gridsim.unit`
         """
         for process in self._processes:
-            process.update(time, delta_time)
+            process._p_update(time, delta_time)
         for coupling in self._couplings:
-            coupling.update(time, delta_time)
+            coupling._p_update(time, delta_time)
 
     @accepts((1, AbstractThermalElement))
     def add(self, element):

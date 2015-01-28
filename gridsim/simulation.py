@@ -60,8 +60,7 @@ from .unit import units
 
 class Recorder(object):
 
-    @accepts((1, str),
-             ((2, 3), (units.Quantity, type)))
+    @accepts((1, str))
     def __init__(self, attribute_name, x_unit, y_unit):
         """
         __init__(self, attribute_name, x_unit=None, y_unit=None)
@@ -124,7 +123,7 @@ class Recorder(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
-    @accepts((1, units.Quantity))
+    @accepts((1, (int, float)))
     def on_simulation_step(self, time):
         """
         on_simulation_step(self, time)
@@ -138,7 +137,7 @@ class Recorder(object):
         raise NotImplementedError('Pure abstract method!')
 
     @accepts((1, AbstractSimulationElement),
-             (2, units.Quantity))
+             (2, (int, float)))
     def on_observed_value(self, subject, time, value):
         """
         on_observed_value(self, subject, time, value)
@@ -342,7 +341,6 @@ class Simulator(object):
 
         return elements
 
-    @accepts((1, units.Quantity))
     @returns(type(None))
     def reset(self, initial_time=0*units.second):
         """
@@ -354,33 +352,32 @@ class Simulator(object):
             Defaults to ``0``.
         :type initial_time: time, see :mod:`gridsim.unit`
         """
-        self.time = initial_time
+        self.time = units.value(initial_time, units.second)
+
         for module in self._modules.values():
-            module.reset()
+            module._p_reset()
 
         for recorder_binding in self._recorderBindings:
-            recorder_binding.reset()
+            recorder_binding._p_reset()
 
-    @accepts((1, units.Quantity))
     @returns(type(None))
     def _calculate(self, delta_time):
         for module in self._modules.values():
-            module.calculate(self.time, delta_time)
+            module._p_calculate(self.time, delta_time)
 
-    @accepts((1, units.Quantity))
+    @accepts((1, (int, float)))
     @returns(type(None))
     def _update(self, delta_time):
 
         for module in self._modules.values():
-            module.update(self.time, delta_time)
+            module._p_update(self.time, delta_time)
 
         for recorder in self._recorders:
             recorder.on_simulation_step(self.time)
 
         for recorder_binding in self._recorderBindings:
-            recorder_binding.update(self.time, delta_time)
+            recorder_binding._p_update(self.time, delta_time)
 
-    @accepts((1, units.Quantity))
     @returns(type(None))
     def step(self, delta_time):
         """
@@ -391,11 +388,11 @@ class Simulator(object):
         :param delta_time: The delta time for the single step.
         :type delta_time: time, see :mod:`gridsim.unit`
         """
-        self._calculate(delta_time)
-        self.time += delta_time
-        self._update(delta_time)
+        delta_time_sec = units.value(delta_time, units.second)
+        self._calculate(delta_time_sec)
+        self.time += delta_time_sec
+        self._update(delta_time_sec)
 
-    @accepts(((1, 2), units.Quantity))
     def run(self, run_time, delta_time):
         """
         run(self, run_time, delta_time)
@@ -415,10 +412,13 @@ class Simulator(object):
         if self.time is None:
             self.reset()
 
-        end_time = self.time + run_time
-        self._update(delta_time)
+        delta_time_sec = units.value(delta_time, units.second)
+        run_time_sec = units.value(run_time, units.second)
+
+        end_time = self.time + run_time_sec
+        self._update(delta_time_sec)
         while self.time < end_time:
-            self.step(delta_time)
+            self.step(delta_time_sec)
 
     # Internal class. Holds a recorder and the binding of the recorder to an
     # attribute of an object.
@@ -431,12 +431,12 @@ class Simulator(object):
             self._recorder = recorder
             self._subjects = subjects
 
-        def reset(self):
+        def _p_reset(self):
             # Call the reset handler of the recorder.
             self._recorder.on_simulation_reset(
                 [subject.friendly_name for subject in self._subjects])
 
-        def update(self, time, delta_time):
+        def _p_update(self, time, delta_time):
             # This method is called by the simulation after each simulation step
             #   in order to update the recorder.
             for subject in self._subjects:

@@ -11,7 +11,6 @@ import numpy as np
 from scipy.sparse import lil_matrix
 
 from gridsim.decorators import accepts, returns
-from gridsim.unit import units
 from gridsim.core import AbstractSimulationModule
 
 from .core import AbstractElectricalElement, ElectricalBus, \
@@ -334,7 +333,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         elements.extend(self._cps_elements)
         return elements
 
-    def reset(self):
+    def _p_reset(self):
         """
         reset(self)
 
@@ -343,11 +342,11 @@ class ElectricalSimulator(AbstractSimulationModule):
         :func:`ElectricalSimulator.add`.
         """
         for element in self._buses:
-            element.reset()
+            element._p_reset()
         for element in self._branches:
-            element.reset()
+            element._p_reset()
         for element in self._cps_elements:
-            element.reset()
+            element._p_reset()
 
     def _has_orphans(self):
         # TODO: check that all elements are attached to a bus and that all buses
@@ -384,7 +383,7 @@ class ElectricalSimulator(AbstractSimulationModule):
             self._b[i_branch, 1] = self._branches[i_branch].to_bus_id
 
         # build table Yb of branch admittances
-        self._Yb = np.zeros((M, 4), dtype=complex)*units.siemens
+        self._Yb = np.zeros((M, 4), dtype=complex)
         # start with the off-diagonal element
         for i_branch in range(0, M):
             branch = self._branches[i_branch]
@@ -404,16 +403,16 @@ class ElectricalSimulator(AbstractSimulationModule):
                 self._Yb[i_branch, 3] = Y_line / tap.k_factor.conjugate()
 
         # active power of electrical CPS elements
-        self._Pe = np.zeros(L)*units.watt
+        self._Pe = np.zeros(L)
 
         # bus electrical values
-        self._bu.P = np.zeros(N)*units.watt
-        self._bu.Q = np.zeros(N)*units.watt
-        self._bu.V = np.zeros(N)*units.volt
-        self._bu.Th = np.zeros(N)*units.degree
+        self._bu.P = np.zeros(N)
+        self._bu.Q = np.zeros(N)
+        self._bu.V = np.zeros(N)
+        self._bu.Th = np.zeros(N)
 
-    @accepts(((1, 2), units.Quantity))
-    def calculate(self, time, delta_time):
+    @accepts(((1, 2), (int, float)))
+    def _p_calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -430,10 +429,10 @@ class ElectricalSimulator(AbstractSimulationModule):
         """
 
         for element in self._cps_elements:
-            element.calculate(time, delta_time)
+            element._p_calculate(time, delta_time)
 
-    @accepts(((1, 2), units.Quantity))
-    def update(self, time, delta_time):
+    @accepts(((1, 2), (int, float)))
+    def _p_update(self, time, delta_time):
         """
         update(self, time, delta_time)
 
@@ -454,13 +453,13 @@ class ElectricalSimulator(AbstractSimulationModule):
                 and len(self._branches) > 0:
             # TODO: raise warning if self._as_orphans():
             self._prepare_matrices()
-            self.load_flow_calculator.update(self.s_base, self.v_base,
+            self.load_flow_calculator._p_update(self.s_base, self.v_base,
                                              self._is_PV, self._b, self._Yb)
 
             self._hasChanges = False
 
         for element in self._cps_elements:
-            element.update(time, delta_time)
+            element._p_update(time, delta_time)
 
         if len(self._buses) > 1 and len(self._branches) > 0:
             # put element powers into corresponding array
@@ -476,7 +475,7 @@ class ElectricalSimulator(AbstractSimulationModule):
             # perform network computations
             #------------------------------
             [self._bu.P, self._bu.Q, self._bu.V, self._bu.Th] = \
-                self.load_flow_calculator.calculate(self._bu.P, self._bu.Q,
+                self.load_flow_calculator._p_calculate(self._bu.P, self._bu.Q,
                                                     self._bu.V, self._bu.Th,
                                                     True)
 
@@ -487,30 +486,30 @@ class ElectricalSimulator(AbstractSimulationModule):
             #-----------------------------------------------------
             for i_bus in range(1, len(self._buses)):
                 self._buses[i_bus].Th = self._bu.Th[i_bus]
-                self._buses[i_bus].P = self._bu.P[i_bus]*units.watt
+                self._buses[i_bus].P = self._bu.P[i_bus]
                 if self._is_PV[i_bus]:
-                    self._buses[i_bus].Q = self._bu.Q[i_bus]*units.watt
+                    self._buses[i_bus].Q = self._bu.Q[i_bus]
                 else:  # is PQ
-                    self._buses[i_bus].V = self._bu.V[i_bus]*units.volt
+                    self._buses[i_bus].V = self._bu.V[i_bus]
             # slack
-            self._buses[0].P = self._bu.P[0]*units.watt
-            self._buses[0].Q = self._bu.Q[0]*units.watt
-            self._buses[0].Th = 0*units.degree
+            self._buses[0].P = self._bu.P[0]
+            self._buses[0].Q = self._bu.Q[0]
+            self._buses[0].Th = 0
 
             for i_branch in range(0, len(self._branches)):
                 if not self._br.Pij is None:
-                    self._branches[i_branch].Pij = self._br.Pij[i_branch]*units.watt
+                    self._branches[i_branch].Pij = self._br.Pij[i_branch]
                 else:
                     self._branches[i_branch].Pij = None
                 if not self._br.Qij is None:
-                    self._branches[i_branch].Qij = self._br.Qij[i_branch]*units.watt
+                    self._branches[i_branch].Qij = self._br.Qij[i_branch]
                 else:
                     self._branches[i_branch].Qij = None
                 if not self._br.Pji is None:
-                    self._branches[i_branch].Pji = self._br.Pji[i_branch]*units.watt
+                    self._branches[i_branch].Pji = self._br.Pji[i_branch]
                 else:
                     self._branches[i_branch].Pji = None
                 if not self._br.Qji is None:
-                    self._branches[i_branch].Qji = self._br.Qji[i_branch]*units.watt
+                    self._branches[i_branch].Qji = self._br.Qji[i_branch]
                 else:
                     self._branches[i_branch].Qji = None

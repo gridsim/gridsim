@@ -16,14 +16,14 @@ class TimeTestElement(AbstractSimulationElement):
 
         self.iter = 0
 
-    def reset(self):
-        self.val = 0*units.second
-        self._val = 0*units.second
+    def _p_reset(self):
+        self.val = 0
+        self._val = 0
 
-    def calculate(self, time, delta_time):
+    def _p_calculate(self, time, delta_time):
         self._val += delta_time
 
-    def update(self, time, delta_time):
+    def _p_update(self, time, delta_time):
         self.val = self._val
         self.iter += 1
 
@@ -44,17 +44,17 @@ class TimeTestModule(AbstractSimulationModule):
     def attribute_name(self):
         return 'time_test'
 
-    def reset(self):
+    def _p_reset(self):
         for element in self.elements:
-            element.reset()
+            element._p_reset()
 
-    def calculate(self, time, delta_time):
+    def _p_calculate(self, time, delta_time):
         for element in self.elements:
-            element.calculate(time, delta_time)
+            element._p_calculate(time, delta_time)
 
-    def update(self, time, delta_time):
+    def _p_update(self, time, delta_time):
         for element in self.elements:
-            element.update(time, delta_time)
+            element._p_update(time, delta_time)
 
 Simulator.register_simulation_module(TimeTestModule)
 
@@ -68,11 +68,11 @@ class TestTime(unittest.TestCase):
 
         sim = Simulator()
         el = sim.time_test.add(TimeTestElement('test'))
-        sim.reset(1*units.second)
+        sim.reset()
         sim.run(total_time, delta_time)
 
-        self.assertEqual(el.val, total_time)
-        self.assertEqual(el.iter, 3601)  # from 0 to 3600 included
+        self.assertEqual(el.val, units.value(total_time, units.second))
+        self.assertEqual(el.iter, 3601)  # from 0 to 3601 included
 
 if __name__ == '__main__':
     unittest.main()

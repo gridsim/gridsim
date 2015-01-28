@@ -13,8 +13,6 @@ from .core import AbstractElectricalTwoPort, ElectricalBus
 
 class ElectricalTransmissionLine(AbstractElectricalTwoPort):
 
-    @accepts((1, str),
-             ((2, 3, 4, 5), units.Quantity))
     def __init__(self, friendly_name, length, X, R=0*units.ohm,
                  B=0*units.siemens):
         """
@@ -63,11 +61,11 @@ class ElectricalTransmissionLine(AbstractElectricalTwoPort):
         if B < 0*units.siemens:
             raise RuntimeError('Line charging B can not be negative number')
 
-        self.length = length
+        self.length = units.value(length, units.metre)
         """
         The transmission line length.
         """
-        self.B = B
+        self.B = units.value(B, units.siemens)
         """
         The transmission line charging.
         """
@@ -76,8 +74,7 @@ class ElectricalTransmissionLine(AbstractElectricalTwoPort):
 class ElectricalGenTransformer(AbstractElectricalTwoPort):
 
     @accepts((1, str),
-             (2, complex),
-             ((3, 4), units.Quantity))
+             (2, complex))
     def __init__(self, friendly_name, k_factor, X, R=0*units.ohm):
         """
         __init__(self, friendly_name, k_factor, X, R=0*units.ohm)

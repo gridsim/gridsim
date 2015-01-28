@@ -106,8 +106,7 @@ from .simulation import Recorder
 
 class PlotRecorder(Recorder, AttributesGetter):
 
-    @accepts((1, str),
-             ((2, 3), (units.Quantity, type)))
+    @accepts((1, str))
     def __init__(self, attribute_name, x_unit, y_unit):
         """
         __init__(self, attribute_name, x_unit=None, y_unit=None)
@@ -192,7 +191,7 @@ class PlotRecorder(Recorder, AttributesGetter):
         if isinstance(self._x_unit, type):
             self._x.append(self._x_unit(time))
         else:
-            self._x.append(units.value(units.convert(time, self._x_unit)))
+            self._x.append(units.value(time, self._x_unit))
 
     def on_observed_value(self, subject, time, value):
         """
@@ -207,7 +206,7 @@ class PlotRecorder(Recorder, AttributesGetter):
         if isinstance(self._y_unit, type):
             self._y[subject].append(self._y_unit(value))
         else:
-            self._y[subject].append(units.value(units.convert(value, self._y_unit)))
+            self._y[subject].append(units.value(value, self._y_unit))
 
     def get_x_values(self):
         """

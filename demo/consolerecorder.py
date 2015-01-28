@@ -18,7 +18,7 @@ class ConsoleRecorder(Recorder):
 
     def on_observed_value(self, subject, time, value):
         print '    ' + subject + '.' + self.attribute_name +\
-              ' = ' + str(value)
+              ' = ' + str( units.convert(value*units.kelvin, units.degC))
 
 # Create simulator.
 sim = Simulator()

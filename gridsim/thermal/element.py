@@ -28,14 +28,14 @@ class ConstantTemperatureProcess(ThermalProcess):
             float('inf')*units.heat_capacity, temperature,
             position=position)
 
-    @accepts((1, units.Quantity))
+    @accepts((1, (int, float)))
     def add_energy(self, delta_energy):
         """
         Does nothing at all for this type of :class:`.ThermalProcess`.
         """
         pass
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
         Does nothing at all for this type of :class:`.ThermalProcess`.
@@ -90,7 +90,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
         # because its parent (ThermalProcess) already has a 'temperature'
         return getattr(self._time_series, item)
 
-    def reset(self):
+    def _p_reset(self):
         """
         Sets the time to default (``0``).
 
@@ -98,7 +98,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
         """
         self._time_series.set_time()
 
-    def calculate(self, time, delta_time):
+    def _p_calculate(self, time, delta_time):
         """
         Calculates the temperature of the element during the simulation step.
 
@@ -109,7 +109,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
         # its local params
         self.temperature = self._time_series.temperature
 
-    def update(self, time, delta_time):
+    def _p_update(self, time, delta_time):
         """
         Does nothing for this type of :class:`.ThermalProcess`.
         """

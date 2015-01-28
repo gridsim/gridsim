@@ -104,7 +104,7 @@ class Thermostat(AbstractControllerElement):
         self._output_value = off_value
 
     # AbstractSimulationElement implementation.
-    def reset(self):
+    def _p_reset(self):
         """
         AbstractSimulationElement implementation
 
@@ -112,7 +112,7 @@ class Thermostat(AbstractControllerElement):
         """
         pass
 
-    def calculate(self, time, delta_time):
+    def _p_calculate(self, time, delta_time):
         """
         AbstractSimulationElement implementation
 
@@ -125,7 +125,7 @@ class Thermostat(AbstractControllerElement):
         elif actual_temperature > (self.target_temperature + self.hysteresis / 2.):
             self._output_value = self.off_value
 
-    def update(self, time, delta_time):
+    def _p_update(self, time, delta_time):
         """
         AbstractSimulationElement implementation
 
@@ -141,13 +141,13 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement):
 
         if not isinstance(efficiency_factor, (float, int)):
             raise TypeError('efficiency_factor must be a float or int!')
-        self._efficiency_factor = float(efficiency_factor)
+        self._efficiency_factor = units.value(efficiency_factor)
 
         if not isinstance(thermal_process, ThermalProcess):
             raise TypeError('thermal_process must be of type ThermalProcess!')
         self._thermal_process = thermal_process
 
-        self.power = pwr
+        self.power = units.value(pwr, units.watt)
 
         self._on = False
         """
@@ -165,16 +165,16 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement):
         self._on = on_off
 
     # AbstractSimulationElement implementation.
-    def reset(self):
+    def _p_reset(self):
         super(ElectroThermalHeaterCooler, self).reset()
         self.on = False
 
-    def calculate(self, time, delta_time):
+    def _p_calculate(self, time, delta_time):
         self._internal_delta_energy = self.power * delta_time
         if not self.on:
-            self._internal_delta_energy = 0*units.joule
+            self._internal_delta_energy = 0
 
-    def update(self, time, delta_time):
+    def _p_update(self, time, delta_time):
         super(ElectroThermalHeaterCooler, self).update(time, delta_time)
         self._thermal_process.add_energy(
             self._delta_energy * self._efficiency_factor)

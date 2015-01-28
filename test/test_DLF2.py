@@ -6,7 +6,6 @@
 import unittest
 import numpy as np
 
-from gridsim.unit import units
 from gridsim.electrical.loadflow import DirectLoadFlowCalculator
 
 
@@ -25,8 +24,8 @@ class TestDLF2(unittest.TestCase):
         b = np.array([[0, 1], [0, 2], [0, 3], [1, 2], [2, 3]])
 
         # array containing branch admittances
-        Yb = np.zeros((5,4),dtype=complex)*units.siemens
-        yT = [1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.)]*units.siemens
+        Yb = np.zeros((5,4),dtype=complex)
+        yT = [1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.)]
         for i_branch in range(0, 5):
             Yb[i_branch, 0] = yT[i_branch]
             Yb[i_branch, 1] = yT[i_branch]
@@ -39,7 +38,7 @@ class TestDLF2(unittest.TestCase):
         v_base = 1.0
         dlf = DirectLoadFlowCalculator()
         #dlf = NewtonRaphsonLoadFlowCalculator()
-        dlf.update(s_base, v_base, is_PV, b, Yb)
+        dlf._p_update(s_base, v_base, is_PV, b, Yb)
 
         # input buses electrical values
         #------------------------------
@@ -56,7 +55,7 @@ class TestDLF2(unittest.TestCase):
 
         # compute buses other electrical values
         #--------------------------------------
-        [P, Q, V, Th] = dlf.calculate(P, Q, V, Th, True)
+        [P, Q, V, Th] = dlf._p_calculate(P, Q, V, Th, True)
 
         # check results against reference values
         p_slack = P[0]

@@ -39,10 +39,10 @@ class ConstantElectricalCPSElement(AbstractElectricalCPSElement):
 
         """
         super(ConstantElectricalCPSElement, self).__init__(friendly_name)
-        self.power = power
+        self.power = units.value(power, units.watt)
 
-    @accepts(((1, 2), units.Quantity))
-    def calculate(self, time, delta_time):
+    @accepts(((1, 2), (int, float)))
+    def _p_calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -145,8 +145,8 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         """
         return self._cycle_start_time
 
-    @accepts(((1, 2), units.Quantity))
-    def calculate(self, time, delta_time):
+    @accepts(((1, 2), (int, float)))
+    def _p_calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -241,8 +241,8 @@ class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
         self._new_power_values = new_power_values
         self._update_done = False
 
-    @accepts(((1, 2), units.Quantity))
-    def calculate(self, time, delta_time):
+    @accepts(((1, 2), (int, float)))
+    def _p_calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -301,7 +301,7 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         self._standard_deviation = standard_deviation
 
     @property
-    @returns(units.Quantity)
+    @returns((int, float))
     def mean_power(self):
         """
         Gets the mean value of the Gaussian distributed power.
@@ -321,7 +321,7 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         """
         return self._standard_deviation
 
-    def calculate(self, time, delta_time):
+    def _p_calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -381,14 +381,14 @@ class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
     def __getattr__(self, item):
         return getattr(self.time_series, item)
 
-    def reset(self):
+    def _p_reset(self):
         """
           .. seealso:: :func:`gridsim.core.AbstractSimulationElement.reset`.
         """
         self._time_series.set_time()
 
-    @accepts(((1, 2), units.Quantity))
-    def calculate(self, time, delta_time):
+    @accepts(((1, 2), (int, float)))
+    def _p_calculate(self, time, delta_time):
         """
         Calculates the energy consumed or produced by the element during the
         simulation step.
@@ -532,7 +532,7 @@ class AnyIIDRandomElectricalCPSElement(AbstractElectricalCPSElement):
         """
         return self._cdf
 
-    def calculate(self, time, delta_time):
+    def _p_calculate(self, time, delta_time):
         """
         Calculate the element's the energy consumed or produced by the element
         during the simulation step.

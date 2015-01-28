@@ -115,7 +115,7 @@ class ElectricalBus(AbstractElectricalElement):
         The bus voltage angle.
         """
 
-    def reset(self):
+    def _p_reset(self):
         """
         reset(self)
 
@@ -158,11 +158,11 @@ class AbstractElectricalTwoPort(AbstractElectricalElement):
         if R < 0*units.ohm:
             raise RuntimeError('Line resistance R can not be negative number')
 
-        self.X = X
+        self.X = units.value(X, units.ohm)
         """
         The reactance.
         """
-        self.R = R
+        self.R = units.value(R, units.ohm)
         """
         The resistance.
         """
@@ -255,7 +255,7 @@ class ElectricalNetworkBranch(AbstractElectricalElement):
         """
         return self._to_bus_id
 
-    def reset(self):
+    def _p_reset(self):
         """
         reset(self)
 
@@ -293,8 +293,8 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
 
         """
         super(AbstractElectricalCPSElement, self).__init__(friendly_name)
-        self._delta_energy = 0*units.joule
-        self._internal_delta_energy = 0*units.joule
+        self._delta_energy = 0
+        self._internal_delta_energy = 0
 
     @property
     def delta_energy(self):
@@ -313,16 +313,16 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
     def delta_energy(self, value):
         self._delta_energy = value
 
-    def reset(self):
+    def _p_reset(self):
         """
         reset(self)
 
         Resets the element to its initial state.
         """
-        self._delta_energy = 0*units.joule
-        self._internal_delta_energy = 0*units.joule
+        self._delta_energy = 0
+        self._internal_delta_energy = 0
 
-    def update(self, time, delta_time):
+    def _p_update(self, time, delta_time):
         """
         update(self, time, delta_time)
 
