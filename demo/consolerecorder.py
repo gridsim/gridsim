@@ -32,13 +32,13 @@ sim = Simulator()
 #          |__________|      <----------->        |___________|
 #                                 1m
 
-celsius = units.Quantity(60, units.degC)
+celsius = units(60, units.degC)
 hot_room = sim.thermal.add(ThermalProcess.room('hot_room',
                                                50*units.meter*units.meter,
                                                2.5*units.metre,
                                                celsius.to(units.kelvin)))
 
-celsius = units.Quantity(20, units.degC)
+celsius = units(20, units.degC)
 cold_room = sim.thermal.add(ThermalProcess.room('cold_room',
                                                 50*units.meter*units.meter,
                                                 2.5*units.metre,
