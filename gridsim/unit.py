@@ -59,6 +59,21 @@ and::
                 >>> print(hysteresis.to(units.delta_degF))
                 4.32 delta_degF
 
+.. method:: to_si(unit)
+
+    Returns the SI base unit of the given ``unit``::
+
+        >>> mass = 1000*units.gram
+        >>> print units.to_si(mass)
+        1.0 kilogram
+        >>> print units.to_si(units.kilometre)
+        1000.0 meter
+
+    :param value: the value of the measurement
+    :type value: int, float
+    :param unit: the unit of the measurement
+    :type unit: see :ref:`all-unit`
+
 .. method:: units(value, unit)
 
     Creates a measurement of ``value`` times ``unit``
@@ -527,6 +542,7 @@ Volume
 * ``firkin = barrel / 4``
 
 """
+import os
 from pint import UnitRegistry
 
 
@@ -588,7 +604,7 @@ class _Unit(object):
 
 
         """
-        self._registry = UnitRegistry()
+        self._registry = UnitRegistry(os.path.dirname(__file__)+'/gridsim_en.unit')
         self._registry.define('heat_capacity = J/(kg*K)')
         self._registry.define('mass_density = kg/(m*m*m)')
         self._registry.define('thermal_conductivity = W/(K*m)')
@@ -598,6 +614,14 @@ class _Unit(object):
 
     def __getattr__(self, item):
         return getattr(self._registry, item)
+
+    def to_si(self, measurement):
+        if isinstance(measurement, self._registry.Quantity):
+            _measurement = measurement
+            _measurement = _measurement.to_base_units()
+            return _measurement
+        else:
+            raise AttributeError('Attribute must be a unit or a measurement not a '+str(type(measurement)))
 
     def value(self, measurement, unit=None):
         if unit is not None:

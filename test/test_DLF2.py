@@ -38,7 +38,7 @@ class TestDLF2(unittest.TestCase):
         v_base = 1.0
         dlf = DirectLoadFlowCalculator()
         #dlf = NewtonRaphsonLoadFlowCalculator()
-        dlf._p_update(s_base, v_base, is_PV, b, Yb)
+        dlf.update(s_base, v_base, is_PV, b, Yb)
 
         # input buses electrical values
         #------------------------------
@@ -55,16 +55,16 @@ class TestDLF2(unittest.TestCase):
 
         # compute buses other electrical values
         #--------------------------------------
-        [P, Q, V, Th] = dlf._p_calculate(P, Q, V, Th, True)
+        [P, Q, V, Th] = dlf.calculate(P, Q, V, Th, True)
 
         # check results against reference values
         p_slack = P[0]
         # print "P_slack ="
         # print p_slack
-        ref_p_slack = 2.
+        refslack = 2.
 
-        self.assertEqual(p_slack, ref_p_slack, "The power of the slack bus is "
-                         + str(p_slack) + " instead of " + str(ref_p_slack))
+        self.assertEqual(p_slack, refslack, "The power of the slack bus is "
+                         + str(p_slack) + " instead of " + str(refslack))
 
         # print "Th = "
         # print Th

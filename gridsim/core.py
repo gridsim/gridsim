@@ -136,7 +136,7 @@ class AbstractSimulationModule(object):
             has_attribute=has_attribute
         )
 
-    def _p_reset(self):
+    def reset(self):
         """
         reset(self)
 
@@ -146,7 +146,7 @@ class AbstractSimulationModule(object):
         raise NotImplementedError('Abstract method called!')
 
     @accepts(((1, 2), (int, float)))
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         """
         update(self, time, delta_time)
 
@@ -165,7 +165,7 @@ class AbstractSimulationModule(object):
         raise NotImplementedError('Abstract method called!')
 
     @accepts(((1, 2), (int, float)))
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -226,7 +226,7 @@ class AbstractSimulationElement(object):
             and the class (base-class) information.
         """
 
-    def _p_reset(self):
+    def reset(self):
         """
         reset(self)
 
@@ -237,7 +237,7 @@ class AbstractSimulationElement(object):
         raise NotImplementedError('Pure abstract method!')
 
     @accepts(((1, 2), (int, float)))
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -258,7 +258,7 @@ class AbstractSimulationElement(object):
         raise NotImplementedError('Pure abstract method!')
 
     @accepts(((1, 2), (int, float)))
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         """
         update(self, time, delta_time)
 

@@ -70,16 +70,16 @@ class ControllerSimulator(AbstractSimulationModule):
         """
         return self._controllers
 
-    def _p_reset(self):
+    def reset(self):
         """
         AbstractSimulationModule implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationModule.reset`.
         """
         for controller in self._controllers:
-            controller._p_reset()
+            controller.reset()
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         AbstractSimulationModule implementation
 
@@ -88,7 +88,7 @@ class ControllerSimulator(AbstractSimulationModule):
         for controller in self._controllers:
             controller.calculate(time, delta_time)
 
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         """
         AbstractSimulationModule implementation
 

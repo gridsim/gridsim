@@ -78,7 +78,11 @@ class ThermalProcess(AbstractThermalElement):
         :type position: :class:`.Position`
         """
         super(ThermalProcess, self).__init__(friendly_name, position)
+
         self._initial_temperature = units.value(initial_temperature, units.kelvin)
+        """
+        The initial temperature of the process. Need for reset.
+        """
 
         self._mass = units.value(mass, units.kilogram)
         """
@@ -106,7 +110,7 @@ class ThermalProcess(AbstractThermalElement):
         The thermal energy stored inside the thermal process.
         """
 
-    def _p_add_energy(self, delta_energy):
+    def add_energy(self, delta_energy):
         """
         add_energy(self, delta_energy)
 
@@ -117,7 +121,7 @@ class ThermalProcess(AbstractThermalElement):
         """
         self._internal_thermal_energy += delta_energy
 
-    def _p_reset(self):
+    def reset(self):
         """
         reset(self)
 
@@ -132,7 +136,7 @@ class ThermalProcess(AbstractThermalElement):
 
         self.thermal_energy = self._internal_thermal_energy
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -142,7 +146,7 @@ class ThermalProcess(AbstractThermalElement):
         """
         pass
 
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         """
         update(self, time, delta_time)
 
@@ -278,7 +282,7 @@ class ThermalCoupling(AbstractThermalElement):
     def thickness(self):
         return self._thickness
 
-    def _p_reset(self):
+    def reset(self):
         """
         reset(self)
 
@@ -288,7 +292,7 @@ class ThermalCoupling(AbstractThermalElement):
         """
         self._delta_energy = 0
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -307,22 +311,15 @@ class ThermalCoupling(AbstractThermalElement):
         #                   interval [J]
         #               dt: Time interval [s]
 
-        print "----------------------"
-        print self.from_process.temperature - self.to_process.temperature
-        print self.thermal_conductivity
-
-        print delta_time
-        print "----------------------"
-
         self._delta_energy = \
-            ((self.from_process.temperature - self.to_process.temperature) / \
+            ((self.from_process.temperature - self.to_process.temperature) * \
             self.thermal_conductivity * \
             self.contact_area / self.thickness)*delta_time
 
-        self.from_process._p_add_energy(-self._delta_energy)
-        self.to_process._p_add_energy(self._delta_energy)
+        self.from_process.add_energy(-self._delta_energy)
+        self.to_process.add_energy(self._delta_energy)
 
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         """
         update(self, time, delta_time)
 

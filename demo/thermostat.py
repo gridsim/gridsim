@@ -61,13 +61,13 @@ class Thermostat(AbstractControllerElement):
         :type position: :class:`Position`
         """
         super(Thermostat, self).__init__(friendly_name, position)
-        self.target_temperature = target_temperature
+        self.target_temperature = units.value(target_temperature, units.kelvin)
         """
         The temperature to try to retain inside the observer thermal process by
         conducting an electrothermal element.
         """
 
-        self.hysteresis = hysteresis
+        self.hysteresis = units.value(hysteresis, units.kelvin)
         """
         The +- hysteresis applied to the temperature measure in order to avoid
         to fast on/off switching.
@@ -104,7 +104,7 @@ class Thermostat(AbstractControllerElement):
         self._output_value = off_value
 
     # AbstractSimulationElement implementation.
-    def _p_reset(self):
+    def reset(self):
         """
         AbstractSimulationElement implementation
 
@@ -112,7 +112,7 @@ class Thermostat(AbstractControllerElement):
         """
         pass
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         AbstractSimulationElement implementation
 
@@ -125,7 +125,7 @@ class Thermostat(AbstractControllerElement):
         elif actual_temperature > (self.target_temperature + self.hysteresis / 2.):
             self._output_value = self.off_value
 
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         """
         AbstractSimulationElement implementation
 
@@ -139,12 +139,8 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement):
 
         super(ElectroThermalHeaterCooler, self).__init__(friendly_name)
 
-        if not isinstance(efficiency_factor, (float, int)):
-            raise TypeError('efficiency_factor must be a float or int!')
         self._efficiency_factor = units.value(efficiency_factor)
 
-        if not isinstance(thermal_process, ThermalProcess):
-            raise TypeError('thermal_process must be of type ThermalProcess!')
         self._thermal_process = thermal_process
 
         self.power = units.value(pwr, units.watt)
@@ -165,16 +161,16 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement):
         self._on = on_off
 
     # AbstractSimulationElement implementation.
-    def _p_reset(self):
+    def reset(self):
         super(ElectroThermalHeaterCooler, self).reset()
         self.on = False
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         self._internal_delta_energy = self.power * delta_time
         if not self.on:
             self._internal_delta_energy = 0
 
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         super(ElectroThermalHeaterCooler, self).update(time, delta_time)
         self._thermal_process.add_energy(
             self._delta_energy * self._efficiency_factor)
@@ -241,7 +237,7 @@ sim.electrical.attach(bus0, heater)
 #                __|__    |__________________________|
 #                 ---
 #
-target = units(18, units.degC)
+target = units(20, units.degC)
 # the hysteresis is a delta of temperature
 hysteresis = 1*units.delta_degC
 
@@ -273,6 +269,9 @@ print("Saving data...")
 
 # Create a PDF document, add the two figures of the plot recorder to the
 # document and close the document.
+print 'fig1'
 FigureSaver(temp, "Temperature").save('./output/thermostat-fig1.png')
+print 'fig2'
 FigureSaver(control, "Control").save('./output/thermostat-fig2.png')
+print 'fig3'
 FigureSaver(power, "Power").save('./output/thermostat-fig3.png')

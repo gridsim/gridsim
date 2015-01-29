@@ -88,9 +88,9 @@ class TimeSeriesThermalProcess(ThermalProcess):
     def __getattr__(self, item):
         # this function is not called when using thermalprocess.temperature
         # because its parent (ThermalProcess) already has a 'temperature'
-        return getattr(self._time_series, item)
+        return units.value(getattr(self._time_series, item))
 
-    def _p_reset(self):
+    def reset(self):
         """
         Sets the time to default (``0``).
 
@@ -98,7 +98,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
         """
         self._time_series.set_time()
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         Calculates the temperature of the element during the simulation step.
 
@@ -107,9 +107,9 @@ class TimeSeriesThermalProcess(ThermalProcess):
         self._time_series.set_time(time)
         # the parent (ThermalProcess) already has a 'temperature' in
         # its local params
-        self.temperature = self._time_series.temperature
+        self.temperature = units.value(self._time_series.temperature)
 
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         """
         Does nothing for this type of :class:`.ThermalProcess`.
         """

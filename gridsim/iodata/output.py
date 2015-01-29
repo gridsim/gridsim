@@ -54,9 +54,9 @@ class AttributesGetter(object):
         super(AttributesGetter, self).__init__()
 
     @returns(list)
-    def get_x_values(self):
+    def x_values(self):
         """
-        get_x_values(self)
+        x_values(self)
 
         This method returns x values of data stored.
 
@@ -66,9 +66,9 @@ class AttributesGetter(object):
         raise NotImplementedError('Pure abstract method.')
 
     @returns(str)
-    def get_x_unit(self):
+    def x_unit(self):
         """
-        get_x_unit(self)
+        x_unit(self)
 
         This method returns x unit of data stored.
 
@@ -78,9 +78,9 @@ class AttributesGetter(object):
         raise NotImplementedError('Pure abstract method.')
 
     @returns(dict)
-    def get_y_values(self):
+    def y_values(self):
         """
-        get_y_values(self)
+        y_values(self)
 
         This method returns y values of data stored. As more than one data can
         be sent, the values have to be sent with the following format:
@@ -95,9 +95,9 @@ class AttributesGetter(object):
         raise NotImplementedError('Pure abstract method.')
 
     @returns(str)
-    def get_y_unit(self):
+    def y_unit(self):
         """
-        get_y_unit(self)
+        y_unit(self)
 
         This method returns y unit of data stored.
 
@@ -129,10 +129,10 @@ class FigureSaver(object):
         self._title = title
         self._figure = None
 
-        self._x_unit = values.get_x_unit()
-        self._x = values.get_x_values()
-        self._y_unit = values.get_y_unit()
-        self._y = values.get_y_values()
+        self._x_unit = values.x_unit()
+        self._x = values.x_values()
+        self._y_unit = values.y_unit()
+        self._y = values.y_values()
 
     @property
     def figure(self):
@@ -154,7 +154,7 @@ class FigureSaver(object):
 
         .. note:: you do not need to call this method explicitly as it will get
                   called as soon as needed by other methods like :func:`save()`
-                  or the property getter **figure** are called. This method
+                  or the property getter ``figure`` are called. This method
                   offers some fine tuning parameters to control the look of the
                   figure.
 
@@ -163,16 +163,42 @@ class FigureSaver(object):
 
         :param y_max: Maximal value on the y-axis.
         :type y_max: float
+
+        :param delta_y: a delta value in y axis. Added to y limits for a better
+                        rendering.
+        :type delta_y: float
         """
         self._figure = plot.figure()
         plot.title(self._title)
-        if (y_min is not None) and (y_max is not None):
-            plot.ylim(y_min, y_max)
-        for meta, data in self._y.iteritems():
-            plot.plot(self._x, data, label=meta)
+
+        # test the limit of y
+        is_y_min_fixed = True
+        is_y_max_fixed = True
+        if y_min is None:
+            is_y_min_fixed = False
+        if y_max is None:
+            is_y_max_fixed = False
+
+        for meta, y in self._y.iteritems():
+            if not is_y_min_fixed:
+                min_y = min(y)
+                if y_min is None or min_y < y_min:
+                    y_min = min_y
+            if not is_y_max_fixed:
+                max_y = max(y)
+                if y_max is None or max_y > y_max:
+                    y_max = max_y
+            plot.plot(self._x, y, label=meta)
+
+        delta_y = (y_max-y_min)/100.
+
         plot.xlabel('[' + str(self._x_unit) + ']')
         plot.ylabel('[' + str(self._y_unit) + ']')
-        plot.legend(loc='best', prop={'size': 8})
+
+        if len(self._y) < 10:
+            plot.legend(loc='best', prop={'size': 8})
+        plot.ylim(y_min-delta_y, y_max+delta_y)
+
         return self._figure
 
     @accepts((1, str))
@@ -231,10 +257,10 @@ class CSVSaver(object):
         self._figure = None
         self._separator = separator
 
-        self._x_unit = values.get_x_unit()
-        self._x = values.get_x_values()
-        self._y_unit = values.get_y_unit()
-        self._y = values.get_y_values()
+        self._x_unit = values.x_unit()
+        self._x = values.x_values()
+        self._y_unit = values.y_unit()
+        self._y = values.y_values()
 
     @accepts((1, str))
     def save(self, file_name):
@@ -244,8 +270,8 @@ class CSVSaver(object):
         Saves the data in the given file (``file_name``). The format is a text
         file regardless the extension of the file.
         The data is store with the csv format and the header are the data
-        returned by :func:`gridsim.iodata.output.AttributesGetter.get_x_unit()`
-        and :func:`gridsim.iodata.output.AttributesGetter.get_y_unit()`
+        returned by :func:`gridsim.iodata.output.AttributesGetter.x_unit()`
+        and :func:`gridsim.iodata.output.AttributesGetter.y_unit()`
 
         :param file_name: File name (path) where to save the file.
         :type file_name: str

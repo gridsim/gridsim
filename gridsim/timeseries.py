@@ -66,6 +66,9 @@ class TimeSeries(object):
         self._index = 0
         self._time_key = 'time'
 
+    def __getattr__(self, item):
+        raise NotImplementedError('Pure abstract method!')
+
     @accepts(((1, 2), str),
              (3, bool))
     def map_attribute(self, name, mapped_name, is_time_key=False):

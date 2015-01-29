@@ -115,7 +115,7 @@ class ElectricalBus(AbstractElectricalElement):
         The bus voltage angle.
         """
 
-    def _p_reset(self):
+    def reset(self):
         """
         reset(self)
 
@@ -255,7 +255,7 @@ class ElectricalNetworkBranch(AbstractElectricalElement):
         """
         return self._to_bus_id
 
-    def _p_reset(self):
+    def reset(self):
         """
         reset(self)
 
@@ -313,7 +313,7 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
     def delta_energy(self, value):
         self._delta_energy = value
 
-    def _p_reset(self):
+    def reset(self):
         """
         reset(self)
 
@@ -322,7 +322,7 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
         self._delta_energy = 0
         self._internal_delta_energy = 0
 
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         """
         update(self, time, delta_time)
 

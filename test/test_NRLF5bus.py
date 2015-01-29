@@ -89,15 +89,15 @@ class TestNRLF5Bus(unittest.TestCase):
         # use Newton-Raphson Load flow calculator to calculate missing bus
         # electrical values
         # ======================================================================
-        [P, Q, V, Th] = nrlf._p_calculate(P, Q, V, Th, True)
+        [P, Q, V, Th] = nrlf.calculate(P, Q, V, Th, True)
 
         # output results, compare with reference values and output comparison
         # results (OK / NOT OK)
         # ======================================================================
         P_slack = P[0]
-        ref_P_slack = 2.5795
+        refslack = 2.5795
 
-        self.assertTrue(abs(P_slack-ref_P_slack)-1e-4)
+        self.assertTrue(abs(P_slack-refslack)-1e-4)
 
         ref_Q = np.array([2.2995, -0.8, -1.0, -1.3, 1.8134])
 

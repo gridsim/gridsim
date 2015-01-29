@@ -167,6 +167,10 @@ class PlotRecorder(Recorder, AttributesGetter):
         self._x = []
         self._y = {}
 
+        # for optimisation when getting results
+        self._res_x = None
+        self._res_y = None
+
     def on_simulation_reset(self, subjects):
         """
         on_simulation_reset(self, subjects)
@@ -188,10 +192,7 @@ class PlotRecorder(Recorder, AttributesGetter):
         .. seealso:: :func:`gridsim.simulation.Recorder.on_simulation_step()`
                      for details.
         """
-        if isinstance(self._x_unit, type):
-            self._x.append(self._x_unit(time))
-        else:
-            self._x.append(units.value(time, self._x_unit))
+        self._x.append(units.value(time))
 
     def on_observed_value(self, subject, time, value):
         """
@@ -203,14 +204,11 @@ class PlotRecorder(Recorder, AttributesGetter):
         .. seealso:: :func:`gridsim.simulation.Recorder.on_observed_value()`
                      for details.
         """
-        if isinstance(self._y_unit, type):
-            self._y[subject].append(self._y_unit(value))
-        else:
-            self._y[subject].append(units.value(value, self._y_unit))
+        self._y[subject].append(units.value(value))
 
-    def get_x_values(self):
+    def x_values(self):
         """
-        get_x_values(self)
+        x_values(self)
 
         Retrieves a list of time, on for each :func:`on_observed_value` and
         ordered following the call of :func:`gridsim.simulation.Simulator.step`.
@@ -233,11 +231,13 @@ class PlotRecorder(Recorder, AttributesGetter):
         :return: time in second
         :rtype: list
         """
-        return self._x
+        if self._res_x is None:
+            self._res_x = [units.value(units.convert(x, units.second), self._x_unit) for x in self._x]
+        return self._res_x
 
-    def get_x_unit(self):
+    def x_unit(self):
         """
-        get_x_unit(self)
+        x_unit(self)
 
         Retrieves the unit of the time.
 
@@ -246,9 +246,9 @@ class PlotRecorder(Recorder, AttributesGetter):
         """
         return self._x_unit
 
-    def get_y_values(self):
+    def y_values(self):
         """
-        get_y_values(self)
+        y_values(self)
 
         Retrieves a map of the recorded data::
 
@@ -263,11 +263,18 @@ class PlotRecorder(Recorder, AttributesGetter):
         :return: a map associating id to recorded data
         :rtype: dict
         """
-        return self._y
+        if self._res_y is None:
+            self._res_y = {}
+            for key in self._y.keys():
+                if type(self._y_unit) is type:
+                    self._res_y[key] = [self._y_unit(y) for y in self._y[key]]
+                else:
+                    self._res_y[key] = [units.value(units.convert(y, units.to_si(self._y_unit)), self._y_unit) for y in self._y[key]]
+        return self._res_y
 
-    def get_y_unit(self):
+    def y_unit(self):
         """
-        get_y_unit(self)
+        y_unit(self)
 
         Retrieves the unit od the recorded data.
 

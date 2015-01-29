@@ -16,14 +16,14 @@ class TimeTestElement(AbstractSimulationElement):
 
         self.iter = 0
 
-    def _p_reset(self):
+    def reset(self):
         self.val = 0
         self._val = 0
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         self._val += delta_time
 
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         self.val = self._val
         self.iter += 1
 
@@ -44,17 +44,17 @@ class TimeTestModule(AbstractSimulationModule):
     def attribute_name(self):
         return 'time_test'
 
-    def _p_reset(self):
+    def reset(self):
         for element in self.elements:
-            element._p_reset()
+            element.reset()
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         for element in self.elements:
-            element._p_calculate(time, delta_time)
+            element.calculate(time, delta_time)
 
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         for element in self.elements:
-            element._p_update(time, delta_time)
+            element.update(time, delta_time)
 
 Simulator.register_simulation_module(TimeTestModule)
 

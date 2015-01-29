@@ -333,7 +333,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         elements.extend(self._cps_elements)
         return elements
 
-    def _p_reset(self):
+    def reset(self):
         """
         reset(self)
 
@@ -342,11 +342,11 @@ class ElectricalSimulator(AbstractSimulationModule):
         :func:`ElectricalSimulator.add`.
         """
         for element in self._buses:
-            element._p_reset()
+            element.reset()
         for element in self._branches:
-            element._p_reset()
+            element.reset()
         for element in self._cps_elements:
-            element._p_reset()
+            element.reset()
 
     def _has_orphans(self):
         # TODO: check that all elements are attached to a bus and that all buses
@@ -412,7 +412,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         self._bu.Th = np.zeros(N)
 
     @accepts(((1, 2), (int, float)))
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -429,10 +429,10 @@ class ElectricalSimulator(AbstractSimulationModule):
         """
 
         for element in self._cps_elements:
-            element._p_calculate(time, delta_time)
+            element.calculate(time, delta_time)
 
     @accepts(((1, 2), (int, float)))
-    def _p_update(self, time, delta_time):
+    def update(self, time, delta_time):
         """
         update(self, time, delta_time)
 
@@ -449,17 +449,18 @@ class ElectricalSimulator(AbstractSimulationModule):
         :type delta_time: time, see :mod:`gridsim.unit`
         """
 
+
         if self._hasChanges and len(self._buses) > 1 \
                 and len(self._branches) > 0:
             # TODO: raise warning if self._as_orphans():
             self._prepare_matrices()
-            self.load_flow_calculator._p_update(self.s_base, self.v_base,
+            self.load_flow_calculator.update(self.s_base, self.v_base,
                                              self._is_PV, self._b, self._Yb)
 
             self._hasChanges = False
 
         for element in self._cps_elements:
-            element._p_update(time, delta_time)
+            element.update(time, delta_time)
 
         if len(self._buses) > 1 and len(self._branches) > 0:
             # put element powers into corresponding array
@@ -475,7 +476,7 @@ class ElectricalSimulator(AbstractSimulationModule):
             # perform network computations
             #------------------------------
             [self._bu.P, self._bu.Q, self._bu.V, self._bu.Th] = \
-                self.load_flow_calculator._p_calculate(self._bu.P, self._bu.Q,
+                self.load_flow_calculator.calculate(self._bu.P, self._bu.Q,
                                                     self._bu.V, self._bu.Th,
                                                     True)
 

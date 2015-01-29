@@ -42,7 +42,7 @@ class ConstantElectricalCPSElement(AbstractElectricalCPSElement):
         self.power = units.value(power, units.watt)
 
     @accepts(((1, 2), (int, float)))
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -146,7 +146,7 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         return self._cycle_start_time
 
     @accepts(((1, 2), (int, float)))
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -162,8 +162,8 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         current_cycle_pos = int((
                                 time - self._cycle_start_time) /
                                 self._cycle_delta_time) % self._cycle_length
-        self._internal_delta_energy = 0*units.joule
-        current_dtime = 0*units.second
+        self._internal_delta_energy = 0
+        current_dtime = 0
         next_dtime = self._cycle_delta_time
         if next_dtime > delta_time:
             next_dtime = delta_time
@@ -242,7 +242,7 @@ class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
         self._update_done = False
 
     @accepts(((1, 2), (int, float)))
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -321,7 +321,7 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         """
         return self._standard_deviation
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
 
@@ -334,9 +334,7 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
             done in seconds.
         :type delta_time: time, see :mod:`gridsim.unit`
         """
-        normal_value = np.random.normal(self._mean_power.to(units.watt),
-                                        self._standard_deviation.to(units.watt))
-        normal = normal_value*units.watt
+        normal = np.random.normal(self._mean_power, self._standard_deviation)
 
         self._internal_delta_energy = normal * delta_time
 
@@ -379,16 +377,16 @@ class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
             raise AttributeError('Requested column is missing in data')
 
     def __getattr__(self, item):
-        return getattr(self.time_series, item)
+        return units.value(getattr(self.time_series, item))
 
-    def _p_reset(self):
+    def reset(self):
         """
           .. seealso:: :func:`gridsim.core.AbstractSimulationElement.reset`.
         """
         self._time_series.set_time()
 
     @accepts(((1, 2), (int, float)))
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         Calculates the energy consumed or produced by the element during the
         simulation step.
@@ -532,7 +530,7 @@ class AnyIIDRandomElectricalCPSElement(AbstractElectricalCPSElement):
         """
         return self._cdf
 
-    def _p_calculate(self, time, delta_time):
+    def calculate(self, time, delta_time):
         """
         Calculate the element's the energy consumed or produced by the element
         during the simulation step.

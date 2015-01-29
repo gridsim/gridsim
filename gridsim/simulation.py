@@ -355,28 +355,28 @@ class Simulator(object):
         self.time = units.value(initial_time, units.second)
 
         for module in self._modules.values():
-            module._p_reset()
+            module.reset()
 
         for recorder_binding in self._recorderBindings:
-            recorder_binding._p_reset()
+            recorder_binding.reset()
 
     @returns(type(None))
     def _calculate(self, delta_time):
         for module in self._modules.values():
-            module._p_calculate(self.time, delta_time)
+            module.calculate(self.time, delta_time)
 
     @accepts((1, (int, float)))
     @returns(type(None))
     def _update(self, delta_time):
 
         for module in self._modules.values():
-            module._p_update(self.time, delta_time)
+            module.update(self.time, delta_time)
 
         for recorder in self._recorders:
             recorder.on_simulation_step(self.time)
 
         for recorder_binding in self._recorderBindings:
-            recorder_binding._p_update(self.time, delta_time)
+            recorder_binding.update(self.time, delta_time)
 
     @returns(type(None))
     def step(self, delta_time):
@@ -431,12 +431,12 @@ class Simulator(object):
             self._recorder = recorder
             self._subjects = subjects
 
-        def _p_reset(self):
+        def reset(self):
             # Call the reset handler of the recorder.
             self._recorder.on_simulation_reset(
                 [subject.friendly_name for subject in self._subjects])
 
-        def _p_update(self, time, delta_time):
+        def update(self, time, delta_time):
             # This method is called by the simulation after each simulation step
             #   in order to update the recorder.
             for subject in self._subjects:

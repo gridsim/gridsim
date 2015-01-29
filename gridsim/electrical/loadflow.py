@@ -66,7 +66,7 @@ class AbstractElectricalLoadFlowCalculator(object):
         self._Th = None
 
     @accepts(((1, 2), (int, float)))
-    def _p_update(self, s_base, v_base, is_PV, b, Yb):
+    def update(self, s_base, v_base, is_PV, b, Yb):
         """
         update(self, s_base, v_base, is_PV, b, Yb)
 
@@ -185,7 +185,7 @@ class AbstractElectricalLoadFlowCalculator(object):
             self._V = self._v_sc * V
 
     @accepts((5, bool))
-    def _p_calculate(self, P, Q, V, Th, scaled):
+    def calculate(self, P, Q, V, Th, scaled):
         """
         calculate(self, P, Q, V, Th, scaled)
 
@@ -368,7 +368,7 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
             self.update(s_base, v_base, is_PV, b, Yb)
 
     @accepts(((1, 2), (int, float)))
-    def _p_update(self, s_base, v_base, is_PV, b, Yb):
+    def update(self, s_base, v_base, is_PV, b, Yb):
         """
         update(self, s_base, v_base, is_PV, b, Yb)
 
@@ -393,7 +393,7 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
                   Hossein Seifi, Mohammad Sadegh Sepasian, Electric Power System
                   Planning: Issues, Algorithms and Solutions, pp. 246-248
         """
-        super(DirectLoadFlowCalculator, self)._p_update(s_base, v_base,
+        super(DirectLoadFlowCalculator, self).update(s_base, v_base,
                                                      is_PV, b, Yb)
 
 
@@ -421,7 +421,7 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         self._bA = self._bA.tocsr()
 
     @accepts((5, bool))
-    def _p_calculate(self, P, Q, V, Th, scaled):
+    def calculate(self, P, Q, V, Th, scaled):
         """
         calculate(self, P, Q, V, Th, scaled)
 
@@ -594,10 +594,10 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
         if s_base is not None and v_base is not None and is_PV is not None \
                 and b is not None and Yb is not None:
-            self._p_update(s_base, v_base, is_PV, b, Yb)
+            self.update(s_base, v_base, is_PV, b, Yb)
 
     @accepts(((1, 2), (int, float)))
-    def _p_update(self, s_base, v_base, is_PV, b, Yb):
+    def update(self, s_base, v_base, is_PV, b, Yb):
         """
         update(self, s_base, v_base, is_PV, b, Yb)
 
@@ -618,7 +618,7 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
             and `Yji` of each branch.
         :type Yb: 2-dimensional numpy array of complex
         """
-        super(NewtonRaphsonLoadFlowCalculator, self)._p_update(s_base, v_base,
+        super(NewtonRaphsonLoadFlowCalculator, self).update(s_base, v_base,
                                                             is_PV, b, Yb)
 
         # compute real part and imaginary part of admittance matrix
@@ -630,7 +630,7 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         self._ones_vector = np.ones(self._nBu)
 
     @accepts((5, bool))
-    def _p_calculate(self, P, Q, V, Th, scaled):
+    def calculate(self, P, Q, V, Th, scaled):
         """
         calculate(self, P, Q, V, Th, scaled)
 
