@@ -589,8 +589,8 @@ class _Unit(object):
 
         """
         self._registry = UnitRegistry()
-        self._registry.define('heat_capacity = J/(g*K)')
-        self._registry.define('mass_density = g/(m*m*m)')
+        self._registry.define('heat_capacity = J/(kg*K)')
+        self._registry.define('mass_density = kg/(m*m*m)')
         self._registry.define('thermal_conductivity = W/(K*m)')
 
     def __call__(self, *args, **kwargs):
