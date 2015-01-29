@@ -215,8 +215,8 @@ Gridsim units
 Gridsim defines its own units to simplify coding as these special units is used
 often times.
 
-* ``heat_capacity = joule/(gram*kelvin)``
-* ``mass_density = gram/(metre*metre*metre)``
+* ``heat_capacity = joule/(kilogram*kelvin)``
+* ``mass_density = kilogram/(metre*metre*metre)``
 * ``thermal_conductivity = watt/(kelvin*metre)``
 
 
