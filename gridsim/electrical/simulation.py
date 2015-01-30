@@ -288,7 +288,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         if bus.type == ElectricalBus.Type.SLACK_BUS:
             raise RuntimeError('No element can be attached to slack bus')
         if not isinstance(el, AbstractElectricalCPSElement):
-            el = self.element(el)
+            el = self._cps_elements(el)
         if not el.friendly_name in self._cps_elementDict.keys():
             self.add(el)
         self._cps_elementBusMap[el.id] = bus.id
