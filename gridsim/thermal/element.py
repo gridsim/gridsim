@@ -1,3 +1,4 @@
+import types
 from gridsim.decorators import accepts
 from gridsim.util import Position
 from gridsim.unit import units
@@ -7,8 +8,8 @@ from gridsim.timeseries import TimeSeries
 
 class ConstantTemperatureProcess(ThermalProcess):
 
-    @accepts((1, (str, unicode)),
-             (3, Position))
+    @accepts((1, str), (3, Position))
+    @units.wraps(None, (None, None, units.kelvin))
     def __init__(self, friendly_name, temperature, position=Position()):
         """
         This is a special thermal process with an infinite thermal capacity
@@ -22,10 +23,10 @@ class ConstantTemperatureProcess(ThermalProcess):
         :param position: The position of the :class:`.ThermalProcess`.
         :type position: :class:`Position`
         """
-
+        # super constructor needs units as it is a "public" function
         super(ConstantTemperatureProcess, self).__init__(
             friendly_name,
-            float('inf')*units.heat_capacity, temperature,
+            float('inf')*units.heat_capacity, temperature*units.kelvin,
             position=position)
 
     @accepts((1, (int, float)))
@@ -45,9 +46,7 @@ class ConstantTemperatureProcess(ThermalProcess):
 
 class TimeSeriesThermalProcess(ThermalProcess):
 
-    @accepts(((1, 3), str),
-             (2, TimeSeries),
-             (5, Position))
+    @accepts(((1, 3), str), (2, TimeSeries), (4, types.FunctionType), (5, Position))
     def __init__(self, friendly_name, time_series, stream, time_converter=None,
                  temperature_calculator=lambda t: units.convert(t, units.kelvin),
                  position=Position()):
@@ -83,7 +82,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
 
         self._time_series.convert('temperature', self._temperature_calculator)
 
-        self.calculate(0*units.second, 0*units.second)
+        self.calculate(0, 0)
 
     def __getattr__(self, item):
         # this function is not called when using thermalprocess.temperature
@@ -98,6 +97,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
         """
         self._time_series.set_time()
 
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         Calculates the temperature of the element during the simulation step.
@@ -109,6 +109,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
         # its local params
         self.temperature = units.value(self._time_series.temperature)
 
+    @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
         Does nothing for this type of :class:`.ThermalProcess`.

@@ -1,5 +1,4 @@
 from gridsim.decorators import accepts, returns
-from gridsim.unit import units
 from gridsim.core import AbstractSimulationModule
 
 from .core import AbstractThermalElement, ThermalProcess, ThermalCoupling
@@ -30,14 +29,10 @@ class ThermalSimulator(AbstractSimulationModule):
         self._couplings = []
         self._couplingsDict = {}
 
+    @accepts((1, int))
+    @returns(ThermalProcess)
     def _process(self, process_id):
-        if isinstance(process_id, int):
-            if len(self._processes) > process_id:
-                return self._processes[process_id]
-            else:
-                raise IndexError('Invalid index.')
-        else:
-            raise TypeError
+        return self._processes[process_id]
 
     # SimulationModule implementation.
     @returns(str)
@@ -67,6 +62,9 @@ class ThermalSimulator(AbstractSimulationModule):
         The core simulator will use these lists in order to be able
         to retrieve objects or list of objects by certain criteria using
         :func:`gridsim.simulation.Simulator.find`.
+
+        :return: a list of all :class:`.AbstractThermalElement`
+        :rtype: list
         """
         elements = []
         elements.extend(self._processes)

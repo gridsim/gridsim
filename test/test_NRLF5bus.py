@@ -1,5 +1,5 @@
-
 import unittest
+import math
 import numpy as np
 
 from gridsim.electrical.loadflow import NewtonRaphsonLoadFlowCalculator
@@ -108,8 +108,10 @@ class TestNRLF5Bus(unittest.TestCase):
         self.assertTrue(np.allclose(V, ref_V))
 
         ref_Th = np.array([0., -4.77851, 17.85353, -4.28193, 21.84332])
+        ref_Th = ref_Th*math.pi/180.
 
-        self.assertTrue(np.allclose(Th, ref_Th))
+        for ith, iref_th in zip(Th, ref_Th):
+            self.assertAlmostEqual(ith, iref_th)
 
         # compute branch power load flows
         # ===============================

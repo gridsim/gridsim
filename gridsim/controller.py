@@ -21,7 +21,7 @@ This simulation outputs the following plots:
             :align: center
 
 """
-from .decorators import accepts
+from .decorators import accepts, returns
 from .util import Position
 from .core import AbstractSimulationModule, AbstractSimulationElement
 from .simulation import Simulator
@@ -29,7 +29,7 @@ from .simulation import Simulator
 
 class AbstractControllerElement(AbstractSimulationElement):
 
-    @accepts((1, (str, unicode)), (2, Position))
+    @accepts((1, str), (2, Position))
     def __init__(self, friendly_name, position=Position()):
         """
         Base class of all elements which can be part of a controller simulation.
@@ -53,7 +53,7 @@ class ControllerSimulator(AbstractSimulationModule):
         super(ControllerSimulator, self).__init__()
         self._controllers = []
 
-    # SimulationModule implementation.
+    @returns(str)
     def attribute_name(self):
         """
         AbstractSimulationModule implementation
@@ -79,6 +79,7 @@ class ControllerSimulator(AbstractSimulationModule):
         for controller in self._controllers:
             controller.reset()
 
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         AbstractSimulationModule implementation
@@ -88,6 +89,7 @@ class ControllerSimulator(AbstractSimulationModule):
         for controller in self._controllers:
             controller.calculate(time, delta_time)
 
+    @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
         AbstractSimulationModule implementation

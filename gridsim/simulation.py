@@ -60,7 +60,7 @@ from .unit import units
 
 class Recorder(object):
 
-    @accepts((1, str))
+    @accepts((1, str), ((2, 3), (units.Quantity, type)))
     def __init__(self, attribute_name, x_unit, y_unit):
         """
         __init__(self, attribute_name, x_unit=None, y_unit=None)
@@ -105,7 +105,6 @@ class Recorder(object):
         """
         return self._attribute_name
 
-    @accepts((1, list))
     def on_simulation_reset(self, subjects):
         """
         on_simulation_reset(self, subjects)
@@ -136,8 +135,7 @@ class Recorder(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
-    @accepts((1, AbstractSimulationElement),
-             (2, (int, float)))
+    @accepts((1, AbstractSimulationElement), (2, (int, float)), (3, (int, float, units.Quantity)))
     def on_observed_value(self, subject, time, value):
         """
         on_observed_value(self, subject, time, value)
@@ -167,7 +165,7 @@ class Simulator(object):
     # need to instantiate them in __init__().
     _simulation_modules = []
 
-    # Named tuple to be used in the recorder lamdba function.
+    # Named tuple to be used in the recorder lambda function.
     _RecorderContext = namedtuple('RecorderContext', 'value time delta_time')
 
     @staticmethod
@@ -237,11 +235,7 @@ class Simulator(object):
         else:
             raise AttributeError("The module "+str(item)+" is not loaded")
 
-    @accepts(
-        ((1, 3, 6), (str, type(None))),
-        ((2, 4, 5), (int, type(None))),
-        (7, (tuple, type(None))),
-    )
+    @accepts(((1, 3, 6), (str, type(None))),((2, 4, 5), (int, type(None))),(7, (tuple, type(None))))
     @returns(list)
     def find(self, module=None, uid=None, friendly_name=None,
              element_class=None, instance_of=None,
@@ -341,8 +335,8 @@ class Simulator(object):
 
         return elements
 
-    @returns(type(None))
-    def reset(self, initial_time=0*units.second):
+    @units.wraps(None, (None, units.second))
+    def reset(self, initial_time=0):
         """
         reset(self, initial_time=0*units.second)
 
@@ -352,7 +346,7 @@ class Simulator(object):
             Defaults to ``0``.
         :type initial_time: time, see :mod:`gridsim.unit`
         """
-        self.time = units.value(initial_time, units.second)
+        self.time = initial_time
 
         for module in self._modules.values():
             module.reset()
@@ -360,13 +354,12 @@ class Simulator(object):
         for recorder_binding in self._recorderBindings:
             recorder_binding.reset()
 
-    @returns(type(None))
+    @accepts((1, (int, float)))
     def _calculate(self, delta_time):
         for module in self._modules.values():
             module.calculate(self.time, delta_time)
 
     @accepts((1, (int, float)))
-    @returns(type(None))
     def _update(self, delta_time):
 
         for module in self._modules.values():
@@ -378,10 +371,10 @@ class Simulator(object):
         for recorder_binding in self._recorderBindings:
             recorder_binding.update(self.time, delta_time)
 
-    @returns(type(None))
-    def step(self, delta_time):
+    @accepts((1, (int, float)))
+    def _step(self, delta_time):
         """
-        step(self, delta_time)
+        _step(self, delta_time)
 
         Executes a single simulation step on all modules.
 
@@ -393,6 +386,19 @@ class Simulator(object):
         self.time += delta_time_sec
         self._update(delta_time_sec)
 
+    @units.wraps(None, (None, units.second))
+    def step(self, delta_time):
+        """
+        step(self, delta_time)
+
+        Executes a single simulation step on all modules.
+
+        :param delta_time: The delta time for the single step.
+        :type delta_time: time, see :mod:`gridsim.unit`
+        """
+        self._step(delta_time)
+
+    @units.wraps(None, (None, units.second, units.second))
     def run(self, run_time, delta_time):
         """
         run(self, run_time, delta_time)
@@ -412,13 +418,10 @@ class Simulator(object):
         if self.time is None:
             self.reset()
 
-        delta_time_sec = units.value(delta_time, units.second)
-        run_time_sec = units.value(run_time, units.second)
-
-        end_time = self.time + run_time_sec
-        self._update(delta_time_sec)
+        end_time = self.time + run_time
+        self._update(delta_time)
         while self.time < end_time:
-            self.step(delta_time_sec)
+            self._step(delta_time)
 
     # Internal class. Holds a recorder and the binding of the recorder to an
     # attribute of an object.
@@ -449,8 +452,7 @@ class Simulator(object):
                                                  time, value)
 
 
-    @accepts((1, Recorder),
-             (2, (list, tuple, AbstractSimulationElement)))
+    @accepts((1, Recorder), (2, (list, tuple, AbstractSimulationElement)))
     @returns(Recorder)
     def record(self, recorder, subjects):
         """

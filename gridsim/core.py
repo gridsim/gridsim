@@ -37,7 +37,6 @@ is only a set of sequential calls of :func:`gridsim.simulation.Simulator.step`
 incrementing the time.
 """
 from .decorators import accepts, returns
-from .unit import units
 
 
 class AbstractSimulationModule(object):
@@ -92,9 +91,8 @@ class AbstractSimulationModule(object):
         """
         raise NotImplementedError('Abstract method called!')
 
-    @accepts((1, int),
-             ((2, 5), (str, type(None))),
-             ((3, 4), (type, type(None))))
+    @accepts((1, int), ((2, 5), (str, type(None))), ((3, 4), (type, type(None))))
+    @returns(list)
     def find(self, uid=None, friendly_name=None, element_class=None,
              instance_of=None, has_attribute=None):
         """
@@ -129,6 +127,8 @@ class AbstractSimulationModule(object):
             'power' attribute.
         :type has_attribute: str
 
+        :return: a list of all :class:`.AbstractThermalElement`
+        :rtype: list
         """
         return self.simulator.find(
             module=self.attribute_name(), uid=uid, friendly_name=friendly_name,

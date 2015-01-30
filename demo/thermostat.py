@@ -269,9 +269,6 @@ print("Saving data...")
 
 # Create a PDF document, add the two figures of the plot recorder to the
 # document and close the document.
-print 'fig1'
 FigureSaver(temp, "Temperature").save('./output/thermostat-fig1.png')
-print 'fig2'
 FigureSaver(control, "Control").save('./output/thermostat-fig2.png')
-print 'fig3'
 FigureSaver(power, "Power").save('./output/thermostat-fig3.png')

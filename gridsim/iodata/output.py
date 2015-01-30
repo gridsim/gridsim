@@ -163,10 +163,6 @@ class FigureSaver(object):
 
         :param y_max: Maximal value on the y-axis.
         :type y_max: float
-
-        :param delta_y: a delta value in y axis. Added to y limits for a better
-                        rendering.
-        :type delta_y: float
         """
         self._figure = plot.figure()
         plot.title(self._title)

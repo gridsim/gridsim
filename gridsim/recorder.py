@@ -106,7 +106,7 @@ from .simulation import Recorder
 
 class PlotRecorder(Recorder, AttributesGetter):
 
-    @accepts((1, str))
+    @accepts((1, str), ((2, 3), (units.Quantity, type)))
     def __init__(self, attribute_name, x_unit, y_unit):
         """
         __init__(self, attribute_name, x_unit=None, y_unit=None)
@@ -183,6 +183,7 @@ class PlotRecorder(Recorder, AttributesGetter):
         for subject in subjects:
             self._y[subject] = []
 
+    @accepts((1, (int, float)))
     def on_simulation_step(self, time):
         """
         on_simulation_step(self, time)
@@ -192,8 +193,9 @@ class PlotRecorder(Recorder, AttributesGetter):
         .. seealso:: :func:`gridsim.simulation.Recorder.on_simulation_step()`
                      for details.
         """
-        self._x.append(units.value(time))
+        self._x.append(time)
 
+    @accepts((2, (int, float)), (3, (int, float, units.Quantity)))
     def on_observed_value(self, subject, time, value):
         """
         on_observed_value(self, subject, time, value)
@@ -204,7 +206,7 @@ class PlotRecorder(Recorder, AttributesGetter):
         .. seealso:: :func:`gridsim.simulation.Recorder.on_observed_value()`
                      for details.
         """
-        self._y[subject].append(units.value(value))
+        self._y[subject].append(value)
 
     def x_values(self):
         """

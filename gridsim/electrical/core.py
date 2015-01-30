@@ -130,6 +130,7 @@ class ElectricalBus(AbstractElectricalElement):
 class AbstractElectricalTwoPort(AbstractElectricalElement):
 
     @accepts((1, str))
+    @units.wraps(None, (None, None, units.ohm, units.ohm))
     def __init__(self, friendly_name, X, R=0*units.ohm):
         """
         __init__(self, friendly_name, X, R=0*units.ohm)
@@ -151,18 +152,18 @@ class AbstractElectricalTwoPort(AbstractElectricalElement):
         :type R: ohm, see :mod:`gridsim.unit`
 
         """
-        super(AbstractElectricalTwoPort, self).__init__(friendly_name)
+        super(AbstractElectricalTwoPort, self).__init__(friendly_name, )
 
-        if X <= 0*units.ohm:
+        if X <= 0:
             raise RuntimeError('Line reactance X cannot be negative or null')
-        if R < 0*units.ohm:
+        if R < 0:
             raise RuntimeError('Line resistance R can not be negative number')
 
-        self.X = units.value(X, units.ohm)
+        self.X = X
         """
         The reactance.
         """
-        self.R = units.value(R, units.ohm)
+        self.R = R
         """
         The resistance.
         """

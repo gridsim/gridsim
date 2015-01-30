@@ -14,7 +14,6 @@ from numpy.linalg import inv
 from scipy.sparse import lil_matrix
 
 from gridsim.decorators import accepts, returns
-from gridsim.unit import units
 
 
 class AbstractElectricalLoadFlowCalculator(object):
@@ -290,7 +289,6 @@ class AbstractElectricalLoadFlowCalculator(object):
 
 
     @accepts((1, bool))
-    @returns(np.ndarray)
     def get_branch_max_currents(self, scaled):
         """
         get_branch_max_currents(self, scaled)
@@ -334,8 +332,7 @@ class AbstractElectricalLoadFlowCalculator(object):
 
 class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
-    @accepts(((1, 2), (int, float, type(None))),
-             ((3, 4, 5), (np.ndarray, type(None))))
+    @accepts(((1, 2), (int, float, type(None))))
     def __init__(self, s_base=None, v_base=None, is_PV=None, b=None, Yb=None):
         """
         This class implements the direct load flow method to solve the
@@ -476,7 +473,7 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
         # vector of voltage angles
         # update intern variable
-        self._Th = np.concatenate(([0.0], np.dot(self._invBvq, self._P[1:])))*units.degree
+        self._Th = np.concatenate(([0.0], np.dot(self._invBvq, self._P[1:])))
 
 
         # return external variable
@@ -485,7 +482,6 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         return [self._P, self._Q, self._V, self._Th]
 
     @accepts((1, bool))
-    @returns(tuple)
     def get_branch_power_flows(self, scaled):
         """
         get_branch_power_flows(self, scaled)
@@ -529,7 +525,6 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         return Pbr, None, -Pbr, None
 
     @accepts((1, bool))
-    @returns(np.ndarray)
     def get_branch_max_currents(self, scaled):
         """
         get_branch_max_currents(self, scaled)
@@ -564,7 +559,7 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
 class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
-    @accepts(((1, 2), (int, float)), (3, np.ndarray))
+    @accepts(((1, 2), (int, float)))
     def __init__(self, s_base=None, v_base=None, is_PV=None, b=None, Yb=None):
         """
         This class implements the Newton-Raphson method to solve the power-flow
@@ -671,7 +666,7 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         # initialize voltage amplitudes of PQ buses to 1.0
         self._V[self._is_PQ] = 1.0
         # initialize voltage angles of all buses to 0.0
-        self._Th = np.zeros([self._nBu])*units.degree
+        self._Th = np.zeros([self._nBu])
 
         self._nIter = 0
         while (self._residual_metric > self._residual_tolerance):
