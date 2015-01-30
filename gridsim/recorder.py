@@ -106,8 +106,8 @@ from .simulation import Recorder
 
 class PlotRecorder(Recorder, AttributesGetter):
 
-    @accepts((1, str), ((2, 3), (units.Quantity, type)))
-    def __init__(self, attribute_name, x_unit, y_unit):
+    @accepts((1, str), ((2, 3), (units.Quantity, type, type(None))))
+    def __init__(self, attribute_name, x_unit=None, y_unit=None):
         """
         __init__(self, attribute_name, x_unit=None, y_unit=None)
 
@@ -233,8 +233,11 @@ class PlotRecorder(Recorder, AttributesGetter):
         :return: time in second
         :rtype: list
         """
-        if self._res_x is None:
-            self._res_x = [units.value(units.convert(x, units.second), self._x_unit) for x in self._x]
+        if self._x_unit is None:
+            self._res_x = self._x
+        else:
+            if self._res_x is None:
+                self._res_x = [units.value(units.convert(x, units.to_si(self._x_unit)), self._x_unit) for x in self._x]
         return self._res_x
 
     def x_unit(self):
@@ -265,13 +268,17 @@ class PlotRecorder(Recorder, AttributesGetter):
         :return: a map associating id to recorded data
         :rtype: dict
         """
-        if self._res_y is None:
-            self._res_y = {}
-            for key in self._y.keys():
-                if type(self._y_unit) is type:
-                    self._res_y[key] = [self._y_unit(y) for y in self._y[key]]
-                else:
-                    self._res_y[key] = [units.value(units.convert(y, units.to_si(self._y_unit)), self._y_unit) for y in self._y[key]]
+        if self._y_unit is None:
+            self._res_y = self._y
+        else:
+            if self._res_y is None:
+                self._res_y = {}
+                for key in self._y.keys():
+                    if type(self._y_unit) is type:
+                        self._res_y[key] = [self._y_unit(y) for y in self._y[key]]
+                    else:
+                        self._res_y[key] = [units.value(units.convert(y, units.to_si(self._y_unit)), self._y_unit) for y in self._y[key]]
+
         return self._res_y
 
     def y_unit(self):
