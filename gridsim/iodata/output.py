@@ -129,10 +129,26 @@ class FigureSaver(object):
         self._title = title
         self._figure = None
 
-        self._x_unit = values.x_unit()
+        self._x_label = str(values.x_unit())
         self._x = values.x_values()
-        self._y_unit = values.y_unit()
+        self._y_label = str(values.y_unit())
         self._y = values.y_values()
+
+    @property
+    def x_label(self):
+        return self._x_label
+
+    @property
+    def y_label(self):
+        return self._y_label
+
+    @x_label.setter
+    def x_label(self, label):
+        self._x_label = str(label)
+
+    @y_label.setter
+    def y_label(self, label):
+        self._y_label = str(label)
 
     @property
     def figure(self):
@@ -188,8 +204,8 @@ class FigureSaver(object):
 
         delta_y = (y_max-y_min)/100.
 
-        plot.xlabel('[' + str(self._x_unit) + ']')
-        plot.ylabel('[' + str(self._y_unit) + ']')
+        plot.xlabel('[' + str(self._x_label) + ']')
+        plot.ylabel('[' + str(self._y_label) + ']')
 
         if len(self._y) < 10:
             plot.legend(loc='best', prop={'size': 8})
