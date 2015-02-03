@@ -60,7 +60,7 @@ from .unit import units
 
 class Recorder(object):
 
-    @accepts((1, str), ((2, 3), (units.Quantity, type)))
+    @accepts((1, str), ((2, 3), (units.Quantity, type, type(None))))
     def __init__(self, attribute_name, x_unit, y_unit):
         """
         __init__(self, attribute_name, x_unit=None, y_unit=None)
