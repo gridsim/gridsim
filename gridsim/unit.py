@@ -617,8 +617,7 @@ class _Unit(object):
 
     def to_si(self, measurement):
         if isinstance(measurement, self._registry.Quantity):
-            _measurement = measurement
-            _measurement = _measurement.to_base_units()
+            _measurement = measurement.to_base_units()
             return _measurement
         else:
             raise AttributeError('Attribute must be a unit or a measurement not a '+str(type(measurement)))
