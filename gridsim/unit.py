@@ -161,7 +161,7 @@ The data in **square brackets** ``[]`` are the dimension returned by
 * ``second = [time] = s = sec``
 * ``ampere = [current] = A = amp``
 * ``candela = [luminosity] = cd = candle``
-* ``gram = [mass] = g``
+* ``kilogram = [mass] = kg``
 * ``mole = [substance] = mol``
 * ``kelvin = [temperature]; offset: 0 = K = degK``
 * ``radian = [] = rad``
