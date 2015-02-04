@@ -3,7 +3,6 @@
 import unittest
 import numpy as np
 
-from gridsim.unit import units
 from gridsim.electrical.loadflow import NewtonRaphsonLoadFlowCalculator
 
 
@@ -66,7 +65,7 @@ class TestNRLF14Bus(unittest.TestCase):
             1.0/(0.12711+1j*0.27038),
             1.0/(0.08205+1j*0.19207),
             1.0/(0.22092+1j*0.19988),
-            1.0/(0.17093+1j*0.34802)])*units.siemens
+            1.0/(0.17093+1j*0.34802)])
 
         # check
         self.assertEqual(len(Y_T), b.shape[0])
@@ -102,13 +101,13 @@ class TestNRLF14Bus(unittest.TestCase):
             0.,
             0.,
             0.,
-            0.])*units.siemens
+            0.])
 
         # check
         self.assertEqual(sum(is_line), len(b_L))
 
         # compute branch admittances
-        Yb = np.zeros([b.shape[0], 4], dtype=complex)*units.siemens
+        Yb = np.zeros([b.shape[0], 4], dtype=complex)
         # transformers
         Yb[is_transformer, 0] = Y_T[is_transformer]
         Yb[is_transformer, 1] = Y_T[is_transformer]/k_T
@@ -185,7 +184,7 @@ class TestNRLF14Bus(unittest.TestCase):
         # use Newton-Raphson Load flow calculator to calculate missing bus
         # electrical values
         # ======================================================================
-        nrlf.calculate(P, Q, V, Th, True)
+        [P, Q, V, Th] = nrlf.calculate(P, Q, V, Th, True)
 
         # output results
         # ================

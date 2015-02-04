@@ -97,15 +97,15 @@ class TestEsimDLF(unittest.TestCase):
         # create recorders to collect output data
         #-----------------------------------------
         # Create a plot recorder which records active power on slack bus.
-        bus_pwr = PlotRecorder('P')
+        bus_pwr = PlotRecorder('P', units.second, units.watt)
         sim.record(bus_pwr, esim.find(element_class=ElectricalSlackBus))
         # Create a plot recorder which records theta angle on each bus.
-        bus_th = PlotRecorder('Th')
+        bus_th = PlotRecorder('Th', units.second, units.radian)
 
         sim.record(bus_th, esim.find(has_attribute='Th'))
 
         # Create a plot recorder which records power flow on each branch.
-        bra_pwr = PlotRecorder('Pij')
+        bra_pwr = PlotRecorder('Pij', units.second, units.watt)
 
         sim.record(bra_pwr, esim.find(element_class=ElectricalNetworkBranch))
 
@@ -120,26 +120,27 @@ class TestEsimDLF(unittest.TestCase):
         #----------------------------------
         # slack active power
 
-        y = bus_pwr.get_y_values()
+        y = bus_pwr.y_values()
         p_slack = y[bus1.friendly_name][0]
 
-        ref_p_slack = 0.37
+        refslack = 0.37
 
-        self.assertEqual(p_slack, ref_p_slack, "The power of the slack bus is "
-                         + str(p_slack) + " instead of " + str(ref_p_slack))
+        self.assertEqual(p_slack, refslack, "The power of the slack bus is "
+                         + str(p_slack) + " instead of " + str(refslack))
 
-        y = bus_th.get_y_values()
+        y = bus_th.y_values()
         # theta angles of all buses
         th = np.array([y[bus1.friendly_name][0],
                        y[bus2.friendly_name][0],
                        y[bus3.friendly_name][0]])
 
         ref_th = np.array([0., -0.00254839, -0.05537872])
-        self.assertTrue(np.allclose(th, ref_th))
 
+        for ith, iref_th in zip(th, ref_th):
+            self.assertAlmostEqual(ith, iref_th)
 
         # power flows of all branches
-        y = bra_pwr.get_y_values()
+        y = bra_pwr.y_values()
         pbr = np.array([y[bra1.friendly_name][0],
                         y[bra2.friendly_name][0],
                         y[bra3.friendly_name][0]])
@@ -147,7 +148,7 @@ class TestEsimDLF(unittest.TestCase):
 
         self.assertTrue(np.allclose(pbr, ref_pbr),
                         "The power of the slack bus is " + str(p_slack) +
-                        " instead of " + str(ref_p_slack))
+                        " instead of " + str(refslack))
 
 if __name__ == '__main__':
     unittest.main()

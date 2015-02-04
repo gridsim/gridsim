@@ -37,7 +37,6 @@ is only a set of sequential calls of :func:`gridsim.simulation.Simulator.step`
 incrementing the time.
 """
 from .decorators import accepts, returns
-from .unit import units
 
 
 class AbstractSimulationModule(object):
@@ -92,9 +91,8 @@ class AbstractSimulationModule(object):
         """
         raise NotImplementedError('Abstract method called!')
 
-    @accepts((1, int),
-             ((2, 5), (str, type(None))),
-             ((3, 4), (type, type(None))))
+    @accepts((1, int), ((2, 5), (str, type(None))), ((3, 4), (type, type(None))))
+    @returns(list)
     def find(self, uid=None, friendly_name=None, element_class=None,
              instance_of=None, has_attribute=None):
         """
@@ -129,6 +127,8 @@ class AbstractSimulationModule(object):
             'power' attribute.
         :type has_attribute: str
 
+        :return: a list of all :class:`.AbstractThermalElement`
+        :rtype: list
         """
         return self.simulator.find(
             module=self.attribute_name(), uid=uid, friendly_name=friendly_name,
@@ -145,7 +145,7 @@ class AbstractSimulationModule(object):
         """
         raise NotImplementedError('Abstract method called!')
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
         update(self, time, delta_time)
@@ -156,15 +156,15 @@ class AbstractSimulationModule(object):
         method on all simulation elements it owns/manages.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in in second
 
         :param delta_time: The time period for which the update has
             to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
         raise NotImplementedError('Abstract method called!')
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -175,11 +175,11 @@ class AbstractSimulationModule(object):
         the :func:`update` method on all simulation elements it owns/manages.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
         raise NotImplementedError('Abstract method called!')
 
@@ -236,7 +236,7 @@ class AbstractSimulationElement(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -257,7 +257,7 @@ class AbstractSimulationElement(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
         update(self, time, delta_time)

@@ -9,6 +9,12 @@ This module provides a unit management based on pint
 How to use :mod:`gridsim.units`
 *******************************
 
+The unit in Gridsim are used for 'user interface' functions such as
+:func:`gridsim.simulation.Simulator.run`, but for improves performance Gridsim
+converts all units in SI base unit and uses them as number (int, float, complex).
+Therefore some function parameters are float instead of unit especially when
+extending Gridsim core (see :ref:`gridsim-core`).
+
 It provides an object call ``units`` which is a wrapper to all useful features
 of pint, thus it should used as follow::
 
@@ -59,6 +65,21 @@ and::
                 >>> print(hysteresis.to(units.delta_degF))
                 4.32 delta_degF
 
+.. method:: to_si(unit)
+
+    Returns the SI base unit of the given ``unit``::
+
+        >>> mass = 1000*units.gram
+        >>> print units.to_si(mass)
+        1.0 kilogram
+        >>> print units.to_si(units.kilometre)
+        1000.0 meter
+
+    :param value: the value of the measurement
+    :type value: int, float
+    :param unit: the unit of the measurement
+    :type unit: see :ref:`all-unit`
+
 .. method:: units(value, unit)
 
     Creates a measurement of ``value`` times ``unit``
@@ -75,12 +96,12 @@ and::
 
     Returns the value of the ``measurement`` without any conversion::
 
-        >>> size = 1*units.meter
+        >>> size = 1.2*units.meter
         >>> print units.value(size)
-        meter
-        >>> size = 1*units.kilometer
+        1.2
+        >>> size = 34*units.kilometer
         >>> print units.value(size)
-        kilometer
+        34
 
     :returns: the value of the measurement
     :rtype: float
@@ -146,7 +167,7 @@ The data in **square brackets** ``[]`` are the dimension returned by
 * ``second = [time] = s = sec``
 * ``ampere = [current] = A = amp``
 * ``candela = [luminosity] = cd = candle``
-* ``gram = [mass] = g``
+* ``kilogram = [mass] = kg``
 * ``mole = [substance] = mol``
 * ``kelvin = [temperature]; offset: 0 = K = degK``
 * ``radian = [] = rad``
@@ -215,8 +236,8 @@ Gridsim units
 Gridsim defines its own units to simplify coding as these special units is used
 often times.
 
-* ``heat_capacity = joule/(gram*kelvin)``
-* ``mass_density = gram/(metre*metre*metre)``
+* ``heat_capacity = joule/(kilogram*kelvin)``
+* ``mass_density = kilogram/(metre*metre*metre)``
 * ``thermal_conductivity = watt/(kelvin*metre)``
 
 
@@ -527,6 +548,7 @@ Volume
 * ``firkin = barrel / 4``
 
 """
+import os
 from pint import UnitRegistry
 
 
@@ -588,9 +610,9 @@ class _Unit(object):
 
 
         """
-        self._registry = UnitRegistry()
-        self._registry.define('heat_capacity = J/(g*K)')
-        self._registry.define('mass_density = g/(m*m*m)')
+        self._registry = UnitRegistry(os.path.dirname(__file__)+'/gridsim_en.unit')
+        self._registry.define('heat_capacity = J/(kg*K)')
+        self._registry.define('mass_density = kg/(m*m*m)')
         self._registry.define('thermal_conductivity = W/(K*m)')
 
     def __call__(self, *args, **kwargs):
@@ -599,11 +621,23 @@ class _Unit(object):
     def __getattr__(self, item):
         return getattr(self._registry, item)
 
-    def value(self, measurement):
+    def to_si(self, measurement):
         if isinstance(measurement, self._registry.Quantity):
-            return measurement.magnitude
+            _measurement = measurement.to_base_units()
+            return _measurement
         else:
-            return measurement
+            raise AttributeError('Attribute must be a unit or a measurement not a '+str(type(measurement)))
+
+    def value(self, measurement, unit=None):
+        if unit is not None:
+            _measurement = self.convert(measurement, unit)
+        else:
+            _measurement = measurement
+
+        if isinstance(_measurement, self._registry.Quantity):
+            return _measurement.magnitude
+        else:
+            return _measurement
 
     def unit(self, measurement):
         if isinstance(measurement, self._registry.Quantity):

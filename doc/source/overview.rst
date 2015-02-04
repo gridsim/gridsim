@@ -48,7 +48,7 @@ This module takes care of all connections between electrical nodes. The module
 currently supports 2 calculation methods:
 
 * **Direct Load Flow Computing:** for fast results.
-* **Newton-Rhapsody Flow Computing:** for a detailed simulation.
+* **Newton-Raphson Load Flow Computing:** for a detailed simulation.
 
 Thermal
 -------
@@ -86,8 +86,7 @@ Simulation process
 ******************
 
 This section provides a brief explanation of how to use the simulator, if you
-want more information about use the simulator you should read
-:ref:`gridsim-use`.
+want more information about use the simulator you should read :ref:`gridsim-use`.
 
 Before doing anything else, you have to create an object of the class
 :class:`.Simulator`. This will automatically, almost magically

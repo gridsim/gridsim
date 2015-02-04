@@ -14,7 +14,6 @@ from numpy.linalg import inv
 from scipy.sparse import lil_matrix
 
 from gridsim.decorators import accepts, returns
-from gridsim.unit import units
 
 
 class AbstractElectricalLoadFlowCalculator(object):
@@ -148,7 +147,7 @@ class AbstractElectricalLoadFlowCalculator(object):
             self._Yb *= (v2_base * self._Yb)
 
         # compute admittance matrix Y
-        self._Y = np.zeros([self._nBu, self._nBu], dtype=complex)*units.siemens
+        self._Y = np.zeros([self._nBu, self._nBu], dtype=complex)
         # off-diagonal elements
         self._Y[self._b[:, 0], self._b[:, 1]] = -self._Yb[:, 1]
         self._Y[self._b[:, 1], self._b[:, 0]] = -self._Yb[:, 3]
@@ -223,6 +222,9 @@ class AbstractElectricalLoadFlowCalculator(object):
         :param scaled: specifies whether electrical input values are scaled or
             not
         :type scaled: boolean
+
+        :return: modified [P, Q, V, Th]
+        :rtype: a list of 4 element
         """
         raise NotImplementedError('Pure abstract method!')
 
@@ -287,7 +289,6 @@ class AbstractElectricalLoadFlowCalculator(object):
 
 
     @accepts((1, bool))
-    @returns(np.ndarray)
     def get_branch_max_currents(self, scaled):
         """
         get_branch_max_currents(self, scaled)
@@ -331,8 +332,7 @@ class AbstractElectricalLoadFlowCalculator(object):
 
 class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
-    @accepts(((1, 2), (int, float, type(None))),
-             ((3, 4, 5), (np.ndarray, type(None))))
+    @accepts(((1, 2), (int, float, type(None))))
     def __init__(self, s_base=None, v_base=None, is_PV=None, b=None, Yb=None):
         """
         This class implements the direct load flow method to solve the
@@ -446,12 +446,14 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         :param scaled: specifies whether electrical input values are scaled or
             not
         :type scaled: boolean
+
+        :return: modified [P, Q, V, Th]
+        :rtype: a list of 4 element
         """
         # check input arguments and save them to internal
         # variables _P, _Q, and _V
         # variables _P, _Q, and _V
-        super(DirectLoadFlowCalculator, self)._read_calculate_args(P, Q, V, Th,
-                                                                   scaled)
+        self._read_calculate_args(P, Q, V, Th, scaled)
         # initialize voltage angles internal variable _Th to 0.0
         self._Th = np.zeros([self._nBu, 1])
 
@@ -471,14 +473,15 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
         # vector of voltage angles
         # update intern variable
-        self._Th = np.concatenate(([0.0], np.dot(self._invBvq, self._P[1:])))*units.degree
-        # update external variable
-        Th[:] = self._Th
+        self._Th = np.concatenate(([0.0], np.dot(self._invBvq, self._P[1:])))
 
+
+        # return external variable
         self._calculate_done = True
 
+        return [self._P, self._Q, self._V, self._Th]
+
     @accepts((1, bool))
-    @returns(tuple)
     def get_branch_power_flows(self, scaled):
         """
         get_branch_power_flows(self, scaled)
@@ -522,7 +525,6 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         return Pbr, None, -Pbr, None
 
     @accepts((1, bool))
-    @returns(np.ndarray)
     def get_branch_max_currents(self, scaled):
         """
         get_branch_max_currents(self, scaled)
@@ -557,7 +559,7 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
 class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
-    @accepts(((1, 2), (int, float)), (3, np.ndarray))
+    @accepts(((1, 2), (int, float)))
     def __init__(self, s_base=None, v_base=None, is_PV=None, b=None, Yb=None):
         """
         This class implements the Newton-Raphson method to solve the power-flow
@@ -660,12 +662,11 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         """
         # check input arguments and save them to internal variables _P, _Q,
         # and _V
-        super(NewtonRaphsonLoadFlowCalculator, self)\
-            ._read_calculate_args(P, Q, V, Th, scaled)
+        self._read_calculate_args(P, Q, V, Th, scaled)
         # initialize voltage amplitudes of PQ buses to 1.0
         self._V[self._is_PQ] = 1.0
         # initialize voltage angles of all buses to 0.0
-        self._Th = np.zeros([self._nBu])*units.degree
+        self._Th = np.zeros([self._nBu])
 
         self._nIter = 0
         while (self._residual_metric > self._residual_tolerance):
@@ -809,13 +810,9 @@ class NewtonRaphsonLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
         # Update reactive power for slack and all PV buses
         self._Q[~self._is_PQ] = q_calc[~self._is_PQ]
 
-        if scaled:
-            P[:] = self._P
-            Q[:] = self._Q
-            V[:] = self._V
-        else:
-            P[:] = self.s_base * self._P
-            Q[:] = self.s_base * self._Q
-            V[:] = self.v_base * self._V
+        if not scaled:
+            self._P *= self.s_base
+            self._Q *= self.s_base
+            self._V *= self.v_base
 
-        Th[:] = self._Th
+        return [self._P, self._Q, self._V, self._Th]

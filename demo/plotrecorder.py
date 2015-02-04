@@ -43,19 +43,18 @@ sim.thermal.add(ThermalCoupling('room1 to room2',
                                 room1, room2))
 
 # Create a plot recorder that records the temperatures of all thermal processes.
-kelvin = PlotRecorder('temperature')
+kelvin = PlotRecorder('temperature', units.second, units.kelvin)
 sim.record(kelvin, sim.thermal.find(has_attribute='temperature'))
 
 # Create a plot recorder that records the temperatures of all thermal
 # processes in Kelvin.
-celsius = PlotRecorder('temperature')
-sim.record(celsius, sim.thermal.find(has_attribute='temperature'),
-           lambda context: units.convert(context.value, units.degC))
+celsius = PlotRecorder('temperature', units.minutes, units.degC)
+sim.record(celsius, sim.thermal.find(has_attribute='temperature'))
 
 # Create a second plot recorder which records all energy flows
 # (thermal couplings) between the different processes.
 
-flow = PlotRecorder('power')
+flow = PlotRecorder('power', units.second, units.watt)
 sim.record(flow, sim.thermal.find(element_class=ThermalCoupling))
 
 print("Running simulation...")

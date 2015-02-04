@@ -2,26 +2,25 @@ from gridsim.simulation import Simulator
 from gridsim.unit import units
 from gridsim.recorder import Recorder
 from gridsim.thermal.core import ThermalProcess, ThermalCoupling
-from gridsim.decorators import timed
 
 
 #Custom recorder.
 class ConsoleRecorder(Recorder):
 
-    def __init__(self, attribute_name):
-        super(ConsoleRecorder, self).__init__(attribute_name)
+    def __init__(self, attribute_name, x_unit, y_unit):
+        super(ConsoleRecorder, self).__init__(attribute_name, x_unit, y_unit)
 
-    @timed
     def on_simulation_reset(self, subjects):
         print 'RESET, observing: ' + str(subjects)
 
-    @timed
     def on_simulation_step(self, time):
-        print 'time = ' + str(time) + ':'
+        # time is given in SI unit (i.e. second)
+        print 'time = ' + str(units.convert(time*units.second, self._x_unit)) + ':'
 
     def on_observed_value(self, subject, time, value):
+        # time and value are given in SI unit (i.e. second and kelvin)
         print '    ' + subject + '.' + self.attribute_name +\
-              ' = ' + str(value)
+              ' = ' + str(units.convert(value*units.kelvin, self._y_unit))
 
 # Create simulator.
 sim = Simulator()
@@ -35,13 +34,13 @@ sim = Simulator()
 #          |__________|      <----------->        |___________|
 #                                 1m
 
-celsius = units.Quantity(60, units.degC)
+celsius = units(60, units.degC)
 hot_room = sim.thermal.add(ThermalProcess.room('hot_room',
                                                50*units.meter*units.meter,
                                                2.5*units.metre,
                                                celsius.to(units.kelvin)))
 
-celsius = units.Quantity(20, units.degC)
+celsius = units(20, units.degC)
 cold_room = sim.thermal.add(ThermalProcess.room('cold_room',
                                                 50*units.meter*units.meter,
                                                 2.5*units.metre,
@@ -53,7 +52,7 @@ sim.thermal.add(ThermalCoupling('coupling',
 
 # Add a custom console recorder to the attribute "temperature" of the hot
 # room thermal process.
-sim.record(ConsoleRecorder("temperature"),
+sim.record(ConsoleRecorder("temperature", units.second, units.degC),
            sim.thermal.find(element_class=ThermalProcess))
 
 # Simulate

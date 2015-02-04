@@ -12,8 +12,7 @@ from gridsim.core import AbstractSimulationElement
 
 class AbstractThermalElement(AbstractSimulationElement):
 
-    @accepts((1, str),
-             (2, Position))
+    @accepts((1, str), (2, Position))
     def __init__(self, friendly_name, position=Position()):
         """
         __init__(self, friendly_name, position=Position())
@@ -46,11 +45,10 @@ class AbstractThermalElement(AbstractSimulationElement):
 
 class ThermalProcess(AbstractThermalElement):
 
-    @accepts((1, str),
-             ((2, 3, 4), units.Quantity),
-             (5, Position))
+    @accepts((1, str), (5, Position))
+    @units.wraps(None, (None, None, units.heat_capacity, units.kelvin, units.kilogram, None))
     def __init__(self, friendly_name,
-                 thermal_capacity, initial_temperature, mass=1*units.kilogram,
+                 thermal_capacity, initial_temperature, mass=1,
                  position=Position()):
         """
         __init__(self, friendly_name, thermal_capacity, initial_temperature, mass=1*units.kilogram, position=Position()):
@@ -79,21 +77,31 @@ class ThermalProcess(AbstractThermalElement):
         :type position: :class:`.Position`
         """
         super(ThermalProcess, self).__init__(friendly_name, position)
+
         self._initial_temperature = initial_temperature
+        """
+        The initial temperature of the process. Need for reset.
+        """
 
         self._mass = mass
+        """
+        The mass of the thermal process.
+        """
 
-        self._internal_thermal_energy = initial_temperature * \
-            thermal_capacity * mass
-
-        self.thermal_capacity = thermal_capacity
+        self._thermal_capacity = thermal_capacity
         """
         The thermal capacity of the thermal process.
         """
 
-        self.temperature = initial_temperature
+        self.temperature = self._initial_temperature
         """
         The temperature of the process.
+        """
+
+        self._internal_thermal_energy = self._initial_temperature * \
+            self._thermal_capacity * self._mass
+        """
+        The internal thermal energy stored inside the thermal process.
         """
 
         self.thermal_energy = self._internal_thermal_energy
@@ -101,6 +109,7 @@ class ThermalProcess(AbstractThermalElement):
         The thermal energy stored inside the thermal process.
         """
 
+    @accepts((1, (int, float)))
     def add_energy(self, delta_energy):
         """
         add_energy(self, delta_energy)
@@ -123,10 +132,11 @@ class ThermalProcess(AbstractThermalElement):
         self.temperature = self._initial_temperature
 
         self._internal_thermal_energy = \
-            self._initial_temperature * self.thermal_capacity * self._mass
+            self._initial_temperature * self._thermal_capacity * self._mass
 
         self.thermal_energy = self._internal_thermal_energy
 
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -134,9 +144,17 @@ class ThermalProcess(AbstractThermalElement):
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.calculate`.
+
+        :param time: The actual time of the simulator.
+        :type time: float in second
+
+        :param delta_time: The delta time for which the calculation has to be
+            done.
+        :type delta_time: float in second
         """
         pass
 
+    @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
         update(self, time, delta_time)
@@ -144,20 +162,27 @@ class ThermalProcess(AbstractThermalElement):
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.update`.
+
+        :param time: The actual time of the simulator.
+        :type time: float in second
+
+        :param delta_time: The delta time for which the calculation has to be
+            done.
+        :type delta_time: float in second
         """
         self.thermal_energy = self._internal_thermal_energy
         self.temperature = self.thermal_energy / \
-                           (self.thermal_capacity * self._mass)
+                           (self._thermal_capacity * self._mass)
 
     @staticmethod
-    @accepts((0, str),
-             (4, Position))
+    @accepts((0, str), (4, Position))
+    @units.wraps(None, (None, units.metre**2, units.metre, units.kelvin, None))
     def room(friendly_name,
              surface, height,
-             initial_temperature=units(20, units.degC),
+             initial_temperature=293.15,  # 20 degree Celsius to Kelvin
              position=Position()):
         """
-        room(friendly_name, surface, height, initial_temperature=293.15*units.kelvin, position=Position()):
+        room(friendly_name, surface, height, initial_temperature=293.15, position=Position()):
 
         Returns the thermal process of a room filled with air and the given
         surface, height and initial temperature.
@@ -175,19 +200,22 @@ class ThermalProcess(AbstractThermalElement):
         :return: A new thermal process object representing the room or None on
             error.
         """
+        # Needs conversion to units as constructor is a "public" function
         return ThermalProcess(friendly_name,
                               Air().thermal_capacity,
-                              initial_temperature,
-                              surface * height * Air().weight,
+                              initial_temperature*units.kelvin,
+                              (surface*units.metre**2 * height*units.metre * Air().weight),
                               position)
 
     @staticmethod
+    @accepts((0, str), (4, Position))
+    @units.wraps(None, (None, units.heat_capacity, units.kilogram, units.kelvin, None))
     def solid(friendly_name,
               specific_thermal_capacity, mass,
-              initial_temperature=units(20, units.degC),
+              initial_temperature=293.15,  # 20 degree Celsius to Kelvin
               position=Position()):
         """
-        solid(friendly_name, specific_thermal_capacity, mass, initial_temperature=units(20, units.degC), position=Position()):
+        solid(friendly_name, specific_thermal_capacity, mass, initial_temperature=293.15, position=Position()):
 
         Returns the thermal process of a solid body and the given mass, initial
         temperature.
@@ -205,21 +233,20 @@ class ThermalProcess(AbstractThermalElement):
         :return: A new thermal process object representing the solid or None
             on error.
         """
-        return ThermalProcess(friendly_name, specific_thermal_capacity,
-                              initial_temperature, mass, position)
+        # Needs conversion to units as constructor is a "public" function
+        return ThermalProcess(friendly_name, specific_thermal_capacity*units.heat_capacity,
+                              initial_temperature*units.kelvin, mass*units.kilogram, position)
 
 
 class ThermalCoupling(AbstractThermalElement):
 
-    @accepts((1, str),
-             ((3, 4), ThermalProcess))
+    @accepts((1, str), ((3, 4), ThermalProcess))
+    @units.wraps(None, (None, None, units.thermal_conductivity, None, None, units.metre**2, units.metre))
     def __init__(self, friendly_name, thermal_conductivity,
-                 from_process,
-                 to_process,
-                 contact_area=1*units.metre*units.metre,
-                 thickness=1*units.metre):
+                 from_process, to_process,
+                 contact_area=1, thickness=1):
         """
-        __init__(self, friendly_name, thermal_conductivity, from_process, to_process, contact_area=1*units.metre*units.metre, thickness=1*units.metre)
+        __init__(self, friendly_name, thermal_conductivity, from_process, to_process, contact_area=1, thickness=1)
 
         A thermal coupling connects two thermal processes allowing them to
         exchange thermal energy.
@@ -231,31 +258,23 @@ class ThermalCoupling(AbstractThermalElement):
             element.
         :type thermal_conductivity: thermal conductivity, see :mod:`gridsim.unit`
 
-        :param from_process: The first process coupled or the ID of the first
+        :param from_process: The first process coupled
             process.
-        :type from_process: int (ID), :class:`ThermalProcess`
+        :type from_process: :class:`ThermalProcess`
 
-        :param to_process: The second process coupled or the ID of the second
+        :param to_process: The second process coupled
             process.
-        :type to_process: int (ID), :class:`ThermalProcess`
+        :type to_process: :class:`ThermalProcess`
         """
         super(ThermalCoupling, self).__init__(friendly_name)
+
+        self.from_process = from_process
+        self.to_process = to_process
 
         self.thermal_conductivity = thermal_conductivity
         """
         The thermal conductivity of the coupling in W/K.
         """
-
-        self.from_process_id = None
-        """
-        The ID of the first process.
-        """
-
-        self.to_process_id = None
-        """
-        The ID of the second process.
-        """
-
         self._contact_area = contact_area
         """
         The size of the contact area between the two :class:`ThermalProcess`
@@ -264,27 +283,10 @@ class ThermalCoupling(AbstractThermalElement):
         """
         The thickness of the material between the two :class:`ThermalProcess`
         """
-
-        if isinstance(from_process, ThermalProcess) \
-                and not from_process is None \
-                and not from_process.id is None:
-            self.from_process_id = from_process.id
-        elif isinstance(from_process, int):
-            self.from_process_id = from_process
-        else:
-            raise RuntimeError('Missing or invalid from_process reference.')
-        if isinstance(to_process, ThermalProcess) \
-                and not to_process is None \
-                and not to_process.id is None:
-            self.to_process_id = to_process.id
-        elif isinstance(to_process, int):
-            self.to_process_id = to_process
-        else:
-            raise RuntimeError('Missing or invalid to_process reference.')
-        self._simulator = None
-
-        self._delta_energy = 0*units.joule
-
+        self._delta_energy = 0
+        """
+        The energy variation
+        """
         self.power = None
         """
         Thermal power that gets conducted by the thermal coupling.
@@ -306,9 +308,9 @@ class ThermalCoupling(AbstractThermalElement):
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.reset`.
         """
-        self._delta_energy = 0*units.joule
-        pass
+        self._delta_energy = 0
 
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -317,9 +319,26 @@ class ThermalCoupling(AbstractThermalElement):
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.calculate`.
         """
-        # Nothing to do, we do all calculations in simulator main module.
-        pass
+        #
+        # Q = C * T     Q: Thermal energy [J]
+        #               C: Thermal conductivity [J/K]
+        # dT = Rth * I  T: Temperature [K]
+        #               dT: Temperature difference [K]
+        # dQ = dt * I   Rth: Thermal resistance [K/W]
+        #               I: Thermal flow [W]
+        #               dQ: Change of thermal energy per time
+        #                   interval [J]
+        #               dt: Time interval [s]
 
+        self._delta_energy = \
+            ((self.from_process.temperature - self.to_process.temperature) * \
+            self.thermal_conductivity * \
+            self.contact_area / self.thickness)*delta_time
+
+        self.from_process.add_energy(-self._delta_energy)
+        self.to_process.add_energy(self._delta_energy)
+
+    @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
         update(self, time, delta_time)
@@ -329,4 +348,3 @@ class ThermalCoupling(AbstractThermalElement):
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.update`.
         """
         self.power = self._delta_energy / delta_time
-        pass

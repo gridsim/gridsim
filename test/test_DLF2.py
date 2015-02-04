@@ -6,7 +6,6 @@
 import unittest
 import numpy as np
 
-from gridsim.unit import units
 from gridsim.electrical.loadflow import DirectLoadFlowCalculator
 
 
@@ -25,8 +24,8 @@ class TestDLF2(unittest.TestCase):
         b = np.array([[0, 1], [0, 2], [0, 3], [1, 2], [2, 3]])
 
         # array containing branch admittances
-        Yb = np.zeros((5,4),dtype=complex)*units.siemens
-        yT = [1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.)]*units.siemens
+        Yb = np.zeros((5,4),dtype=complex)
+        yT = [1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.)]
         for i_branch in range(0, 5):
             Yb[i_branch, 0] = yT[i_branch]
             Yb[i_branch, 1] = yT[i_branch]
@@ -56,16 +55,16 @@ class TestDLF2(unittest.TestCase):
 
         # compute buses other electrical values
         #--------------------------------------
-        dlf.calculate(P, Q, V, Th, True)
+        [P, Q, V, Th] = dlf.calculate(P, Q, V, Th, True)
 
         # check results against reference values
         p_slack = P[0]
         # print "P_slack ="
         # print p_slack
-        ref_p_slack = 2.
+        refslack = 2.
 
-        self.assertEqual(p_slack, ref_p_slack, "The power of the slack bus is "
-                         + str(p_slack) + " instead of " + str(ref_p_slack))
+        self.assertEqual(p_slack, refslack, "The power of the slack bus is "
+                         + str(p_slack) + " instead of " + str(refslack))
 
         # print "Th = "
         # print Th

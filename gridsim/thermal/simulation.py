@@ -1,5 +1,4 @@
-from gridsim.decorators import accepts, returns, timed
-from gridsim.unit import units
+from gridsim.decorators import accepts, returns
 from gridsim.core import AbstractSimulationModule
 
 from .core import AbstractThermalElement, ThermalProcess, ThermalCoupling
@@ -15,8 +14,8 @@ class ThermalSimulator(AbstractSimulationModule):
         automatically added to the :class:`.Simulator` when
         importing any class or module of :mod:`gridsim.thermal` package.
 
-        To access this class from simulation, use
-        :class:`.Simulator` as follow::
+        To access this class from simulation, use :class:`.Simulator` as
+        follow::
 
             # Create the simulation.
             sim = Simulator()
@@ -30,16 +29,11 @@ class ThermalSimulator(AbstractSimulationModule):
         self._couplings = []
         self._couplingsDict = {}
 
+    @accepts((1, int))
+    @returns(ThermalProcess)
     def _process(self, process_id):
-        if isinstance(process_id, int):
-            if len(self._processes) > process_id:
-                return self._processes[process_id]
-            else:
-                raise IndexError('Invalid index.')
-        else:
-            raise TypeError
+        return self._processes[process_id]
 
-    # SimulationModule implementation.
     @returns(str)
     def attribute_name(self):
         """
@@ -67,6 +61,9 @@ class ThermalSimulator(AbstractSimulationModule):
         The core simulator will use these lists in order to be able
         to retrieve objects or list of objects by certain criteria using
         :func:`gridsim.simulation.Simulator.find`.
+
+        :return: a list of all :class:`.AbstractThermalElement`
+        :rtype: list
         """
         elements = []
         elements.extend(self._processes)
@@ -86,7 +83,7 @@ class ThermalSimulator(AbstractSimulationModule):
         for coupling in self._couplings:
             coupling.reset()
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -97,43 +94,20 @@ class ThermalSimulator(AbstractSimulationModule):
         the :class:`.ThermalCoupling` to update the energy of each process.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
 
         for process in self._processes:
             process.calculate(time, delta_time)
 
         for coupling in self._couplings:
-            process_a = self._process(coupling.from_process_id)
-            process_b = self._process(coupling.to_process_id)
+            coupling.calculate(time, delta_time)
 
-            if process_a is not None and process_b is not None:
-
-                coupling._delta_energy = \
-                    (process_a.temperature - process_b.temperature) * \
-                    coupling.thermal_conductivity * \
-                    coupling.contact_area / coupling.thickness
-
-                process_a.add_energy(-coupling._delta_energy * delta_time)
-
-                process_b.add_energy(coupling._delta_energy * delta_time)
-
-                #
-                # Q = C * T     Q: Thermal energy [J]
-                #               C: Thermal conductivity [J/K]
-                # dT = Rth * I  T: Temperature [K]
-                #               dT: Temperature difference [K]
-                # dQ = dt * I   Rth: Thermal resistance [K/W]
-                #               I: Thermal flow [W]
-                #               dQ: Change of thermal energy per time
-                #                   interval [J]
-                #               dt: Time interval [s]
-
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
         update(self, time, delta_time)
@@ -144,11 +118,11 @@ class ThermalSimulator(AbstractSimulationModule):
         :class:`.AbstractElectricalLoadFlowCalculator`.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
         for process in self._processes:
             process.update(time, delta_time)
@@ -179,10 +153,10 @@ class ThermalSimulator(AbstractSimulationModule):
             if element.friendly_name in self._couplingsDict.keys():
                 raise RuntimeError(
                     'Duplicate thermal coupling friendly name, must be unique.')
-            elif element.from_process_id > len(self._processes):
-                raise RuntimeError('Invalid from process or from process ID.')
-            elif element.to_process_id > len(self._processes):
-                raise RuntimeError('Invalid to process or to process ID.')
+            elif element.from_process is None:
+                raise RuntimeError('Invalid from process.')
+            elif element.to_process is None:
+                raise RuntimeError('Invalid to process.')
             element.id = len(self._couplings)
             self._couplings.append(element)
             self._couplingsDict[element.friendly_name] = element

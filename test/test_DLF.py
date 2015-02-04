@@ -41,7 +41,6 @@
 import unittest
 import numpy as np
 
-from gridsim.unit import units
 from gridsim.electrical.loadflow import DirectLoadFlowCalculator
 
 
@@ -57,11 +56,11 @@ class TestDLF(unittest.TestCase):
 
 
         # array giving from-bus and to-bus ids for each branch
-        b = np.array([[0, 1], [1, 2], [0, 2]])*units.siemens
+        b = np.array([[0, 1], [1, 2], [0, 2]])
 
         # array containing branch admittances
-        Yb = np.zeros((3,4), dtype=complex)*units.siemens
-        yT = [1./(1j*0.0576), 1./(1j*0.092), 1./(1j*0.17)]*units.siemens
+        Yb = np.zeros((3,4), dtype=complex)
+        yT = [1./(1j*0.0576), 1./(1j*0.092), 1./(1j*0.17)]
         for i_branch in range(0, 3):
             Yb[i_branch, 0] = yT[i_branch]
             Yb[i_branch, 1] = yT[i_branch]
@@ -94,15 +93,15 @@ class TestDLF(unittest.TestCase):
 
         # compute buses other electrical values
         #--------------------------------------
-        dlf.calculate(P, Q, V, Th, True)
+        [P, Q, V, Th] = dlf.calculate(P, Q, V, Th, True)
 
         # check results against reference values
         P_slack = P[0]
         # print "P_slack ="
         # print P_slack
-        ref_P_slack = 0.37
+        refslack = 0.37
 
-        self.assertEqual(P_slack, ref_P_slack)
+        self.assertEqual(P_slack, refslack)
 
         # print "Th = "
         # print Th

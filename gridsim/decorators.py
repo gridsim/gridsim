@@ -79,7 +79,7 @@ def accepts(*atypes):
                             if not default_param \
                                     and not isinstance(args[apos], atype[1]):
                                 raise TypeError(
-                                    "In"+func.__name__+", "
+                                    "In '"+func.__name__+"', "
                                     "params value %r does not "
                                     "match %s" % (args[apos], atype[1]))
                     else:

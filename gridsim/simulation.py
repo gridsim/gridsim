@@ -60,10 +60,10 @@ from .unit import units
 
 class Recorder(object):
 
-    @accepts((1, str))
-    def __init__(self, attribute_name):
+    @accepts((1, str), ((2, 3), (units.Quantity, type, type(None))))
+    def __init__(self, attribute_name, x_unit, y_unit):
         """
-        __init__(self, attribute_name)
+        __init__(self, attribute_name, x_unit=None, y_unit=None)
 
         Defines the interface an object has to implement in order to get
         notified between simulation steps with a reference to the observed
@@ -75,12 +75,26 @@ class Recorder(object):
         :param attribute_name: The name of the attribute observed by this
             recorder.
         :type attribute_name: str
+        :param x_unit: The unit of the horizontal axis
+        :type x_unit: type or unit see :mod:`gridsim.unit`
+        :param y_unit: The unit of the vertical axis
+        :type y_unit: type or unit see :mod:`gridsim.unit`
         """
         super(Recorder, self).__init__()
 
         self._attribute_name = attribute_name
         """
         The name of the attribute observed by this recorder
+        """
+
+        self._x_unit = x_unit
+        """
+        The unit of the horizontal axis
+        """
+
+        self._y_unit = y_unit
+        """
+        The unit of the vertical axis
         """
 
     @property
@@ -91,7 +105,6 @@ class Recorder(object):
         """
         return self._attribute_name
 
-    @accepts((1, list))
     def on_simulation_reset(self, subjects):
         """
         on_simulation_reset(self, subjects)
@@ -109,7 +122,7 @@ class Recorder(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
-    @accepts((1, units.Quantity))
+    @accepts((1, (int, float)))
     def on_simulation_step(self, time):
         """
         on_simulation_step(self, time)
@@ -122,8 +135,7 @@ class Recorder(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
-    @accepts((1, AbstractSimulationElement),
-             (2, units.Quantity))
+    @accepts((1, AbstractSimulationElement), (2, (int, float)), (3, (int, float, units.Quantity)))
     def on_observed_value(self, subject, time, value):
         """
         on_observed_value(self, subject, time, value)
@@ -153,7 +165,7 @@ class Simulator(object):
     # need to instantiate them in __init__().
     _simulation_modules = []
 
-    # Named tuple to be used in the recorder lamdba function.
+    # Named tuple to be used in the recorder lambda function.
     _RecorderContext = namedtuple('RecorderContext', 'value time delta_time')
 
     @staticmethod
@@ -223,11 +235,7 @@ class Simulator(object):
         else:
             raise AttributeError("The module "+str(item)+" is not loaded")
 
-    @accepts(
-        ((1, 3, 6), (str, type(None))),
-        ((2, 4, 5), (int, type(None))),
-        (7, (tuple, type(None))),
-    )
+    @accepts(((1, 3, 6), (str, type(None))),((2, 4, 5), (int, type(None))),(7, (tuple, type(None))))
     @returns(list)
     def find(self, module=None, uid=None, friendly_name=None,
              element_class=None, instance_of=None,
@@ -327,9 +335,8 @@ class Simulator(object):
 
         return elements
 
-    @accepts((1, units.Quantity))
-    @returns(type(None))
-    def reset(self, initial_time=0*units.second):
+    @units.wraps(None, (None, units.second))
+    def reset(self, initial_time=0):
         """
         reset(self, initial_time=0*units.second)
 
@@ -340,20 +347,19 @@ class Simulator(object):
         :type initial_time: time, see :mod:`gridsim.unit`
         """
         self.time = initial_time
+
         for module in self._modules.values():
             module.reset()
 
         for recorder_binding in self._recorderBindings:
             recorder_binding.reset()
 
-    @accepts((1, units.Quantity))
-    @returns(type(None))
+    @accepts((1, (int, float)))
     def _calculate(self, delta_time):
         for module in self._modules.values():
             module.calculate(self.time, delta_time)
 
-    @accepts((1, units.Quantity))
-    @returns(type(None))
+    @accepts((1, (int, float)))
     def _update(self, delta_time):
 
         for module in self._modules.values():
@@ -365,8 +371,22 @@ class Simulator(object):
         for recorder_binding in self._recorderBindings:
             recorder_binding.update(self.time, delta_time)
 
-    @accepts((1, units.Quantity))
-    @returns(type(None))
+    @accepts((1, (int, float)))
+    def _step(self, delta_time):
+        """
+        _step(self, delta_time)
+
+        Executes a single simulation step on all modules.
+
+        :param delta_time: The delta time for the single step.
+        :type delta_time: time, see :mod:`gridsim.unit`
+        """
+        delta_time_sec = units.value(delta_time, units.second)
+        self._calculate(delta_time_sec)
+        self.time += delta_time_sec
+        self._update(delta_time_sec)
+
+    @units.wraps(None, (None, units.second))
     def step(self, delta_time):
         """
         step(self, delta_time)
@@ -376,11 +396,9 @@ class Simulator(object):
         :param delta_time: The delta time for the single step.
         :type delta_time: time, see :mod:`gridsim.unit`
         """
-        self._calculate(delta_time)
-        self.time += delta_time
-        self._update(delta_time)
+        self._step(delta_time)
 
-    @accepts(((1, 2), units.Quantity))
+    @units.wraps(None, (None, units.second, units.second))
     def run(self, run_time, delta_time):
         """
         run(self, run_time, delta_time)
@@ -403,19 +421,18 @@ class Simulator(object):
         end_time = self.time + run_time
         self._update(delta_time)
         while self.time < end_time:
-            self.step(delta_time)
+            self._step(delta_time)
 
     # Internal class. Holds a recorder and the binding of the recorder to an
     # attribute of an object.
     class _RecorderBinding(object):
 
-        def __init__(self, recorder, subjects, conversion):
+        def __init__(self, recorder, subjects):
             super(Simulator._RecorderBinding, self).__init__()
 
             # Save the recorder instance and the subject's attribute.
             self._recorder = recorder
             self._subjects = subjects
-            self._conversion = conversion
 
         def reset(self):
             # Call the reset handler of the recorder.
@@ -429,19 +446,15 @@ class Simulator(object):
 
                 value = getattr(subject, self._recorder.attribute_name)
 
-                if self._conversion is not None:
-                    value = self._conversion(
-                    Simulator._RecorderContext(value, time, delta_time))
+                Simulator._RecorderContext(value, time, delta_time)
 
                 self._recorder.on_observed_value(subject.friendly_name,
                                                  time, value)
 
 
-    @accepts((1, Recorder),
-             (2, (list, tuple, AbstractSimulationElement)),
-             (3, (types.FunctionType, type(None))))
+    @accepts((1, Recorder), (2, (list, tuple, AbstractSimulationElement)))
     @returns(Recorder)
-    def record(self, recorder, subjects, conversion=None):
+    def record(self, recorder, subjects):
         """
         record(self, recorder, subjects, conversion=None)
 
@@ -479,8 +492,7 @@ class Simulator(object):
         if isinstance(subjects, AbstractSimulationElement):
             subjects = (subjects,)
 
-        self._recorderBindings.append(self._RecorderBinding(recorder, subjects,
-                                                            conversion))
+        self._recorderBindings.append(self._RecorderBinding(recorder, subjects))
 
         if not recorder in self._recorders:
             self._recorders.append(recorder)

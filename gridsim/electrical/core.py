@@ -130,6 +130,7 @@ class ElectricalBus(AbstractElectricalElement):
 class AbstractElectricalTwoPort(AbstractElectricalElement):
 
     @accepts((1, str))
+    @units.wraps(None, (None, None, units.ohm, units.ohm))
     def __init__(self, friendly_name, X, R=0*units.ohm):
         """
         __init__(self, friendly_name, X, R=0*units.ohm)
@@ -151,11 +152,11 @@ class AbstractElectricalTwoPort(AbstractElectricalElement):
         :type R: ohm, see :mod:`gridsim.unit`
 
         """
-        super(AbstractElectricalTwoPort, self).__init__(friendly_name)
+        super(AbstractElectricalTwoPort, self).__init__(friendly_name, )
 
-        if X <= 0*units.ohm:
+        if X <= 0:
             raise RuntimeError('Line reactance X cannot be negative or null')
-        if R < 0*units.ohm:
+        if R < 0:
             raise RuntimeError('Line resistance R can not be negative number')
 
         self.X = X
@@ -293,8 +294,8 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
 
         """
         super(AbstractElectricalCPSElement, self).__init__(friendly_name)
-        self._delta_energy = 0*units.joule
-        self._internal_delta_energy = 0*units.joule
+        self._delta_energy = 0
+        self._internal_delta_energy = 0
 
     @property
     def delta_energy(self):
@@ -319,8 +320,8 @@ class AbstractElectricalCPSElement(AbstractElectricalElement):
 
         Resets the element to its initial state.
         """
-        self._delta_energy = 0*units.joule
-        self._internal_delta_energy = 0*units.joule
+        self._delta_energy = 0
+        self._internal_delta_energy = 0
 
     def update(self, time, delta_time):
         """

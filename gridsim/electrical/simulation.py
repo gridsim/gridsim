@@ -11,7 +11,6 @@ import numpy as np
 from scipy.sparse import lil_matrix
 
 from gridsim.decorators import accepts, returns
-from gridsim.unit import units
 from gridsim.core import AbstractSimulationModule
 
 from .core import AbstractElectricalElement, ElectricalBus, \
@@ -289,7 +288,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         if bus.type == ElectricalBus.Type.SLACK_BUS:
             raise RuntimeError('No element can be attached to slack bus')
         if not isinstance(el, AbstractElectricalCPSElement):
-            el = self.element(el)
+            el = self._cps_elements(el)
         if not el.friendly_name in self._cps_elementDict.keys():
             self.add(el)
         self._cps_elementBusMap[el.id] = bus.id
@@ -384,7 +383,7 @@ class ElectricalSimulator(AbstractSimulationModule):
             self._b[i_branch, 1] = self._branches[i_branch].to_bus_id
 
         # build table Yb of branch admittances
-        self._Yb = np.zeros((M, 4), dtype=complex)*units.siemens
+        self._Yb = np.zeros((M, 4), dtype=complex)
         # start with the off-diagonal element
         for i_branch in range(0, M):
             branch = self._branches[i_branch]
@@ -404,15 +403,15 @@ class ElectricalSimulator(AbstractSimulationModule):
                 self._Yb[i_branch, 3] = Y_line / tap.k_factor.conjugate()
 
         # active power of electrical CPS elements
-        self._Pe = np.zeros(L)*units.watt
+        self._Pe = np.zeros(L)
 
         # bus electrical values
-        self._bu.P = np.zeros(N)*units.watt
-        self._bu.Q = np.zeros(N)*units.watt
-        self._bu.V = np.zeros(N)*units.volt
-        self._bu.Th = np.zeros(N)*units.degree
+        self._bu.P = np.zeros(N)
+        self._bu.Q = np.zeros(N)
+        self._bu.V = np.zeros(N)
+        self._bu.Th = np.zeros(N)
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -422,17 +421,17 @@ class ElectricalSimulator(AbstractSimulationModule):
         simulator, added by the :func:`.ElectricalSimulator.add`.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
 
         for element in self._cps_elements:
             element.calculate(time, delta_time)
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
         update(self, time, delta_time)
@@ -443,12 +442,13 @@ class ElectricalSimulator(AbstractSimulationModule):
         :class:`.AbstractElectricalLoadFlowCalculator`.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
+
 
         if self._hasChanges and len(self._buses) > 1 \
                 and len(self._branches) > 0:
@@ -475,8 +475,10 @@ class ElectricalSimulator(AbstractSimulationModule):
 
             # perform network computations
             #------------------------------
-            self.load_flow_calculator.calculate(self._bu.P, self._bu.Q,
-                                                self._bu.V, self._bu.Th, True)
+            [self._bu.P, self._bu.Q, self._bu.V, self._bu.Th] = \
+                self.load_flow_calculator.calculate(self._bu.P, self._bu.Q,
+                                                    self._bu.V, self._bu.Th,
+                                                    True)
 
             [self._br.Pij, self._br.Qij, self._br.Pji, self._br.Qji] = \
                 self.load_flow_calculator.get_branch_power_flows(True)
@@ -485,30 +487,30 @@ class ElectricalSimulator(AbstractSimulationModule):
             #-----------------------------------------------------
             for i_bus in range(1, len(self._buses)):
                 self._buses[i_bus].Th = self._bu.Th[i_bus]
-                self._buses[i_bus].P = self._bu.P[i_bus]*units.watt
+                self._buses[i_bus].P = self._bu.P[i_bus]
                 if self._is_PV[i_bus]:
-                    self._buses[i_bus].Q = self._bu.Q[i_bus]*units.watt
+                    self._buses[i_bus].Q = self._bu.Q[i_bus]
                 else:  # is PQ
-                    self._buses[i_bus].V = self._bu.V[i_bus]*units.volt
+                    self._buses[i_bus].V = self._bu.V[i_bus]
             # slack
-            self._buses[0].P = self._bu.P[0]*units.watt
-            self._buses[0].Q = self._bu.Q[0]*units.watt
-            self._buses[0].Th = 0*units.degree
+            self._buses[0].P = self._bu.P[0]
+            self._buses[0].Q = self._bu.Q[0]
+            self._buses[0].Th = 0
 
             for i_branch in range(0, len(self._branches)):
                 if not self._br.Pij is None:
-                    self._branches[i_branch].Pij = self._br.Pij[i_branch]*units.watt
+                    self._branches[i_branch].Pij = self._br.Pij[i_branch]
                 else:
                     self._branches[i_branch].Pij = None
                 if not self._br.Qij is None:
-                    self._branches[i_branch].Qij = self._br.Qij[i_branch]*units.watt
+                    self._branches[i_branch].Qij = self._br.Qij[i_branch]
                 else:
                     self._branches[i_branch].Qij = None
                 if not self._br.Pji is None:
-                    self._branches[i_branch].Pji = self._br.Pji[i_branch]*units.watt
+                    self._branches[i_branch].Pji = self._br.Pji[i_branch]
                 else:
                     self._branches[i_branch].Pji = None
                 if not self._br.Qji is None:
-                    self._branches[i_branch].Qji = self._br.Qji[i_branch]*units.watt
+                    self._branches[i_branch].Qji = self._br.Qji[i_branch]
                 else:
                     self._branches[i_branch].Qji = None

@@ -1,8 +1,7 @@
-
 import unittest
+import math
 import numpy as np
 
-from gridsim.unit import units
 from gridsim.electrical.loadflow import NewtonRaphsonLoadFlowCalculator
 
 
@@ -32,7 +31,7 @@ class TestNRLF5Bus(unittest.TestCase):
             1.0/(0.04+1j*0.25),
             1.0/(0.1+1j*0.35),
             1.0/(0.08+1j*0.3),
-            1.0/(1j*0.015)])*units.siemens
+            1.0/(1j*0.015)])
 
         # check
         self.assertEqual(len(Y_T), b.shape[0])
@@ -47,7 +46,7 @@ class TestNRLF5Bus(unittest.TestCase):
         # transmission lines
         iterable = (not i for i in is_transformer)
         is_line = np.fromiter(iterable, np.bool)
-        b_L = np.array([0.5, 0., 0.5])*units.siemens
+        b_L = np.array([0.5, 0., 0.5])
 
         # check
         self.assertEqual(sum(is_line), len(b_L), "the length of " +
@@ -55,7 +54,7 @@ class TestNRLF5Bus(unittest.TestCase):
                         str(sum(is_line)))
 
         # compute branch admittances
-        Yb = np.zeros([b.shape[0], 4], dtype=complex)*units.siemens
+        Yb = np.zeros([b.shape[0], 4], dtype=complex)
 
         # transformers
         Yb[is_transformer, 0] = Y_T[is_transformer]
@@ -90,15 +89,15 @@ class TestNRLF5Bus(unittest.TestCase):
         # use Newton-Raphson Load flow calculator to calculate missing bus
         # electrical values
         # ======================================================================
-        nrlf.calculate(P, Q, V, Th, True)
+        [P, Q, V, Th] = nrlf.calculate(P, Q, V, Th, True)
 
         # output results, compare with reference values and output comparison
         # results (OK / NOT OK)
         # ======================================================================
         P_slack = P[0]
-        ref_P_slack = 2.5795
+        refslack = 2.5795
 
-        self.assertTrue(abs(P_slack-ref_P_slack)-1e-4)
+        self.assertTrue(abs(P_slack-refslack)-1e-4)
 
         ref_Q = np.array([2.2995, -0.8, -1.0, -1.3, 1.8134])
 
@@ -109,8 +108,10 @@ class TestNRLF5Bus(unittest.TestCase):
         self.assertTrue(np.allclose(V, ref_V))
 
         ref_Th = np.array([0., -4.77851, 17.85353, -4.28193, 21.84332])
+        ref_Th = ref_Th*math.pi/180.
 
-        self.assertTrue(np.allclose(Th, ref_Th))
+        for ith, iref_th in zip(Th, ref_Th):
+            self.assertAlmostEqual(ith, iref_th)
 
         # compute branch power load flows
         # ===============================
