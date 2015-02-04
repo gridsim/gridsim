@@ -14,8 +14,8 @@ class ThermalSimulator(AbstractSimulationModule):
         automatically added to the :class:`.Simulator` when
         importing any class or module of :mod:`gridsim.thermal` package.
 
-        To access this class from simulation, use
-        :class:`.Simulator` as follow::
+        To access this class from simulation, use :class:`.Simulator` as
+        follow::
 
             # Create the simulation.
             sim = Simulator()
@@ -34,7 +34,6 @@ class ThermalSimulator(AbstractSimulationModule):
     def _process(self, process_id):
         return self._processes[process_id]
 
-    # SimulationModule implementation.
     @returns(str)
     def attribute_name(self):
         """
@@ -95,11 +94,11 @@ class ThermalSimulator(AbstractSimulationModule):
         the :class:`.ThermalCoupling` to update the energy of each process.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
 
         for process in self._processes:
@@ -119,11 +118,11 @@ class ThermalSimulator(AbstractSimulationModule):
         :class:`.AbstractElectricalLoadFlowCalculator`.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
         for process in self._processes:
             process.update(time, delta_time)

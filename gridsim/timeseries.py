@@ -133,6 +133,14 @@ class TimeSeries(object):
 
     @units.wraps(None, (None, units.second), strict=False)
     def set_time(self, time):
+        """
+        set_time(self, time=0)
+
+        Changes the actual time on the object.
+
+        :param time: the new time.
+        :type time: float, int or time, see :mod:`gridsim.unit`
+        """
         raise NotImplementedError('Pure abstract method!')
 
     @accepts((1, (str, BufferedReader)),
@@ -209,7 +217,7 @@ class TimeSeriesObject(TimeSeries):
         Changes the actual time on the object.
 
         :param time: the new time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: float, int or time, see :mod:`gridsim.unit`
         """
         if self._computed_data is None:
             self._compute_data()
@@ -315,13 +323,20 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
 
     @units.wraps(None, (None, units.second), strict=False)
     def set_time(self, time=0):
+        """
+        set_time(self, time=0)
+
+        Changes the actual time on the object.
+
+        :param time: the new time.
+        :type time: float, int or time, see :mod:`gridsim.unit`
+        """
         time_value = units.value(units.convert(time, units.seconds))
 
         if time_value < self._start:
             self._index = -1
         else:
-            self._index = int(
-                (time_value - self._start) / self._interval) % self._count
+            self._index = int((time_value - self._start) / self._interval) % self._count
 
     @accepts((1, (str, BufferedReader)),
              (2, (None, types.MethodType)),

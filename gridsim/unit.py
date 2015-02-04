@@ -9,6 +9,12 @@ This module provides a unit management based on pint
 How to use :mod:`gridsim.units`
 *******************************
 
+The unit in Gridsim are used for 'user interface' functions such as
+:func:`gridsim.simulation.Simulator.run`, but for improves performance Gridsim
+converts all units in SI base unit and uses them as number (int, float, complex).
+Therefore some function parameters are float instead of unit especially when
+extending Gridsim core (see :ref:`gridsim-core`).
+
 It provides an object call ``units`` which is a wrapper to all useful features
 of pint, thus it should used as follow::
 

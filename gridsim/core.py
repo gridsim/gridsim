@@ -156,11 +156,11 @@ class AbstractSimulationModule(object):
         method on all simulation elements it owns/manages.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in in second
 
         :param delta_time: The time period for which the update has
             to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
         raise NotImplementedError('Abstract method called!')
 
@@ -175,11 +175,11 @@ class AbstractSimulationModule(object):
         the :func:`update` method on all simulation elements it owns/manages.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
         raise NotImplementedError('Abstract method called!')
 

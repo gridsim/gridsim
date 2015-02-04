@@ -56,44 +56,44 @@ recorders are added to the simulation:*
 
     RESET, observing: ['hot_room', 'cold_room']
     time = 0 second:
-        hot_room.temperature = 333.15 kelvin
-        cold_room.temperature = 293.15 kelvin
+        hot_room.temperature = 60.0 degC
+        cold_room.temperature = 20.0 degC
     time = 300.0 second:
-        hot_room.temperature = 325.189800995 kelvin
-        cold_room.temperature = 301.110199005 kelvin
+        hot_room.temperature = 52.039800995 degC
+        cold_room.temperature = 27.960199005 degC
     time = 600.0 second:
-        hot_room.temperature = 320.3978404 kelvin
-        cold_room.temperature = 305.9021596 kelvin
+        hot_room.temperature = 47.2478404 degC
+        cold_room.temperature = 32.7521596 degC
     time = 900.0 second:
-        hot_room.temperature = 317.513127803 kelvin
-        cold_room.temperature = 308.786872197 kelvin
+        hot_room.temperature = 44.363127803 degC
+        cold_room.temperature = 35.636872197 degC
     time = 1200.0 second:
-        hot_room.temperature = 315.776559523 kelvin
-        cold_room.temperature = 310.523440477 kelvin
+        hot_room.temperature = 42.6265595232 degC
+        cold_room.temperature = 37.3734404768 degC
     time = 1500.0 second:
-        hot_room.temperature = 314.731162698 kelvin
-        cold_room.temperature = 311.568837302 kelvin
+        hot_room.temperature = 41.581162698 degC
+        cold_room.temperature = 38.418837302 degC
     time = 1800.0 second:
-        hot_room.temperature = 314.101844211 kelvin
-        cold_room.temperature = 312.198155789 kelvin
+        hot_room.temperature = 40.9518442113 degC
+        cold_room.temperature = 39.0481557887 degC
     time = 2100.0 second:
-        hot_room.temperature = 313.723000744 kelvin
-        cold_room.temperature = 312.576999256 kelvin
+        hot_room.temperature = 40.5730007441 degC
+        cold_room.temperature = 39.4269992559 degC
     time = 2400.0 second:
-        hot_room.temperature = 313.494940746 kelvin
-        cold_room.temperature = 312.805059254 kelvin
+        hot_room.temperature = 40.3449407464 degC
+        cold_room.temperature = 39.6550592536 degC
     time = 2700.0 second:
-        hot_room.temperature = 313.357650897 kelvin
-        cold_room.temperature = 312.942349103 kelvin
+        hot_room.temperature = 40.2076508971 degC
+        cold_room.temperature = 39.7923491029 degC
     time = 3000.0 second:
-        hot_room.temperature = 313.275003774 kelvin
-        cold_room.temperature = 313.024996226 kelvin
+        hot_room.temperature = 40.1250037739 degC
+        cold_room.temperature = 39.8749962261 degC
     time = 3300.0 second:
-        hot_room.temperature = 313.225251028 kelvin
-        cold_room.temperature = 313.074748972 kelvin
+        hot_room.temperature = 40.0752510281 degC
+        cold_room.temperature = 39.9247489719 degC
     time = 3600.0 second:
-        hot_room.temperature = 313.19530037 kelvin
-        cold_room.temperature = 313.10469963 kelvin
+        hot_room.temperature = 40.0453003701 degC
+        cold_room.temperature = 39.9546996299 degC
 """
 from math import floor
 
@@ -120,9 +120,15 @@ class PlotRecorder(Recorder, AttributesGetter):
             be recorded
         :type attribute_name: str
         :param x_unit: The unit of the horizontal axis
-        :type x_unit: type or unit see :mod:`gridsim.unit`
+        :type x_unit: int, float, type or unit see :mod:`gridsim.unit`
         :param y_unit: The unit of the vertical axis
-        :type y_unit: type or unit see :mod:`gridsim.unit`
+        :type y_unit: int, float, type or unit see :mod:`gridsim.unit`
+
+        If no information are give to the constructor of a :class:`.Recorder`,
+        the data are not preprocessed.
+
+        .. warning:: The preprocess can take a long time if a lot of data are
+                     stored in a :class:`.PlotRecorder`.
 
         *Example:*
 
@@ -136,12 +142,9 @@ class PlotRecorder(Recorder, AttributesGetter):
           the thermal module who have the attribute 'temperature' by using the
           powerful :func:`gridsim.simulation.Simulator.find()` method by asking
           to return a list of all elements that have the attribute 'temperature'.
-        * On line 51, we create a very similar recorder as before,
-        * On line 52, this time we do not want to record the temperature in
-          Kelvin, we want the temperature in degrees celsius. As the
-          simulator needs temperatures in kelvin (see :mod:`gridsim.unit` for
-          mor information), we only have to give this information to the recorder,
-          which will convert the temperature in degrees celsius.
+        * On line 51, we create a very similar recorder as before, but
+          the attribute will be in celsius and the time in minutes.
+        * On line 52, we recorder same objects as above,
         * On line 68, we create a first :class:`.FigureSaver` instance with the
           title 'Temperature (K)' which will use the data returned by the
           :class:`.Recorder` to :func:`save` the data in a figure.
@@ -233,11 +236,12 @@ class PlotRecorder(Recorder, AttributesGetter):
         :return: time in second
         :rtype: list
         """
-        if self._x_unit is None:
+        if self._x_unit is None or not len(self._res_x) == len(self._x):
             self._res_x = self._x
         else:
             if self._res_x is None:
-                self._res_x = [units.value(units.convert(x, units.to_si(self._x_unit)), self._x_unit) for x in self._x]
+                self._res_x = [units.value(units.convert(x, units.to_si(self._x_unit)), self._x_unit)
+                               for x in self._x]
         return self._res_x
 
     def x_unit(self):
@@ -268,7 +272,7 @@ class PlotRecorder(Recorder, AttributesGetter):
         :return: a map associating id to recorded data
         :rtype: dict
         """
-        if self._y_unit is None:
+        if self._y_unit is None or not len(self._res_y) == len(self._y):
             self._res_y = self._y
         else:
             if self._res_y is None:
@@ -277,7 +281,8 @@ class PlotRecorder(Recorder, AttributesGetter):
                     if type(self._y_unit) is type:
                         self._res_y[key] = [self._y_unit(y) for y in self._y[key]]
                     else:
-                        self._res_y[key] = [units.value(units.convert(y, units.to_si(self._y_unit)), self._y_unit) for y in self._y[key]]
+                        self._res_y[key] = [units.value(units.convert(y, units.to_si(self._y_unit)), self._y_unit)
+                                            for y in self._y[key]]
 
         return self._res_y
 

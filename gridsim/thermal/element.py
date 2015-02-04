@@ -69,6 +69,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
         :param position: The position of the thermal process.
         :type position: :class:`Position`
         """
+        # super constructor needs units as it is a "public" function
         super(TimeSeriesThermalProcess, self).\
             __init__(friendly_name,
                      float('inf')*units.heat_capacity, 0*units.kelvin,

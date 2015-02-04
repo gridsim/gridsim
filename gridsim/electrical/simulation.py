@@ -421,11 +421,11 @@ class ElectricalSimulator(AbstractSimulationModule):
         simulator, added by the :func:`.ElectricalSimulator.add`.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
 
         for element in self._cps_elements:
@@ -442,11 +442,11 @@ class ElectricalSimulator(AbstractSimulationModule):
         :class:`.AbstractElectricalLoadFlowCalculator`.
 
         :param time: The actual simulation time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: int or float in second
 
         :param delta_time: The time period for which the calculation
             has to be done.
-        :type delta_time: time, see :mod:`gridsim.unit`
+        :type delta_time: int or float in second
         """
 
 
