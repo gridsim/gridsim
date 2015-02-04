@@ -255,7 +255,7 @@ class PlotRecorder(Recorder, AttributesGetter):
         :rtype: str
         """
         if type(self._x_unit) is units.Quantity:
-            return units.dimension(self._x_unit)
+            return units.unit(self._x_unit)
         else:
             return str(self._x_unit)
 
@@ -300,7 +300,7 @@ class PlotRecorder(Recorder, AttributesGetter):
         :rtype: str
         """
         if type(self._y_unit) is units.Quantity:
-            return units.dimension(self._y_unit)
+            return units.unit(self._y_unit)
         else:
             return str(self._y_unit)
 
