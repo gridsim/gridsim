@@ -48,7 +48,7 @@ sim.record(kelvin, sim.thermal.find(has_attribute='temperature'))
 
 # Create a plot recorder that records the temperatures of all thermal
 # processes in Kelvin.
-celsius = PlotRecorder('temperature', units.second, units.degC)
+celsius = PlotRecorder('temperature', units.minutes, units.degC)
 sim.record(celsius, sim.thermal.find(has_attribute='temperature'))
 
 # Create a second plot recorder which records all energy flows
