@@ -144,6 +144,13 @@ class ThermalProcess(AbstractThermalElement):
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.calculate`.
+
+        :param time: The actual time of the simulator.
+        :type time: float in second
+
+        :param delta_time: The delta time for which the calculation has to be
+            done.
+        :type delta_time: float in second
         """
         pass
 
@@ -155,6 +162,13 @@ class ThermalProcess(AbstractThermalElement):
         AbstractSimulationElement implementation
 
         .. seealso:: :func:`gridsim.core.AbstractSimulationElement.update`.
+
+        :param time: The actual time of the simulator.
+        :type time: float in second
+
+        :param delta_time: The delta time for which the calculation has to be
+            done.
+        :type delta_time: float in second
         """
         self.thermal_energy = self._internal_thermal_energy
         self.temperature = self.thermal_energy / \

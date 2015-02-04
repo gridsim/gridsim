@@ -14,9 +14,9 @@ interface.
 .. literalinclude:: ../../demo/plotrecorder.py
     :linenos:
 
-* On lines 46, 51 and 85, we create :class:`.Recorder` objects.
-* On lines 47, 52 and 86, we add the recorders to the simulation.
-* On lines 69 to 71, we use the recorders as :class:`AttributeGetter` to
+* On lines 46, 51 and 57, we create :class:`.Recorder` objects.
+* On lines 47, 52 and 58, we add the recorders to the simulation.
+* On lines 68 to 70, we use the recorders as :class:`AttributeGetter` to
   save them in figure. Here, the 3 images file saved:
 
 .. figure:: ../../demo/output/fig1.png
@@ -28,7 +28,7 @@ interface.
 .. figure:: ../../demo/output/fig3.png
     :align: center
 
-* On line 73, we use a second saver to save in a csv file the a recorder we
+* On line 72, we use a second saver to save in a csv file the a recorder we
   already saved, here the 20th first lines:
 
 .. literalinclude:: ../../demo/output/fig2.csv
