@@ -12,6 +12,8 @@ class ConstantTemperatureProcess(ThermalProcess):
     @units.wraps(None, (None, None, units.kelvin))
     def __init__(self, friendly_name, temperature, position=Position()):
         """
+        __init__(self, friendly_name, temperature, position=Position())
+
         This is a special thermal process with an infinite thermal capacity
         which results that the temperature of the process is constant,
         independent how much energy is taken from or given to the process.
@@ -32,6 +34,8 @@ class ConstantTemperatureProcess(ThermalProcess):
     @accepts((1, (int, float)))
     def add_energy(self, delta_energy):
         """
+        add_energy(self, delta_energy)
+
         Does nothing at all for this type of :class:`.ThermalProcess`.
         """
         pass
@@ -39,7 +43,16 @@ class ConstantTemperatureProcess(ThermalProcess):
     @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
+        update(self, time, delta_time)
+
         Does nothing at all for this type of :class:`.ThermalProcess`.
+
+        :param time: The actual time of the simulator.
+        :type time: float in second
+
+        :param delta_time: The delta time for which the calculation has to be
+            done.
+        :type delta_time: float in second
         """
         pass
 
@@ -51,6 +64,8 @@ class TimeSeriesThermalProcess(ThermalProcess):
                  temperature_calculator=lambda t: units.convert(t, units.kelvin),
                  position=Position()):
         """
+        __init__(self, friendly_name, time_series, stream, time_converter=None, temperature_calculator=lambda t: units.convert(t, units.kelvin), position=Position())
+
         Thermal process that reads the temperature out of a time series object
         (CSV file). It has an infinite thermal capacity.
 
@@ -58,7 +73,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
 
             It is important that the given data contains the
             field 'temperature' or you map a field to the attribute
-            'temperature' using the function :func:`.TimeSeriesObject.map_attribute()`.
+            'temperature' using the function :func:`gridsim.timeseries.TimeSeriesObject.map_attribute()`.
 
         :param friendly_name: Friendly name to give to the process.
         :type friendly_name: str, unicode
@@ -67,7 +82,7 @@ class TimeSeriesThermalProcess(ThermalProcess):
         :type stream: str or stream
         :param temperature_calculator:
         :param position: The position of the thermal process.
-        :type position: :class:`Position`
+        :type position: :class:`.Position`
         """
         # super constructor needs units as it is a "public" function
         super(TimeSeriesThermalProcess, self).\
@@ -92,6 +107,8 @@ class TimeSeriesThermalProcess(ThermalProcess):
 
     def reset(self):
         """
+        reset(self)
+
         Sets the time to default (``0``).
 
         .. seealso:: :func:`gridsim.timeseries.TimeSeriesObject.set_time`
@@ -101,7 +118,16 @@ class TimeSeriesThermalProcess(ThermalProcess):
     @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
+        calculate(self, time, delta_time)
+
         Calculates the temperature of the element during the simulation step.
+
+        :param time: The actual time of the simulator.
+        :type time: float in second
+
+        :param delta_time: The delta time for which the calculation has to be
+            done.
+        :type delta_time: float in second
 
         .. seealso:: :func:`gridsim.timeseries.TimeSeriesObject.set_time`
         """
@@ -113,6 +139,15 @@ class TimeSeriesThermalProcess(ThermalProcess):
     @accepts(((1, 2), (int, float)))
     def update(self, time, delta_time):
         """
+        update(self, time, delta_time)
+
         Does nothing for this type of :class:`.ThermalProcess`.
+
+        :param time: The actual time of the simulator.
+        :type time: float in second
+
+        :param delta_time: The delta time for which the calculation has to be
+            done.
+        :type delta_time: float in second
         """
         pass

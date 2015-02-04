@@ -17,39 +17,40 @@ recorders are added to the simulation:*
 .. literalinclude:: ../../demo/consolerecorder.py
     :linenos:
 
-- On line 9 to 24 we implement our custom recorder.
+- On lines 8 to 23 we implement our custom recorder.
 
-  - On line 15 we re-implement the abstract method
+  - On lines 13 & 14 we re-implement the abstract method
     :func:`gridsim.simulation.Recorder.on_simulation_reset`.
     We log which objects we observe.
-  - On line 19 we implement the
+  - On lines 16 to 18 we implement the
     :func:`gridsim.simulation.Recorder.on_simulation_step` method.
-    We just output the current time.
-  - On line 22 we re-implement the abstract method
+    We just output the current time. The time is given in a float in second.
+  - On lines 20 to 23 we re-implement the abstract method
     :func:`gridsim.simulation.Recorder.on_observed_value()`.
-    Basically we just output the value to the console.
+    Basically we just output the value to the console. The time is given in a
+    float in second.
 
-- On line 27 we create the gridsim simulation object.
-- On line 38 to 52 we setup a very simple thermal process, where we define 2
+- On line 26 we create the gridsim simulation object.
+- On lines 37 to 51 we setup a very simple thermal process, where we define 2
   rooms and a thermal coupling between them:
 
-  - hot_room (line 39) has a ``surface`` of ``50m2`` and a ``height`` of
+  - hot_room (line 38) has a ``surface`` of ``50m2`` and a ``height`` of
     ``2.5m``, so the ``volume`` is ``125m3``. The room is filled with
-    :class:`gridsim.util.Air` (specific thermal capacity=`1.005 J/gK``) with
+    :class:`gridsim.util.Air` (specific thermal capacity=`1005 J/kgK``) with
     the initial temperature of 60 degree celsius (line 38).
-  - cold_room (line 45) has the same volume, but an initial temperature of 20
-    degree celsius (line 44).
+  - cold_room (line 44) has the same volume, but an initial temperature of 20
+    degree celsius (line 43).
   - the two rooms are coupled with a thermal conductivity of ``100 Watts per
-    Kelvin`` (line 51).
+    Kelvin`` (lines 49 to 51).
 
-- On line 56 we add the recorder to the simulation. The recorder will listen all
-  all :class:`ThermalProcess` and record their ``temperature`` parameter.
+- On lines 55 & 56 we add the recorder to the simulation. The recorder will
+  listen all :class:`ThermalProcess` and record their ``temperature`` parameter.
   The horizontal unit will be in second and the vertical unit in degree celsius.
   The simulation will call the recorder's
   **on_simulation_step()** and **on_observed_value()** method each time the
   simulation did a step.
 
-- On line 60 we actually start the simulation for 1 hour with a resolution
+- On line 59 we actually start the simulation for 1 hour with a resolution
   of 5 minutes.
 
 *The output of the console logger should be something like this*::
@@ -100,7 +101,7 @@ from math import floor
 from gridsim.iodata.output import AttributesGetter
 
 from .unit import units
-from .decorators import accepts
+from .decorators import accepts, returns
 from .simulation import Recorder
 
 
@@ -171,8 +172,8 @@ class PlotRecorder(Recorder, AttributesGetter):
         self._y = {}
 
         # for optimisation when getting results
-        self._res_x = None
-        self._res_y = None
+        self._res_x = []
+        self._res_y = {}
 
     def on_simulation_reset(self, subjects):
         """
@@ -236,14 +237,14 @@ class PlotRecorder(Recorder, AttributesGetter):
         :return: time in second
         :rtype: list
         """
-        if self._x_unit is None or not len(self._res_x) == len(self._x):
+        if self._x_unit is None:
             self._res_x = self._x
-        else:
-            if self._res_x is None:
-                self._res_x = [units.value(units.convert(x, units.to_si(self._x_unit)), self._x_unit)
-                               for x in self._x]
+        elif self._res_x is None or not len(self._res_x) == len(self._x):
+            self._res_x = [units.value(units.convert(x, units.to_si(self._x_unit)), self._x_unit)
+                           for x in self._x]
         return self._res_x
 
+    @returns(str)
     def x_unit(self):
         """
         x_unit(self)
@@ -253,7 +254,10 @@ class PlotRecorder(Recorder, AttributesGetter):
         :return: the time unit, see :mod:`gridsim.unit`
         :rtype: str
         """
-        return self._x_unit
+        if type(self._x_unit) is units.Quantity:
+            return units.dimension(self._x_unit)
+        else:
+            return str(self._x_unit)
 
     def y_values(self):
         """
@@ -272,10 +276,9 @@ class PlotRecorder(Recorder, AttributesGetter):
         :return: a map associating id to recorded data
         :rtype: dict
         """
-        if self._y_unit is None or not len(self._res_y) == len(self._y):
+        if self._y_unit is None:
             self._res_y = self._y
-        else:
-            if self._res_y is None:
+        elif self._res_y is None or not len(self._res_y) == len(self._y):
                 self._res_y = {}
                 for key in self._y.keys():
                     if type(self._y_unit) is type:
@@ -286,16 +289,20 @@ class PlotRecorder(Recorder, AttributesGetter):
 
         return self._res_y
 
+    @returns(str)
     def y_unit(self):
         """
         y_unit(self)
 
         Retrieves the unit od the recorded data.
 
-        :return: the unit, see :mod:`gridsim.unit`
+        :return: the type or the unit, see :mod:`gridsim.unit`
         :rtype: str
         """
-        return self._y_unit
+        if type(self._y_unit) is units.Quantity:
+            return units.dimension(self._y_unit)
+        else:
+            return str(self._y_unit)
 
 
 class HistogramRecorder(Recorder, AttributesGetter):
@@ -369,14 +376,16 @@ class HistogramRecorder(Recorder, AttributesGetter):
         label = subject + "." + self.attribute_name
         self._y[label][bin_i] += 1
 
-    def get_x_values(self):
+    def x_values(self):
         return []
 
-    def get_x_unit(self):
+    @returns(str)
+    def x_unit(self):
         return ""
 
-    def get_y_values(self):
+    def y_values(self):
         return self._y
 
-    def get_y_unit(self):
+    @returns(str)
+    def y_unit(self):
         return self._y_unit

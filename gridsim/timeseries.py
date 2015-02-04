@@ -25,7 +25,8 @@ If the data contain a ``temperature`` data, it can be access with:
 
 This would give an output like this::
 
-    18.5 kelvin
+    20.0
+    18.5
 
 """
 import types
