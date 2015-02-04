@@ -16,6 +16,7 @@ from .core import AbstractElectricalCPSElement
 class ConstantElectricalCPSElement(AbstractElectricalCPSElement):
 
     @accepts((1, str))
+    @units.wraps(None, (None, None, units.watt))
     def __init__(self, friendly_name, power):
         """
         __init__(self, friendly_name, power)
@@ -41,7 +42,7 @@ class ConstantElectricalCPSElement(AbstractElectricalCPSElement):
         super(ConstantElectricalCPSElement, self).__init__(friendly_name)
         self.power = power
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -60,8 +61,8 @@ class ConstantElectricalCPSElement(AbstractElectricalCPSElement):
 
 class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
 
-    @accepts((1, str),
-             ((2, 4), int))
+    @accepts((1, str), ((2, 4), int))
+    @units.wraps(None, (None, None, None, units.watt, None))
     def __init__(self, friendly_name, cycle_delta_time, power_values,
                  cycle_start_time=0):
         """
@@ -113,7 +114,6 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         return self._cycle_delta_time
 
     @property
-    @returns(np.array)
     def power_values(self):
         """
         Gets the cycle power values array.
@@ -145,7 +145,7 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         """
         return self._cycle_start_time
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -162,8 +162,8 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
         current_cycle_pos = int((
                                 time - self._cycle_start_time) /
                                 self._cycle_delta_time) % self._cycle_length
-        self._internal_delta_energy = 0*units.joule
-        current_dtime = 0*units.second
+        self._internal_delta_energy = 0
+        current_dtime = 0
         next_dtime = self._cycle_delta_time
         if next_dtime > delta_time:
             next_dtime = delta_time
@@ -187,6 +187,7 @@ class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
     @accepts((1, str),
              ((2, 4), int),
              (3, np.ndarray))
+    @units.wraps(None, (None, None, None, units.watt, units.second))
     def __init__(self, friendly_name, cycle_delta_time, power_values,
                  cycle_start_time=0*units.second):
         """
@@ -241,7 +242,7 @@ class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
         self._new_power_values = new_power_values
         self._update_done = False
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -270,6 +271,7 @@ class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
 class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
 
     @accepts((1, str))
+    @units.wraps(None, (None, None, units.watt, units.watt))
     def __init__(self, friendly_name, mean_power, standard_deviation):
         """
         __init__(self, friendly_name, mean_power, standard_deviation)
@@ -301,7 +303,7 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         self._standard_deviation = standard_deviation
 
     @property
-    @returns(units.Quantity)
+    @returns((int, float))
     def mean_power(self):
         """
         Gets the mean value of the Gaussian distributed power.
@@ -321,6 +323,7 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         """
         return self._standard_deviation
 
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         calculate(self, time, delta_time)
@@ -334,20 +337,17 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
             done in seconds.
         :type delta_time: time, see :mod:`gridsim.unit`
         """
-        normal_value = np.random.normal(self._mean_power.to(units.watt),
-                                        self._standard_deviation.to(units.watt))
-        normal = normal_value*units.watt
+        normal = np.random.normal(self._mean_power, self._standard_deviation)
 
         self._internal_delta_energy = normal * delta_time
 
 
 class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
 
-    @accepts(((1, 3), str),
-             (2, TimeSeries))
-    def __init__(self, friendly_name, time_series, stream, column_name='power'):
+    @accepts(((1, 3), str), (2, TimeSeries))
+    def __init__(self, friendly_name, time_series, stream):
         """
-        __init__(self, friendly_name, reader, stream, column_name='power')
+        __init__(self, friendly_name, reader, stream)
 
         This class provides a Consuming-Producing-Storing element whose consumed
         or produced power is read from a stream by the given reader.
@@ -362,24 +362,14 @@ class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
         :type reader: :class:`.TimeSeries`
         :param stream: The file name
         :type stream: str
-        :param column_name: The name of the column in the data with a the
-            requested power value.
-        :type column_name: str
-
         """
         super(TimeSeriesElectricalCPSElement, self).__init__(friendly_name)
 
         self._time_series = time_series
         self._time_series.load(stream)
 
-        # Check whether the file has the requested attribute
-        try:
-            self._time_series.column_name
-        except AttributeError:
-            raise AttributeError('Requested column is missing in data')
-
     def __getattr__(self, item):
-        return getattr(self.time_series, item)
+        return units.value(getattr(self.time_series, item))
 
     def reset(self):
         """
@@ -387,7 +377,7 @@ class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
         """
         self._time_series.set_time()
 
-    @accepts(((1, 2), units.Quantity))
+    @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
         """
         Calculates the energy consumed or produced by the element during the

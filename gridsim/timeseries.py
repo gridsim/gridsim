@@ -12,8 +12,8 @@ the :func:`TimeSeries.load` method on a TimeSeriesObject or any subclass of it::
     obj = TimeSeries()
     obj.load('../../data/examples/example.csv')
 
-This will call the :func:`gridsim.iodata.input.Reader.load` function and process the data to simplify
-the access from the simulator.
+This will call the :func:`gridsim.iodata.input.Reader.load` function and process
+the data to simplify the access from the simulator.
 
 It is important to have a ``time`` data or to identify the data representing the
 time.
@@ -66,8 +66,10 @@ class TimeSeries(object):
         self._index = 0
         self._time_key = 'time'
 
-    @accepts(((1, 2), str),
-             (3, bool))
+    def __getattr__(self, item):
+        raise NotImplementedError('Pure abstract method!')
+
+    @accepts(((1, 2), str), (3, bool))
     def map_attribute(self, name, mapped_name, is_time_key=False):
         """
         map_attribute(self, name, mapped_name, is_time_key=False)
@@ -129,8 +131,16 @@ class TimeSeries(object):
         """
         self._data[item] = map(converter, self._data[item])
 
-    @accepts((1, units.Quantity))
-    def set_time(self, time=0*units.second):
+    @units.wraps(None, (None, units.second), strict=False)
+    def set_time(self, time):
+        """
+        set_time(self, time=0)
+
+        Changes the actual time on the object.
+
+        :param time: the new time.
+        :type time: float, int or time, see :mod:`gridsim.unit`
+        """
         raise NotImplementedError('Pure abstract method!')
 
     @accepts((1, (str, BufferedReader)),
@@ -155,8 +165,7 @@ class TimeSeriesObject(TimeSeries):
 
         self._computed_data = None
 
-    @accepts(((1, 2), str),
-             (3, bool))
+    @accepts(((1, 2), str), (3, bool))
     def map_attribute(self, name, mapped_name, is_time_key=False):
         """
         map_attribute(self, name, mapped_name, is_time_key=False)
@@ -169,9 +178,8 @@ class TimeSeriesObject(TimeSeries):
         :type mapped_name: str
 
         """
-        super(TimeSeriesObject, self).map_attribute(name, mapped_name,
-                                                    is_time_key)
-        self.compute_data()
+        super(TimeSeriesObject, self).map_attribute(name, mapped_name, is_time_key)
+        self._compute_data()
 
     @accepts((1, str), (2, FunctionType))
     def convert(self, item, converter):
@@ -189,41 +197,39 @@ class TimeSeriesObject(TimeSeries):
 
         """
         super(TimeSeriesObject, self).convert(item, converter)
-        self.compute_data()
+        self._compute_data()
 
     def __getattr__(self, item):
 
         if self._computed_data is None:
-            self.compute_data()
+            self._compute_data()
 
         if item in self._computed_data:
             return self._computed_data[item][self._index]
         else:
             raise AttributeError(str(item)+" attribute does not exist")
 
-    @accepts((1, units.Quantity))
-    def set_time(self, time=0*units.second):
+    @units.wraps(None, (None, units.second), strict=False)
+    def set_time(self, time=0):
         """
-        set_time(self, time=0*units.second)
+        set_time(self, time=0)
 
         Changes the actual time on the object.
 
         :param time: the new time.
-        :type time: time, see :mod:`gridsim.unit`
+        :type time: float, int or time, see :mod:`gridsim.unit`
         """
-        time_value = units.value(units.convert(time, units.seconds))
-
         if self._computed_data is None:
-            self.compute_data()
+            self._compute_data()
 
-        if time_value in self._computed_data[self._time_key]:
-            self._index = time_value
+        if time in self._computed_data[self._time_key]:
+            self._index = time
         else:
             self._index = min(self._computed_data[self._time_key],
-                              key=lambda i: abs(i-time_value))
+                              key=lambda i: abs(i-time))
 
     @accepts((1, (str, BufferedReader)),
-             (2, (None, types.MethodType)),
+             (2, (None, FunctionType)),
              (3, str))
     def load(self, stream, time_converter=None, time_key='time'):
         """
@@ -249,9 +255,11 @@ class TimeSeriesObject(TimeSeries):
                           format(stream, time_key),
                           category=SyntaxWarning)
 
-    def compute_data(self):
+        self._compute_data()
+
+    def _compute_data(self):
         """
-        compute_data(self)
+        _compute_data(self)
 
         Computes data, after a call of :func:`TimeSeriesObject.load`.
         """
@@ -294,6 +302,7 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
         else:
             raise AttributeError(str(item)+" attribute does not exist")
 
+    @accepts(((1, 2), str), (3, bool))
     def map_attribute(self, name, mapped_name, is_time_key=False):
         """
         map_attribute(self, name, mapped_name, is_time_key=False)
@@ -312,17 +321,22 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
         if is_time_key:
             self._update_parameters()
 
+    @units.wraps(None, (None, units.second), strict=False)
+    def set_time(self, time=0):
+        """
+        set_time(self, time=0)
 
+        Changes the actual time on the object.
 
-    @accepts((1, units.Quantity))
-    def set_time(self, time=0*units.second):
+        :param time: the new time.
+        :type time: float, int or time, see :mod:`gridsim.unit`
+        """
         time_value = units.value(units.convert(time, units.seconds))
 
         if time_value < self._start:
             self._index = -1
         else:
-            self._index = int(
-                (time_value - self._start) / self._interval) % self._count
+            self._index = int((time_value - self._start) / self._interval) % self._count
 
     @accepts((1, (str, BufferedReader)),
              (2, (None, types.MethodType)),

@@ -13,12 +13,10 @@ from .core import AbstractElectricalTwoPort, ElectricalBus
 
 class ElectricalTransmissionLine(AbstractElectricalTwoPort):
 
-    @accepts((1, str),
-             ((2, 3, 4, 5), units.Quantity))
-    def __init__(self, friendly_name, length, X, R=0*units.ohm,
-                 B=0*units.siemens):
+    @units.wraps(None, (None, None, units.metre, units.ohm, units.ohm, units.siemens))
+    def __init__(self, friendly_name, length, X, R=0, B=0):
         """
-        __init__(self, friendly_name, length, X, R=0*units.ohm, B=0*units.siemens)
+        __init__(self, friendly_name, length, X, R=0, B=0)
 
         Class for representing a transmission line in an electrical network.
         Its parameters are linked to the
@@ -56,11 +54,12 @@ class ElectricalTransmissionLine(AbstractElectricalTwoPort):
         :param B: Line charging.
         :type B: siemens, see :mod:`gridsim.unit`
         """
-        super(ElectricalTransmissionLine, self).__init__(friendly_name, X, R)
+        # super constructor needs units as it is a "public" function
+        super(ElectricalTransmissionLine, self).__init__(friendly_name, X*units.ohm, R*units.ohm)
 
-        if length <= 0*units.metre:
+        if length <= 0:
             raise RuntimeError('Length has to be a strictly positive number')
-        if B < 0*units.siemens:
+        if B < 0:
             raise RuntimeError('Line charging B can not be negative number')
 
         self.length = length
@@ -75,12 +74,11 @@ class ElectricalTransmissionLine(AbstractElectricalTwoPort):
 
 class ElectricalGenTransformer(AbstractElectricalTwoPort):
 
-    @accepts((1, str),
-             (2, complex),
-             ((3, 4), units.Quantity))
-    def __init__(self, friendly_name, k_factor, X, R=0*units.ohm):
+    @accepts((1, str), (2, complex))
+    @units.wraps(None, (None, None, None, units.ohm, units.ohm))
+    def __init__(self, friendly_name, k_factor, X, R=0):
         """
-        __init__(self, friendly_name, k_factor, X, R=0*units.ohm)
+        __init__(self, friendly_name, k_factor, X, R=0)
 
         Class for representing a transformer and/or a phase shifter in an
         electrical network. Its parameters are
@@ -117,7 +115,8 @@ class ElectricalGenTransformer(AbstractElectricalTwoPort):
         :type R: ohm, see :mod:`gridsim.unit`
 
         """
-        super(ElectricalGenTransformer, self).__init__(friendly_name, X, R)
+        # super constructor needs units as it is a "public" function
+        super(ElectricalGenTransformer, self).__init__(friendly_name, X*units.ohm, R*units.ohm)
 
         if k_factor == 0:
             raise RuntimeError(

@@ -61,13 +61,13 @@ class Thermostat(AbstractControllerElement):
         :type position: :class:`Position`
         """
         super(Thermostat, self).__init__(friendly_name, position)
-        self.target_temperature = target_temperature
+        self.target_temperature = units.value(target_temperature, units.kelvin)
         """
         The temperature to try to retain inside the observer thermal process by
         conducting an electrothermal element.
         """
 
-        self.hysteresis = hysteresis
+        self.hysteresis = units.value(hysteresis, units.kelvin)
         """
         The +- hysteresis applied to the temperature measure in order to avoid
         to fast on/off switching.
@@ -139,15 +139,11 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement):
 
         super(ElectroThermalHeaterCooler, self).__init__(friendly_name)
 
-        if not isinstance(efficiency_factor, (float, int)):
-            raise TypeError('efficiency_factor must be a float or int!')
-        self._efficiency_factor = float(efficiency_factor)
+        self._efficiency_factor = units.value(efficiency_factor)
 
-        if not isinstance(thermal_process, ThermalProcess):
-            raise TypeError('thermal_process must be of type ThermalProcess!')
         self._thermal_process = thermal_process
 
-        self.power = pwr
+        self.power = units.value(pwr, units.watt)
 
         self._on = False
         """
@@ -172,7 +168,7 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement):
     def calculate(self, time, delta_time):
         self._internal_delta_energy = self.power * delta_time
         if not self.on:
-            self._internal_delta_energy = 0*units.joule
+            self._internal_delta_energy = 0
 
     def update(self, time, delta_time):
         super(ElectroThermalHeaterCooler, self).update(time, delta_time)
@@ -241,7 +237,7 @@ sim.electrical.attach(bus0, heater)
 #                __|__    |__________________________|
 #                 ---
 #
-target = units(18, units.degC)
+target = units(20, units.degC)
 # the hysteresis is a delta of temperature
 hysteresis = 1*units.delta_degC
 

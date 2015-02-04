@@ -23,6 +23,13 @@ The figure looks like this one:
 
 .. figure:: ../../demo/output/thermal-example.png
             :align: center
+
+Here is the class diagram of the thermal package:
+
+.. figure:: ./figures/model-thermal.png
+    :align: center
+    :scale: 100 %
+
 """
 
 from gridsim.simulation import Simulator

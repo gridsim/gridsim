@@ -20,6 +20,12 @@ analysis), to the non-slack buses of which are attached 4 CPS elements :
 1 with constant power, production, 3 with random gaussian distributed power
 consumption.
 
+Here is the class diagram of the electrical package:
+
+.. figure:: ./figures/model-electrical.png
+    :align: center
+    :scale: 100 %
+
 """
 from gridsim.simulation import Simulator
 from .simulation import ElectricalSimulator
