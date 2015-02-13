@@ -27,9 +27,9 @@ class Reader(object):
              (2, type),
              (3, bool))
     @returns(dict)
-    def load(self, stream, data_type=str, clear_data=False):
+    def load(self, stream, data_type=None, clear_data=False):
         """
-        load(self, stream, data_type=str, clear_data=False)
+        load(self, stream, data_type=None, clear_data=False)
 
         This method MUST returns formatted data following this format
         ``[(label1, data1], (label2, data2), ...]``
@@ -42,8 +42,9 @@ class Reader(object):
         :param stream: a stream of data or a file name
         :type stream: str, BufferedReader
 
-        :param data_type: the type of stored data
-        :type data_type: type (default str)
+        :param data_type: the type of stored data if ``None`` no conversion
+            are done.
+        :type data_type: type (default None)
 
         :param clear_data: if clear data is ``True`` load the file even if the
             file is already loaded.
@@ -95,15 +96,16 @@ class CSVReader(Reader):
              (2, type),
              (3, bool))
     @returns(dict)
-    def load(self, stream, data_type=str, clear_data=False):
+    def load(self, stream, data_type=None, clear_data=False):
         """
-        load(self, stream, data_type=str, clear_data=False)
+        load(self, stream, data_type=None, clear_data=False)
 
         Loads the data from the given CSV data file.
 
         :param stream: A stream of the CSV data to read
         :type stream: str, BufferedReader
-        :param data_type: the type of the stored data
+        :param data_type: the type of the stored data if ``None`` no conversion
+            are done.
         :type data_type: type
         :param clear_data: if ``True`` clear the data if the reader already
             loads a file.
@@ -155,6 +157,9 @@ class CSVReader(Reader):
                         raise SyntaxError('Invalid gridsim CSV file.')
 
                     for i in range(0, len(row)):
-                        self._data[data_names[i]].append(data_type(row[i]))
+                        if data_type is None:
+                            self._data[data_names[i]].append(row[i])
+                        else:
+                            self._data[data_names[i]].append(data_type(row[i]))
 
         return self._data
