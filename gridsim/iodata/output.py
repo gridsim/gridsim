@@ -246,6 +246,7 @@ class FigureSaver(object):
         :type file_name: str
         """
         self.figure.savefig(file_name)
+        plot.close(self.figure)
 
 
 class CSVSaver(object):
