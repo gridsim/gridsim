@@ -70,6 +70,9 @@ class TimeSeries(object):
     def __getattr__(self, item):
         raise NotImplementedError('Pure abstract method!')
 
+    def __getitem__(self, item):
+        return self._data[item]
+
     @accepts(((1, 2), str), (3, bool))
     def map_attribute(self, name, mapped_name, is_time_key=False):
         """

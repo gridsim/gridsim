@@ -6,6 +6,7 @@
 Gridsim util module. Defines utility classes and functions.
 
 """
+import types
 import math
 
 from .decorators import accepts, returns
@@ -131,7 +132,7 @@ class Material(object):
 
     __metaclass__ = _MaterialType
 
-    @accepts(((1, 2, 3), (int, float)))
+    @accepts(((1, 2, 3), (int, float, types.NoneType)))
     def __init__(self, c, p, k):
         """
         __init__(self, c, p, k)
@@ -161,7 +162,10 @@ class Material(object):
 
         super(Material, self).__init__()
 
-        self._c = c*units.heat_capacity
+        if c is None:
+            self._c = None
+        else:
+            self._c = c*units.heat_capacity
         """
         The thermal capacity in **[J/kgK]**
         In order to get the thermal capacity of an object, you only have to
@@ -173,7 +177,10 @@ class Material(object):
         .. note::
         Source: http://www.engineeringtoolbox.com/specific-heat-solids-d_154.html
         """
-        self._p = p*units.mass_density
+        if p is None:
+            self._p = None
+        else:
+            self._p = p*units.mass_density
         """
         The weight of the material in **[g/m3]**.
 
@@ -186,7 +193,10 @@ class Material(object):
         .. note::
             Source: http://www.simetric.co.uk/si_materials.htm
         """
-        self._k = k*units.thermal_conductivity
+        if k is None:
+            self._k = None
+        else:
+            self._k = k*units.thermal_conductivity
         """
         The thermal conductivity in **[W/Km]**.
 
@@ -949,7 +959,7 @@ class Water(Material):
         * Thermal conductivity ``0.5985 W/Km``
 
         """
-        super(Water, self).__init__(4190., 1000., 0.5985)
+        super(Water, self).__init__(4200., 1000., 0.5985)
 
 
 class Glass(Material):
