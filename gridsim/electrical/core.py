@@ -152,6 +152,12 @@ class AbstractElectricalTwoPort(AbstractElectricalElement):
         :type R: ohm, see :mod:`gridsim.unit`
 
         """
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(X, (int, float)):
+            X = units.value(units.to_si(X))
+        if not isinstance(R, (int, float)):
+            R = units.value(units.to_si(R))
+
         super(AbstractElectricalTwoPort, self).__init__(friendly_name, )
 
         if X <= 0:
