@@ -39,6 +39,7 @@ setup(name=config.get('Project', 'name').lower(),
       platforms=[platform.platform()],  # TODO indicate really tested platforms
 
       packages=find_packages(),
+      package_data={'': ['*.unit']},
       install_requires=config.get('Project', 'required').split(),
 
       # metadata
