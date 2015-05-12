@@ -57,7 +57,7 @@ class ElectricalTransmissionLine(AbstractElectricalTwoPort):
 
         # HACK: when object is constructed with *args or **kwargs
         if not isinstance(length, (int, float)):
-            X = units.value(units.to_si(length))
+            length = units.value(units.to_si(length))
         if not isinstance(X, (int, float)):
             X = units.value(units.to_si(X))
         if not isinstance(R, (int, float)):
