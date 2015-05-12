@@ -306,6 +306,12 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         :type standard_deviation: power, see :mod:`gridsim.unit`
 
         """
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(mean_power, (int, float)):
+            mean_power = units.value(units.to_si(mean_power))
+        if not isinstance(standard_deviation, (int, float)):
+            standard_deviation = units.value(units.to_si(standard_deviation))
+
         super(GaussianRandomElectricalCPSElement, self).__init__(friendly_name)
         self._mean_power = mean_power
         self._standard_deviation = standard_deviation
