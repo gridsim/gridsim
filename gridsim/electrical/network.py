@@ -54,6 +54,17 @@ class ElectricalTransmissionLine(AbstractElectricalTwoPort):
         :param B: Line charging.
         :type B: siemens, see :mod:`gridsim.unit`
         """
+
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(length, (int, float)):
+            length = units.value(units.to_si(length))
+        if not isinstance(X, (int, float)):
+            X = units.value(units.to_si(X))
+        if not isinstance(R, (int, float)):
+            R = units.value(units.to_si(R))
+        if not isinstance(B, (int, float)):
+            B = units.value(units.to_si(B))
+
         # super constructor needs units as it is a "public" function
         super(ElectricalTransmissionLine, self).__init__(friendly_name, X*units.ohm, R*units.ohm)
 
@@ -115,6 +126,13 @@ class ElectricalGenTransformer(AbstractElectricalTwoPort):
         :type R: ohm, see :mod:`gridsim.unit`
 
         """
+
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(X, (int, float)):
+            X = units.value(units.to_si(X))
+        if not isinstance(R, (int, float)):
+            R = units.value(units.to_si(R))
+
         # super constructor needs units as it is a "public" function
         super(ElectricalGenTransformer, self).__init__(friendly_name, X*units.ohm, R*units.ohm)
 

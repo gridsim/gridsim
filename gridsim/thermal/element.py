@@ -25,6 +25,11 @@ class ConstantTemperatureProcess(ThermalProcess):
         :param position: The position of the :class:`.ThermalProcess`.
         :type position: :class:`Position`
         """
+
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(temperature, (int, float)):
+            temperature = units.value(units.to_si(temperature))
+
         # super constructor needs units as it is a "public" function
         super(ConstantTemperatureProcess, self).__init__(
             friendly_name,

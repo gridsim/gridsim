@@ -39,6 +39,9 @@ class ConstantElectricalCPSElement(AbstractElectricalCPSElement):
         :type power: power, see :mod:`gridsim.unit`
 
         """
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(power, (int, float)):
+            power = units.value(units.to_si(power))
         super(ConstantElectricalCPSElement, self).__init__(friendly_name)
         self.power = power
 
@@ -90,6 +93,10 @@ class CyclicElectricalCPSElement(AbstractElectricalCPSElement):
 
         """
         super(CyclicElectricalCPSElement, self).__init__(friendly_name)
+
+        # HACK: when object is constructed with *args or **kwargs
+        if power_values.dtype is not (int, float):
+            power_values = units.value(units.to_si(power_values))
 
         if power_values.dtype != float:
             raise TypeError("'power_values' has to be an array of floats.")
@@ -189,7 +196,7 @@ class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
              (3, np.ndarray))
     @units.wraps(None, (None, None, None, units.watt, units.second))
     def __init__(self, friendly_name, cycle_delta_time, power_values,
-                 cycle_start_time=0*units.second):
+                 cycle_start_time=0):
         """
         __init__(self, friendly_name, cycle_delta_time, power_values, cycle_start_time=0*units.second)
 
@@ -211,6 +218,10 @@ class UpdatableCyclicElectricalCPSElement(CyclicElectricalCPSElement):
         :type cycle_start_time: int
 
         """
+        # HACK: when object is constructed with *args or **kwargs
+        if power_values.dtype is not (int, float):
+            power_values = units.value(units.to_si(power_values))
+
         super(UpdatableCyclicElectricalCPSElement, self).\
             __init__(friendly_name, cycle_delta_time,
                      power_values, cycle_start_time)
@@ -298,6 +309,12 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
         :type standard_deviation: power, see :mod:`gridsim.unit`
 
         """
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(mean_power, (int, float)):
+            mean_power = units.value(units.to_si(mean_power))
+        if not isinstance(standard_deviation, (int, float)):
+            standard_deviation = units.value(units.to_si(standard_deviation))
+
         super(GaussianRandomElectricalCPSElement, self).__init__(friendly_name)
         self._mean_power = mean_power
         self._standard_deviation = standard_deviation
@@ -433,6 +450,11 @@ class AnyIIDRandomElectricalCPSElement(AbstractElectricalCPSElement):
             filename is given as 2nd parameter
         :type frequencies: None or 1-D numpy array of integer or float
         """
+
+        # HACK: when object is constructed with *args or **kwargs
+        if fname_or_power_values.dtype is not (int, float):
+           fname_or_power_values = units.value(units.to_si(fname_or_power_values))
+
         super(AnyIIDRandomElectricalCPSElement, self).__init__(friendly_name)
         # if first parameter is a string (name of a file), read data
         if isinstance(fname_or_power_values, str):

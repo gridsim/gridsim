@@ -76,6 +76,15 @@ class ThermalProcess(AbstractThermalElement):
         :param position: The position of the process.
         :type position: :class:`.Position`
         """
+
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(thermal_capacity, (int, float)):
+            thermal_capacity = units.value(units.to_si(thermal_capacity))
+        if not isinstance(initial_temperature, (int, float)):
+            initial_temperature = units.value(units.to_si(initial_temperature))
+        if not isinstance(mass, (int, float)):
+            mass = units.value(units.to_si(mass))
+
         super(ThermalProcess, self).__init__(friendly_name, position)
 
         self._initial_temperature = initial_temperature
@@ -266,6 +275,15 @@ class ThermalCoupling(AbstractThermalElement):
             process.
         :type to_process: :class:`ThermalProcess`
         """
+
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(thermal_conductivity, (int, float)):
+            thermal_conductivity = units.value(units.to_si(thermal_conductivity))
+        if not isinstance(contact_area, (int, float)):
+            contact_area = units.value(units.to_si(contact_area))
+        if not isinstance(thickness, (int, float)):
+            thickness = units.value(units.to_si(thickness))
+
         super(ThermalCoupling, self).__init__(friendly_name)
 
         self.from_process = from_process
