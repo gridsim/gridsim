@@ -39,6 +39,9 @@ class ConstantElectricalCPSElement(AbstractElectricalCPSElement):
         :type power: power, see :mod:`gridsim.unit`
 
         """
+        # HACK: when object is constructed with *args or **kwargs
+        if not isinstance(power, (int, float)):
+            power = units.value(units.to_si(power))
         super(ConstantElectricalCPSElement, self).__init__(friendly_name)
         self.power = power
 
