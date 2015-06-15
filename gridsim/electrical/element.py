@@ -361,8 +361,9 @@ class GaussianRandomElectricalCPSElement(AbstractElectricalCPSElement):
 
 class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
 
-    @accepts(((1, 3), str), (2, TimeSeries))
-    def __init__(self, friendly_name, time_series, stream):
+    @accepts((1, str), (2, TimeSeries))
+    def __init__(self, friendly_name, time_series, time_converter=None,
+                 power_calculator=lambda t: units.convert(t, units.watt)):
         """
         __init__(self, friendly_name, reader, stream)
 
@@ -375,18 +376,22 @@ class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
         :param friendly_name: Friendly name for the element.
             Should be unique within the simulation module.
         :type friendly_name: str
-        :param reader: The time series
-        :type reader: :class:`.TimeSeries`
-        :param stream: The file name
-        :type stream: str
+        :param time_series: The time series
+        :type time_series: :class:`.TimeSeries`
         """
         super(TimeSeriesElectricalCPSElement, self).__init__(friendly_name)
 
         self._time_series = time_series
-        self._time_series.load(stream)
+        self._time_series.load(time_converter=time_converter)
+
+        self._power_calculator = power_calculator
+
+        self._time_series.convert('power', self._power_calculator)
+
+        self.calculate(0, 0)
 
     def __getattr__(self, item):
-        return units.value(getattr(self.time_series, item))
+        return units.value(getattr(self._time_series, item))
 
     def reset(self):
         """
@@ -407,7 +412,7 @@ class TimeSeriesElectricalCPSElement(AbstractElectricalCPSElement):
         :type delta_time: time, see :mod:`gridsim.unit`
         """
         self._time_series.set_time(time)
-        self._internal_delta_energy = self._time_series.power * delta_time
+        self._internal_delta_energy = units.value(self._time_series.power) * delta_time
 
 
 class AnyIIDRandomElectricalCPSElement(AbstractElectricalCPSElement):

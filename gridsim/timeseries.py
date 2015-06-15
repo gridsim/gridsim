@@ -147,10 +147,9 @@ class TimeSeries(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
-    @accepts((1, (str, BufferedReader)),
-             (2, (None, types.MethodType)),
-             (3, str))
-    def load(self, stream, time_converter=None, time_key='time'):
+    @accepts((1, (None, types.MethodType)),
+             (2, str))
+    def load(self, time_converter=None, time_key='time'):
         raise NotImplementedError('Pure abstract method!')
 
 
@@ -232,19 +231,17 @@ class TimeSeriesObject(TimeSeries):
             self._index = min(self._computed_data[self._time_key],
                               key=lambda i: abs(i-time))
 
-    @accepts((1, (str, BufferedReader)),
-             (2, (None, FunctionType)),
-             (3, str))
-    def load(self, stream, time_converter=None, time_key='time'):
+    @accepts((1, (None, FunctionType)),
+             (2, str))
+    def load(self, time_converter=None, time_key='time'):
         """
-        load(self, stream, time_converter=None, time_key='time')
+        load(self, time_converter=None, time_key='time')
 
-        :param stream:
         :param time_converter:
         :param time_key:
         :return:
         """
-        self._data = self._reader.load(stream, data_type=float)
+        self._data = self._reader.load(data_type=float)
 
         self._time_key = time_key
 
@@ -256,7 +253,7 @@ class TimeSeriesObject(TimeSeries):
 
         else:
             warnings.warn("The data {0} has no '{1}' values".
-                          format(stream, time_key),
+                          format(self._reader, time_key),
                           category=SyntaxWarning)
 
         self._compute_data()
@@ -335,19 +332,17 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
         :param time: the new time.
         :type time: float, int or time, see :mod:`gridsim.unit`
         """
-        time_value = units.value(units.convert(time, units.seconds))
-
-        if time_value < self._start:
+        if time < self._start:
             self._index = -1
         else:
-            self._index = int((time_value - self._start) / self._interval) % self._count
+            self._index = int((time - self._start) / self._interval) % self._count
 
     @accepts((1, (str, BufferedReader)),
              (2, (None, types.MethodType)),
              (3, str))
-    def load(self, stream, time_converter=None, time_key='time'):
+    def load(self, time_converter=None, time_key='time'):
 
-        self._data = self._reader.load(stream, data_type=float)
+        self._data = self._reader.load(data_type=float)
         self._time_key = time_key
 
         if self._time_key in self._data:
@@ -360,7 +355,7 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
 
         else:
             warnings.warn("The data {0} has no '{1}' values".
-                          format(stream, time_key),
+                          format(self._reader, time_key),
                           category=SyntaxWarning)
 
     def _update_parameters(self):

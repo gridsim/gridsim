@@ -196,8 +196,7 @@ room = sim.thermal.add(ThermalProcess.room('room',
                                            units.convert(celsius, units.kelvin)))
 
 outside = sim.thermal.add(
-    TimeSeriesThermalProcess('outside', SortedConstantStepTimeSeriesObject(CSVReader()),
-                             './data/example_time_series.csv',
+    TimeSeriesThermalProcess('outside', SortedConstantStepTimeSeriesObject(CSVReader('./data/example_time_series.csv')),
                              lambda t: t*units.hour,
                              temperature_calculator=
                                 lambda t: units.convert(units(t, units.degC),
@@ -269,6 +268,6 @@ print("Saving data...")
 
 # Create a PDF document, add the two figures of the plot recorder to the
 # document and close the document.
-FigureSaver(temp, "Temperature").save('./output/thermostat-fig1.png')
+FigureSaver(temp, "Temperature").save('./output/thermostat-fig1.pdf')
 FigureSaver(control, "Control").save('./output/thermostat-fig2.png')
 FigureSaver(power, "Power").save('./output/thermostat-fig3.png')
