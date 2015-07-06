@@ -205,6 +205,7 @@ class Simulator(object):
             self._modules[module.attribute_name()] = module
 
         # Prepare an array for all recorders.
+        self._time_recorders = []
         self._recorders = []
         self._recorderBindings = []
 
@@ -367,6 +368,8 @@ class Simulator(object):
 
         for recorder in self._recorders:
             recorder.on_simulation_step(self.time)
+        for recorder in self._time_recorders:
+            recorder.on_simulation_step(self.time)
 
         for recorder_binding in self._recorderBindings:
             recorder_binding.update(self.time, delta_time)
@@ -452,9 +455,9 @@ class Simulator(object):
                                                  time, value)
 
 
-    @accepts((1, Recorder), (2, (list, tuple, AbstractSimulationElement)))
+    @accepts((1, Recorder), (2, (list, tuple, AbstractSimulationElement, types.NoneType)))
     @returns(Recorder)
-    def record(self, recorder, subjects):
+    def record(self, recorder, subjects = None):
         """
         record(self, recorder, subjects, conversion=None)
 
@@ -468,7 +471,8 @@ class Simulator(object):
         :type recorder: :class:`Recorder`
         
         :param subjects: The subjects of the recorder, in other words the 
-            objects which is attributes has to be recorded.
+            objects which is attributes has to be recorded. If `None`, the time
+            is the only one value recorded, with :func:`on_simulation_step()`.
         :type subjects: list or tuple of :class:`.AbstractSimulationElement`
 
         :param conversion: Lambda function to convert the actual value taken
@@ -489,12 +493,14 @@ class Simulator(object):
         
         :returns: Reference to the recoder.
         """
-        if isinstance(subjects, AbstractSimulationElement):
-            subjects = (subjects,)
+        if subjects is None:
+            self._time_recorders.append(recorder)
+        else:
+            if isinstance(subjects, AbstractSimulationElement):
+                subjects = (subjects,)
 
-        self._recorderBindings.append(self._RecorderBinding(recorder, subjects))
+            self._recorderBindings.append(self._RecorderBinding(recorder, subjects))
 
-        if not recorder in self._recorders:
-            self._recorders.append(recorder)
-
+            if not recorder in self._recorders:
+                self._recorders.append(recorder)
         return recorder
