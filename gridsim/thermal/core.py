@@ -255,7 +255,7 @@ class ThermalCoupling(AbstractThermalElement):
                  from_process, to_process,
                  contact_area=1, thickness=1):
         """
-        __init__(self, friendly_name, thermal_conductivity, from_process, to_process, contact_area=1, thickness=1)
+        __init__(self, friendly_name, thermal_conductivity, from_process, to_process, contact_area=1*units.metre**2, thickness=1*units.metre)
 
         A thermal coupling connects two thermal processes allowing them to
         exchange thermal energy.
@@ -271,9 +271,16 @@ class ThermalCoupling(AbstractThermalElement):
             process.
         :type from_process: :class:`ThermalProcess`
 
-        :param to_process: The second process coupled
-            process.
+        :param to_process: The second process coupled process.
         :type to_process: :class:`ThermalProcess`
+
+        :param contact_area: The size of the contact area
+            process.
+        :type contact_area: square_meter, see :mod:`gridsim.unit`
+
+        :param thickness: the thickness of the contact area
+            process.
+        :type thickness: meter, see :mod:`gridsim.unit`
         """
 
         # HACK: when object is constructed with *args or **kwargs
@@ -349,8 +356,8 @@ class ThermalCoupling(AbstractThermalElement):
         #               dt: Time interval [s]
 
         self._delta_energy = \
-            ((self.from_process.temperature - self.to_process.temperature) * \
-            self.thermal_conductivity * \
+            ((self.from_process.temperature - self.to_process.temperature) *
+            self.thermal_conductivity *
             self.contact_area / self.thickness)*delta_time
 
         self.from_process.add_energy(-self._delta_energy)

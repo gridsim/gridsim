@@ -117,7 +117,6 @@ class TimeSeries(object):
 
         self._data[mapped_name] = self._data.pop(name)
 
-
     @accepts((1, str), (2, FunctionType))
     def convert(self, item, converter):
         """

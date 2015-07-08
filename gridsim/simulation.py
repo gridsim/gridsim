@@ -454,10 +454,9 @@ class Simulator(object):
                 self._recorder.on_observed_value(subject.friendly_name,
                                                  time, value)
 
-
     @accepts((1, Recorder), (2, (list, tuple, AbstractSimulationElement, types.NoneType)))
     @returns(Recorder)
-    def record(self, recorder, subjects = None):
+    def record(self, recorder, subjects=None):
         """
         record(self, recorder, subjects, conversion=None)
 

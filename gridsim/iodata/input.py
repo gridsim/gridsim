@@ -71,7 +71,7 @@ class CSVReader(Reader):
         * ``dataX``: a list of ``data_type``
 
         :param stream: a stream of data or a file name
-        :type stream: str, BufferedReader
+        :type stream: str or every type managed by `with` keyword
 
         """
         super(CSVReader, self).__init__()
@@ -83,6 +83,8 @@ class CSVReader(Reader):
         """
         clear(self)
 
+        Removes all data stored in the object.
+
         :return:
         """
         self._data.clear()
@@ -91,7 +93,7 @@ class CSVReader(Reader):
     @returns(dict)
     def load(self, data_type=None):
         """
-        load(self, stream, data_type=None, clear_data=False)
+        load(self, data_type=None)
 
         Loads the data from the given CSV data file.
 
@@ -103,10 +105,10 @@ class CSVReader(Reader):
         # Open the csv data file.
         with open(self._stream, 'r') as csv_data:
 
-            #create a sniffer
+            # create a sniffer
             sniffer = csv.Sniffer()
 
-            #verify header
+            # verify header
             has_header = sniffer.has_header(csv_data.read())
             if not has_header:
                 warnings.warn("The CVS data %s has no header" % self._stream,
