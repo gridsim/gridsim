@@ -616,6 +616,8 @@ class _Unit(object):
         self._registry.define('thermal_conductivity = W/(K*m)')
 
     def __call__(self, *args, **kwargs):
+        if len(args) is 1:
+            return self._registry(args[0])
         return self._registry.Quantity(args[0], args[1])
 
     def __getattr__(self, item):

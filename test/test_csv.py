@@ -12,9 +12,9 @@ class TestCSVReader(unittest.TestCase):
                     'temperature': ['20.0', '20.0', '18', '4.1'],
                     'time': ['0', '1', '2', '3']}
 
-        cvs_reader = CSVReader()
+        cvs_reader = CSVReader('./test/data/datatest_with_header.csv')
 
-        data = cvs_reader.load('./test/data/datatest_with_header.csv')
+        data = cvs_reader.load()
 
         self.assertEqual(ref_data, data)
 
@@ -24,10 +24,9 @@ class TestCSVReader(unittest.TestCase):
                     'temperature': [20.0, 20.0, 18, 4.1],
                     'time': [0, 1, 2, 3]}
 
-        cvs_reader = CSVReader()
+        cvs_reader = CSVReader('./test/data/datatest_with_header.csv')
 
-        data = cvs_reader.load('./test/data/datatest_with_header.csv',
-                               data_type=float)
+        data = cvs_reader.load(data_type=float)
 
         self.assertEqual(ref_data, data)
 
@@ -37,10 +36,10 @@ class TestCSVReader(unittest.TestCase):
                     CSVReader.DEFAULT_DATA_NAME+str(1): ['20.0', '20.0', '18'],
                     CSVReader.DEFAULT_DATA_NAME+str(0): ['0', '1', '2']}
 
-        cvs_reader = CSVReader()
+        cvs_reader = CSVReader('./test/data/datatest_no_header.csv')
 
         warnings.simplefilter("always", SyntaxWarning)
-        data = cvs_reader.load('./test/data/datatest_no_header.csv')
+        data = cvs_reader.load()
 
         self.assertEqual(ref_data, data)
 
@@ -50,22 +49,21 @@ class TestCSVReader(unittest.TestCase):
                     CSVReader.DEFAULT_DATA_NAME+str(1): [20.0, 20.0, 18],
                     CSVReader.DEFAULT_DATA_NAME+str(0): [0, 1, 2]}
 
-        cvs_reader = CSVReader()
+        cvs_reader = CSVReader('./test/data/datatest_no_header.csv')
 
         warnings.simplefilter("always", SyntaxWarning)
-        data = cvs_reader.load('./test/data/datatest_no_header.csv',
-                                   data_type=float)
+        data = cvs_reader.load(data_type=float)
 
         self.assertEqual(ref_data, data)
 
     def test_warning_no_header(self):
 
-        cvs_reader = CSVReader()
+        cvs_reader = CSVReader('./test/data/datatest_no_header.csv')
 
         warnings.simplefilter("error", SyntaxWarning)
         with self.assertRaises(SyntaxWarning):
             warnings.simplefilter("error", SyntaxWarning)
-            cvs_reader.load('./test/data/datatest_no_header.csv')
+            cvs_reader.load()
             warnings.simplefilter('always', SyntaxWarning)
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 import csv
 import warnings
-from io import BufferedReader
 
 from gridsim.decorators import accepts, returns
 
@@ -23,13 +22,11 @@ class Reader(object):
         """
         raise NotImplementedError('Pure abstract method.')
 
-    @accepts((1, (str, BufferedReader)),
-             (2, type),
-             (3, bool))
+    @accepts((1, str))
     @returns(dict)
-    def load(self, stream, data_type=str, clear_data=False):
+    def load(self, data_type=None):
         """
-        load(self, stream, data_type=str, clear_data=False)
+        load(self, data_type=None)
 
         This method MUST returns formatted data following this format
         ``[(label1, data1], (label2, data2), ...]``
@@ -39,15 +36,9 @@ class Reader(object):
         * ``labelX``: a str
         * ``dataX``: a list of ``data_type``
 
-        :param stream: a stream of data or a file name
-        :type stream: str, BufferedReader
-
-        :param data_type: the type of stored data
-        :type data_type: type (default str)
-
-        :param clear_data: if clear data is ``True`` load the file even if the
-            file is already loaded.
-        :type clear_data: bool
+        :param data_type: the type of stored data if ``None`` no conversion
+            are done.
+        :type data_type: type (default None)
 
         :return: a dict of values
         :rtype: dict
@@ -66,7 +57,7 @@ class CSVReader(Reader):
     ``0 <= X < column number - 1``
     """
 
-    def __init__(self):
+    def __init__(self, stream):
         """
         __init__(self)
 
@@ -79,9 +70,14 @@ class CSVReader(Reader):
         * ``labelX``: a str
         * ``dataX``: a list of ``data_type``
 
+        :param stream: a stream of data or a file name
+        :type stream: str, BufferedReader
+
         """
         super(CSVReader, self).__init__()
         self._data = dict()
+
+        self._stream = stream
 
     def clear(self):
         """
@@ -91,70 +87,62 @@ class CSVReader(Reader):
         """
         self._data.clear()
 
-    @accepts((1, (str, BufferedReader)),
-             (2, type),
-             (3, bool))
+    @accepts((1, str))
     @returns(dict)
-    def load(self, stream, data_type=str, clear_data=False):
+    def load(self, data_type=None):
         """
-        load(self, stream, data_type=str, clear_data=False)
+        load(self, stream, data_type=None, clear_data=False)
 
         Loads the data from the given CSV data file.
 
-        :param stream: A stream of the CSV data to read
-        :type stream: str, BufferedReader
-        :param data_type: the type of the stored data
+        :param data_type: the type of the stored data if ``None`` no conversion
+            are done.
         :type data_type: type
-        :param clear_data: if ``True`` clear the data if the reader already
-            loads a file.
-        :type clear_data: bool
         """
 
-        # empty the data if already filled
-        if clear_data:
-            self.clear()
+        # Open the csv data file.
+        with open(self._stream, 'r') as csv_data:
 
-        if len(self._data) == 0:
-            # Open the csv data file.
-            with open(stream, 'r') as csv_data:
+            #create a sniffer
+            sniffer = csv.Sniffer()
 
-                #create a sniffer
-                sniffer = csv.Sniffer()
+            #verify header
+            has_header = sniffer.has_header(csv_data.read())
+            if not has_header:
+                warnings.warn("The CVS data %s has no header" % self._stream,
+                              category=SyntaxWarning)
 
-                #verify header
-                has_header = sniffer.has_header(csv_data.read())
-                if not has_header:
-                    warnings.warn("The CVS data %s has no header" % stream,
-                                  category=SyntaxWarning)
+            # return to the begin
+            csv_data.seek(0)
 
-                # return to the begin
+            # sniff the data to find a header
+            dialect = sniffer.sniff(csv_data.read())
+            # return to the begin
+            csv_data.seek(0)
+
+            # Create the CSV parser.
+            reader = csv.reader(csv_data, dialect)
+
+            # Read header
+
+            data_names = reader.next()
+            if not has_header:
+                for i in range(0, len(data_names)):
+                    data_names[i] = CSVReader.DEFAULT_DATA_NAME+str(i)
                 csv_data.seek(0)
 
-                # sniff the data to find a header
-                dialect = sniffer.sniff(csv_data.read())
-                # return to the begin
-                csv_data.seek(0)
+            # initialise the dict
+            self._data = dict(zip(data_names, [[] for _ in data_names]))
 
-                # Create the CSV parser.
-                reader = csv.reader(csv_data, dialect)
+            # Load data into the object.
+            for row in reader:
+                if len(row) is not len(data_names):
+                    raise SyntaxError('Invalid gridsim CSV file.')
 
-                # Read header
-
-                data_names = reader.next()
-                if not has_header:
-                    for i in range(0, len(data_names)):
-                        data_names[i] = CSVReader.DEFAULT_DATA_NAME+str(i)
-                    csv_data.seek(0)
-
-                # initialise the dict
-                self._data = dict(zip(data_names, [[] for _ in data_names]))
-
-                # Load data into the object.
-                for row in reader:
-                    if len(row) is not len(data_names):
-                        raise SyntaxError('Invalid gridsim CSV file.')
-
-                    for i in range(0, len(row)):
+                for i in range(0, len(row)):
+                    if data_type is None:
+                        self._data[data_names[i]].append(row[i])
+                    else:
                         self._data[data_names[i]].append(data_type(row[i]))
 
         return self._data

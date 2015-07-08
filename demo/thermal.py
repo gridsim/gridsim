@@ -25,8 +25,7 @@ room = sim.thermal.add(ThermalProcess.room('room',
                                            2.5*units.metre,
                                            units.convert(celsius, units.kelvin)))
 outside = sim.thermal.add(
-    TimeSeriesThermalProcess('outside', SortedConstantStepTimeSeriesObject(CSVReader()),
-                             './data/example_time_series.csv',
+    TimeSeriesThermalProcess('outside', SortedConstantStepTimeSeriesObject(CSVReader('./data/example_time_series.csv')),
                              lambda t: t*units.hours,
                              temperature_calculator=
                                 lambda t: units.convert(units(t, units.degC), units.kelvin)))
