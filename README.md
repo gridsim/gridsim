@@ -42,7 +42,9 @@ You can find the latest version of Gridsim on :
 Gridsim is a full python project thus as long as Python is installed on your
 system you can install it by moving in the root folder (the folder this README
 file should be) and run :
+
     python setup.py install
+    
 In some systems you need Administrator right to run this command.
 
 Warning : Gridsim requires these packages to be used in full :
@@ -66,7 +68,7 @@ A documentation also is provided with this release in './doc' folder.
 ===
 If you find any bugs, or if you want new features you can put your request on
 github at the following address :
-    https://github.com/gridsim/
+    https://github.com/gridsim/gridsim
 
 
 6. Contributors
@@ -98,16 +100,16 @@ If not, see <http://www.gnu.org/licenses/>.
 
 9. Copyright
 ===
-Copyright (C) 2011-2014 The Gridsim Team
+Copyright (C) 2011-2015 The Gridsim Team
 
 This file is part of the Gridsim project.
 
-the Gridsim project is free software; you can redistribute it and/or modify it
+The Gridsim project is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free
 Software Foundation; either version 3 of the License, or (at your option) any
 later version.
 
-the Gridsim project is distributed in the hope that it will be useful, but
+The Gridsim project is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
