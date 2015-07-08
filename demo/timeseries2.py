@@ -11,10 +11,10 @@ from gridsim.iodata.output import FigureSaver
 # register them within the simulator.
 class MyObject(AbstractSimulationElement):
 
-    def __init__(self, reader, file_name):
-        super(MyObject, self).__init__(file_name)
+    def __init__(self, friendly_name, reader):
+        super(MyObject, self).__init__(friendly_name)
         self._time_series = TimeSeriesObject(reader)
-        self._time_series.load(file_name, time_converter=lambda t: t*units.day)
+        self._time_series.load(time_converter=lambda t: t*units.day)
 
     def __getattr__(self, item):
         return getattr(self._time_series, item)
@@ -63,7 +63,7 @@ Simulator.register_simulation_module(MyModule)
 # Create a simulator, add an element and record the temperature signal using
 # a recorder.
 sim = Simulator()
-obj = sim.my.add(MyObject(CSVReader(), './data/example_time_series.csv'))
+obj = sim.my.add(MyObject("myObject", CSVReader('./data/example_time_series.csv')))
 obj.convert("temperature", lambda t: units(t, units.degC))
 
 rec = PlotRecorder('temperature', units.month, units.kelvin)

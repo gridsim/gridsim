@@ -71,7 +71,7 @@ class CSVReader(Reader):
         * ``dataX``: a list of ``data_type``
 
         :param stream: a stream of data or a file name
-        :type stream: str or every type managed by `with` keyword
+        :type stream: str or every type managed by ``with`` keyword
 
         """
         super(CSVReader, self).__init__()

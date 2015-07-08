@@ -3,8 +3,8 @@ from gridsim.iodata.input import CSVReader
 from gridsim.timeseries import TimeSeriesObject
 
 # Load time series into a new object.
-obj = TimeSeriesObject(CSVReader())
-obj.load('./data/example.csv')
+obj = TimeSeriesObject(CSVReader('./data/example.csv'))
+obj.load()
 
 # Print value at start time.
 print obj.temperature
