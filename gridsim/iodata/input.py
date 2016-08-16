@@ -27,7 +27,7 @@ class Reader(object):
     @returns(dict)
     def load(self, data_type=None, nb_data=float("inf")):
         """
-        load(self, data_type=None)
+        load(self, data_type=None, nb_data=float("inf"))
 
         This method MUST returns formatted data following this format
         ``[(label1, data1], (label2, data2), ...]``
@@ -96,7 +96,7 @@ class CSVReader(Reader):
     @returns(dict)
     def load(self, data_type=None, nb_data=sys.maxint):
         """
-        load(self, data_type=None)
+        load(self, data_type=None, nb_data=sys.maxint)
 
         Loads the data from the given CSV data file.
 
@@ -164,7 +164,7 @@ class CSVTimeReader(CSVReader):
     @returns(dict)
     def load(self, data_type=None, nb_data=float("inf")):
         """
-        load(self, data_type=None)
+        load(self, data_type=None, nb_data=float("inf"))
 
         Loads the data from the given CSV data file.
 
