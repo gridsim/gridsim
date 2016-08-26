@@ -3,5 +3,5 @@
 numpy>=1.9
 scipy>=0.15
 matplotlib>=1.4
-pint>=0.6
+pint==0.6
 enum34>=1.0
