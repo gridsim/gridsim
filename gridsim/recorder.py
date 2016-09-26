@@ -139,10 +139,10 @@ class PlotRecorder(Recorder, AttributesGetter):
         * In this example, only new concept are detailed.
         * On line 46, we create a :class:`PlotRecorder` which recorder the
           ``temperature`` attribute in Kelvin.
-        * On line 47, we use that recorder in order to record all elements in
+        * On line 47, we use that recorder in order to record all element in
           the thermal module who have the attribute 'temperature' by using the
           powerful :func:`gridsim.simulation.Simulator.find()` method by asking
-          to return a list of all elements that have the attribute 'temperature'.
+          to return a list of all element that have the attribute 'temperature'.
         * On line 51, we create a very similar recorder as before, but
           the attribute will be in celsius and the time in minutes.
         * On line 52, we recorder same objects as above,

@@ -57,7 +57,7 @@ class ThermalProcess(AbstractThermalElement):
         represents a closed thermal envelope like a room or a amount of
         matter which has an uniform thermal capacity and and stores an amount of
         thermal energy resulting in a temperature. Those thermal processes
-        can be coupled by :class:`ThermalCoupling` elements.
+        can be coupled by :class:`ThermalCoupling` element.
 
         :param friendly_name: The name to give to the thermal process.
         :type friendly_name: str

@@ -253,11 +253,11 @@ class Simulator(object):
         objects matching the given criteria by searching on either the given
         Gridsim simulation module or by searching the whole simulation of the
         module was not specified. Note that the method returns always a list of
-        elements, even if only a single instance is found. All parameters are
+        element, even if only a single instance is found. All parameters are
         optional, if :func:`find()` will be called without any parameters,
-        the list of all elements in the actual simulation will be returned.
+        the list of all element in the actual simulation will be returned.
 
-        :param module: The module to search for elements.
+        :param module: The module to search for element.
         :type module: str
         
         :param uid: ID of the element. Note that these ID's are only unique for
@@ -296,7 +296,7 @@ class Simulator(object):
         """
         elements = []
 
-        # Get the complete list of elements from either specific or all modules.
+        # Get the complete list of element from either specific or all modules.
         if module is not None:
             if module in self._modules.keys():
                 elements = self._modules[module].all_elements()
@@ -484,7 +484,7 @@ class Simulator(object):
         :param conversion: Lambda function to convert the actual value taken
             from the attribute before recording. The lambda function gets a
             single parameter ``context`` which is a named tuple with the following
-            elements:
+            element:
             
             **value**: The actual value just read from the simulation element's
             attribute.
