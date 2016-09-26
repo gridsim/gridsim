@@ -62,9 +62,9 @@ class ElectricalSimulator(AbstractSimulationModule):
         # TODO: allow to change the slack bus position
         self._hasChanges = False
 
-        # matrix representing aggregation of CPS elements into buses
+        # matrix representing aggregation of CPS element into buses
         self._mat_A = None
-        # vector if CPS elements active power
+        # vector if CPS element active power
         self._Pe = None
 
         # load flow
@@ -107,7 +107,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         add(self, element)
 
         Add the element to the electrical simulation but do not connect it with
-        other elements. use other functions such as :func:`connect` and
+        other element. use other functions such as :func:`connect` and
         :func:`attach` to really use the element in the simulation.
 
         :param element: the element to add
@@ -158,8 +158,8 @@ class ElectricalSimulator(AbstractSimulationModule):
             self._cps_elementDict[element.friendly_name] = element
 
         else:
-            # TODO: also add these elements to appropriate list,
-            # TODO: e.g. self.elements[element.__class__.__name__]
+            # TODO: also add these element to appropriate list,
+            # TODO: e.g. self.element[element.__class__.__name__]
             pass
         self._hasChanges = True
         return element
@@ -350,7 +350,7 @@ class ElectricalSimulator(AbstractSimulationModule):
             element.reset()
 
     def _has_orphans(self):
-        # TODO: check that all elements are attached to a bus and that all buses
+        # TODO: check that all element are attached to a bus and that all buses
         # TODO: are connected to at least one other bus through a line
         for element in self._cps_elements:
             if element.id not in self._cps_elementBusMap:
@@ -359,11 +359,11 @@ class ElectricalSimulator(AbstractSimulationModule):
 
     def _prepare_matrices(self):
 
-        L = len(self._cps_elements)  # number of elements
+        L = len(self._cps_elements)  # number of element
         M = len(self._branches)  # number of branches
         N = len(self._buses)  # number of buses
 
-        # build matrix A to aggregate elements power to buses power,
+        # build matrix A to aggregate element power to buses power,
         # as sparse matrix
         self._mat_A = lil_matrix((N, L))
         for i_el in range(0, L):
@@ -403,7 +403,7 @@ class ElectricalSimulator(AbstractSimulationModule):
                 self._Yb[i_branch, 2] = Y_line / (abs(tap.k_factor) ** 2)
                 self._Yb[i_branch, 3] = Y_line / tap.k_factor.conjugate()
 
-        # active power of electrical CPS elements
+        # active power of electrical CPS element
         self._Pe = np.zeros(L)
 
         # bus electrical values

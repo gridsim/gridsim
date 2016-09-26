@@ -17,7 +17,7 @@ class AbstractElectricalElement(AbstractSimulationElement):
         """
         __init__(self, friendly_name)
 
-        This class is the base for all elements that can take place in the
+        This class is the base for all element that can take place in the
         electrical simulator. It is based on the general
         :class:`gridsim.core.AbstractSimulationElement`. At
         initialization the user has to give the element ``friendly_name``.
@@ -135,7 +135,7 @@ class AbstractElectricalTwoPort(AbstractElectricalElement):
         """
         __init__(self, friendly_name, X, R=0*units.ohm)
 
-        This class is the base for all electrical elements that can be placed
+        This class is the base for all electrical element that can be placed
         on a network branch, e.g. transmission lines, transformers,
         phase shifters,... It is based on the general
         :class:`.AbstractElectricalElement` class. At initialization the user
