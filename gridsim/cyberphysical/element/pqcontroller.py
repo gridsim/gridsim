@@ -1,5 +1,4 @@
-from gridsim.decorators import accepts
-from gridsim.cyberphysical.core import Actor
+from gridsim.cyberphysical.external import Actor
 
 import threading
 
@@ -9,8 +8,12 @@ import msvcrt
 class ParamType(Enum):
     P = 0
     Q = 1
-    I = 2
-    U = 3
+    I1 = 2
+    I2 = 3
+    I3 = 4
+    U1 = 5
+    U2 = 6
+    U3 = 7
 
 class _TerminalListener(object):
     def __init__(self, pqcontroller):
