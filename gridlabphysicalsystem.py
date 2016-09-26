@@ -7,15 +7,15 @@ from gridsim.timemanager import RealTimeManager
 
 from gridsim.unit import units
 
-readparam = [ParamType.I, ParamType.U]
+readparam = [ParamType.I1, ParamType.U1]
 writeparam = [ParamType.P, ParamType.Q]
 
 pqcontroller = PQController(readparam, writeparam)
 grid = GridLabCyberPhysicalSystem("gridlabcyberphysicalsystem")
 
+host = [] #define read address and write address on the physical devices
 
-
-grid.initialize(readparam, writeparam)
+grid.initialize(readparam, writeparam, host)
 grid.add(pqcontroller)
 
 Simulator.register_simulation_module(CyberPhysicalModule)
