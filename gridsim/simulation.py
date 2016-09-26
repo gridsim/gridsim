@@ -57,6 +57,8 @@ from .core import AbstractSimulationElement, AbstractSimulationModule
 from .util import Position
 from .unit import units
 
+from .timemanager import TimeManager
+
 
 class Recorder(object):
 
@@ -184,7 +186,8 @@ class Simulator(object):
         """
         Simulator._simulation_modules.append(module_class)
 
-    def __init__(self):
+    @accepts((1,TimeManager))
+    def __init__(self, timemanager):
         """
         __init__(self)
 
@@ -196,6 +199,8 @@ class Simulator(object):
         used by the simulation are instantiated.
         """
         super(Simulator, self).__init__()
+
+        self.timemanager = timemanager
 
         # Create an instance for each simulation module.
         self._modules = {}
@@ -420,10 +425,12 @@ class Simulator(object):
         """
         if self.time is None:
             self.reset()
+        self.timemanager.reset()
 
         end_time = self.time + run_time
         self._update(delta_time)
         while self.time < end_time:
+            self.timemanager.wait()
             self._step(delta_time)
 
     # Internal class. Holds a recorder and the binding of the recorder to an
