@@ -1,8 +1,7 @@
 from gridsim.decorators import accepts, returns
 from gridsim.core import AbstractSimulationModule
 
-from .core import
-
+from .core import AbstractCyberPhysicalSystem
 
 class CyberPhysicalModule(AbstractSimulationModule):
     def __init__(self):
@@ -10,7 +9,7 @@ class CyberPhysicalModule(AbstractSimulationModule):
 
         self.lacps = []
 
-    @accepts(1,(AbstractCyberPhysicalSystem))
+    @accepts((1,AbstractCyberPhysicalSystem))
     def add(self, acps):
         acps.id = len(self.lacps)
         self.lacps.append(acps)
@@ -24,7 +23,7 @@ class CyberPhysicalModule(AbstractSimulationModule):
             a.reset()
 
     def calculate(self, time, delta_time):
-        print 'simulation time', time
+        print('simulation time', time)
         for actor in self.lacps:
             actor.calculate(time, delta_time)
 
