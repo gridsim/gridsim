@@ -1,7 +1,7 @@
 from gridsim.decorators import accepts, returns
 from gridsim.core import AbstractSimulationModule
 
-from .core import AbstractCyberPhysicalSystem
+from .external import AbstractCyberPhysicalSystem
 
 class CyberPhysicalModule(AbstractSimulationModule):
     def __init__(self):
