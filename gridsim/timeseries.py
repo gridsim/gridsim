@@ -43,7 +43,8 @@ from .iodata.input import Reader
 class TimeSeries(object):
 
     @accepts((1, Reader))
-    def __init__(self, reader):
+    @units.wraps(None, (None, None, units.second), strict=False)
+    def __init__(self, reader, max_time=1*units.day):
         """
         __init__(self, reader)
 
@@ -66,6 +67,11 @@ class TimeSeries(object):
         self._data = None
         self._index = 0
         self._time_key = 'time'
+        self._max_time = max_time
+
+    @property
+    def max_time(self):
+        return self._max_time
 
     def __getattr__(self, item):
         raise NotImplementedError('Pure abstract method!')
@@ -98,7 +104,7 @@ class TimeSeries(object):
         :type name: str
         :param mapped_name: New name for the attribute.
         :type mapped_name: str
-        :param is_time_key: should be True if the modified name is the time key.
+        :param is_time_key: should be ``True`` if the modified name is the time key.
         :type is_time_key: bool
 
         """
@@ -116,7 +122,6 @@ class TimeSeries(object):
             self._time_key = mapped_name
 
         self._data[mapped_name] = self._data.pop(name)
-
 
     @accepts((1, str), (2, FunctionType))
     def convert(self, item, converter):
@@ -156,7 +161,8 @@ class TimeSeries(object):
 class TimeSeriesObject(TimeSeries):
 
     @accepts((1, Reader))
-    def __init__(self, reader):
+    @units.wraps(None, (None, None, units.second))
+    def __init__(self, reader, max_time=1*units.day):
         """
         This class is the standard time series implementation with no assumption
         about data.
@@ -164,7 +170,7 @@ class TimeSeriesObject(TimeSeries):
         This class has a :func:`TimeSeriesObject.compile_data` function to
         optimize the process but is still slow.
         """
-        super(TimeSeriesObject, self).__init__(reader)
+        super(TimeSeriesObject, self).__init__(reader, max_time)
 
         self._computed_data = None
 
@@ -179,6 +185,8 @@ class TimeSeriesObject(TimeSeries):
         :type name: str
         :param mapped_name: New name for the attribute.
         :type mapped_name: str
+        :param is_time_key: should be ``True`` if the modified name is the time key.
+        :type is_time_key: bool
 
         """
         super(TimeSeriesObject, self).map_attribute(name, mapped_name, is_time_key)
@@ -284,14 +292,16 @@ class TimeSeriesObject(TimeSeries):
 
 class SortedConstantStepTimeSeriesObject(TimeSeries):
 
+    # FIXME: minute for max_time is just for a specific example
     @accepts((1, Reader))
-    def __init__(self, reader):
+    @units.wraps(None, (None, None, units.minute), strict=False)
+    def __init__(self, reader, max_time=1*units.day):
         """
         __init__(self, reader)
 
         This class is a time series with a constant time step between each data.
         """
-        super(SortedConstantStepTimeSeriesObject, self).__init__(reader)
+        super(SortedConstantStepTimeSeriesObject, self).__init__(reader, max_time)
 
         self._start = 0
         self._interval = 1
@@ -314,6 +324,8 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
         :type name: str
         :param mapped_name: New name for the attribute.
         :type mapped_name: str
+        :param is_time_key: should be ``True`` if the modified name is the time key.
+        :type is_time_key: bool
 
         """
         super(SortedConstantStepTimeSeriesObject, self).\
@@ -342,7 +354,7 @@ class SortedConstantStepTimeSeriesObject(TimeSeries):
              (3, str))
     def load(self, time_converter=None, time_key='time'):
 
-        self._data = self._reader.load(data_type=float)
+        self._data = self._reader.load(data_type=float, nb_data=self.max_time)
         self._time_key = time_key
 
         if self._time_key in self._data:

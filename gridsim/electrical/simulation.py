@@ -6,6 +6,7 @@
 """
 
 import warnings
+import types
 
 import numpy as np
 from scipy.sparse import lil_matrix
@@ -30,7 +31,7 @@ class _BranchElectricalValues(object):
 
 class ElectricalSimulator(AbstractSimulationModule):
 
-    @accepts((1, AbstractElectricalLoadFlowCalculator))
+    @accepts((1, (AbstractElectricalLoadFlowCalculator, types.NoneType)))
     def __init__(self, calculator=None):
         """
         Gridsim main simulation class for electrical part. This module is
@@ -85,7 +86,7 @@ class ElectricalSimulator(AbstractSimulationModule):
 
 
     @property
-    @returns(AbstractElectricalLoadFlowCalculator)
+    @returns((AbstractElectricalLoadFlowCalculator, types.NoneType))
     def load_flow_calculator(self):
         """
         The load flow calculator
@@ -95,7 +96,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         return self._load_flow_calculator
 
     @load_flow_calculator.setter
-    @accepts((1, AbstractElectricalLoadFlowCalculator))
+    @accepts((1, (AbstractElectricalLoadFlowCalculator, types.NoneType)))
     def load_flow_calculator(self, new_calculator):
         self._load_flow_calculator = new_calculator
 
@@ -450,7 +451,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         """
 
 
-        if self._hasChanges and len(self._buses) > 1 \
+        if self.load_flow_calculator is not None and self._hasChanges and len(self._buses) > 1 \
                 and len(self._branches) > 0:
             # TODO: raise warning if self._as_orphans():
             self._prepare_matrices()
@@ -462,7 +463,7 @@ class ElectricalSimulator(AbstractSimulationModule):
         for element in self._cps_elements:
             element.update(time, delta_time)
 
-        if len(self._buses) > 1 and len(self._branches) > 0:
+        if self.load_flow_calculator is not None and len(self._buses) > 1 and len(self._branches) > 0:
             # put element powers into corresponding array
             # ----------------------------------------------------
             scale_factor = 1 / delta_time
