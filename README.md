@@ -83,6 +83,7 @@ The Gridsim Team is currently composed of :
  * Michael Sequeira Carvalho (michael.sequeira@hevs.ch)
  * Pierre Ferrez (pierre.ferrez@hevs.ch)
  * Pierre Roduit (pierre.roduit@hevs.ch)
+ * Yann Maret (yann.maret@hevs.ch)
 
 
 7. Contacts
