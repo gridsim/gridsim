@@ -57,7 +57,7 @@ from .core import AbstractSimulationElement, AbstractSimulationModule
 from .util import Position
 from .unit import units
 
-from .timemanager import TimeManager
+from .execution import ExecutionManager
 
 
 class Recorder(object):
@@ -186,8 +186,8 @@ class Simulator(object):
         """
         Simulator._simulation_modules.append(module_class)
 
-    @accepts((1,TimeManager))
-    def __init__(self, timemanager):
+    @accepts((1, ExecutionManager))
+    def __init__(self, executionmanager):
         """
         __init__(self)
 
@@ -200,7 +200,7 @@ class Simulator(object):
         """
         super(Simulator, self).__init__()
 
-        self.timemanager = timemanager
+        self._executionmanager = executionmanager
 
         # Create an instance for each simulation module.
         self._modules = {}
@@ -425,13 +425,14 @@ class Simulator(object):
         """
         if self.time is None:
             self.reset()
-        self.timemanager.reset()
+        self._executionmanager.reset()
 
         end_time = self.time + run_time
         self._update(delta_time)
         while self.time < end_time:
-            self.timemanager.wait()
+            self._executionmanager.preprocess()
             self._step(delta_time)
+            self._executionmanager.postprocess()
 
     # Internal class. Holds a recorder and the binding of the recorder to an
     # attribute of an object.

@@ -53,10 +53,11 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
             a.reset()
 
     def calculate(self, time, delta_time):
-        read = self.readParams()
-        for r in self.readparamlist:
-            r.pushReadParam(read.pop(0))
-        for w in self.writeparamlist:
+        read = self.readParams() #give it in the right order
+        if read != None:
+            for r in self.readparamlist:
+                r.pushReadParam(read.pop(0))
+        for w in self.writeparamlist:#check for multiple write in one time
             self.writeParams(w.paramtype,w.getWriteParam())
 
     def update(self, time, delta_time):

@@ -23,7 +23,6 @@ class CyberPhysicalModule(AbstractSimulationModule):
             a.reset()
 
     def calculate(self, time, delta_time):
-        print('simulation time', time)
         for actor in self.lacps:
             actor.calculate(time, delta_time)
 
