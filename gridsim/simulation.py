@@ -394,6 +394,19 @@ class Simulator(object):
         self.time += delta_time_sec
         self._update(delta_time_sec)
 
+    @accepts((1, (int, float)))
+    def _end(self):
+
+        """
+        _end(self)
+
+        Inform all module that the simulation ended
+
+        """
+
+        for module in self._modules.values():
+            module.end(self.time)
+
     @units.wraps(None, (None, units.second))
     def step(self, delta_time):
         """
@@ -427,12 +440,17 @@ class Simulator(object):
             self.reset()
         self._executionmanager.reset()
 
+        self._executionmanager.preprocess()
         end_time = self.time + run_time
         self._update(delta_time)
+        self._executionmanager.postprocess()
+
         while self.time < end_time:
             self._executionmanager.preprocess()
             self._step(delta_time)
             self._executionmanager.postprocess()
+
+        self._end()
 
     # Internal class. Holds a recorder and the binding of the recorder to an
     # attribute of an object.
