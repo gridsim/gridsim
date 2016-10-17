@@ -183,10 +183,22 @@ class AbstractSimulationModule(object):
         """
         raise NotImplementedError('Abstract method called!')
 
+    @accepts((1, (int, float)))
+    def end(self, time):
+        """
+
+        end(self,time)
+
+        Inform all the module of the simulation that the simulation has reached the end
+
+        :param time: end time
+        """
+        #TODO raise NotImplementedError('Abstract method called!')
+        pass
 
 class AbstractSimulationElement(object):
 
-    @accepts((1, str), (2, (int, type(None))))
+    #@accepts((1, str), (2, (int, type(None))))
     def __init__(self, friendly_name, element_id=None):
         """
         __init__(self, friendly_name, element_id=None)
@@ -273,3 +285,7 @@ class AbstractSimulationElement(object):
         :type delta_time: time, see :mod:`gridsim.unit`
         """
         raise NotImplementedError('Pure abstract method!')
+
+    @accepts((1, (int, float)))
+    def end(self, time):
+        pass
