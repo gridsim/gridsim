@@ -343,11 +343,11 @@ class ElectricalSimulator(AbstractSimulationModule):
         :func:`ElectricalSimulator.add`.
         """
         for element in self._buses:
-            element.reset()
+            element.init()
         for element in self._branches:
-            element.reset()
+            element.init()
         for element in self._cps_elements:
-            element.reset()
+            element.init()
 
     def _has_orphans(self):
         # TODO: check that all element are attached to a bus and that all buses
