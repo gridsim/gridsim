@@ -5,16 +5,13 @@
 
 """
 
+from gridsim.core import AbstractSimulationElement
 from gridsim.cyberphysical.external import Actor
 
 from gridsim.iodata.input import CSVReader
 from gridsim.timeseries import TimeSeriesObject
 
-from gridsim.core import AbstractSimulationElement
-
-from pqcontroller import ParamType
-
-import struct
+from paramtype import ParamType
 
 class PQFileReader(Actor,AbstractSimulationElement):
 
@@ -24,7 +21,7 @@ class PQFileReader(Actor,AbstractSimulationElement):
         __init__(self, friendly_name, infile, outfile, readparamlist, writeparamlist)
 
         Initialize the PQFileReader Actor with the readparam and writeparam dependency list.
-        Datas are read from infile, and get to the simulation on getValue
+        Datas are read from infile, and get to the simulation on getValue function call
 
         :param friendly_name: Element name id
         :param infile: csv file to read value from (P,Q)
@@ -59,14 +56,11 @@ class PQFileReader(Actor,AbstractSimulationElement):
         initFile(self)
 
         Initialize the File to read data from
-
         """
-        self._fileinput[ParamType.un1_P] = 'pa'
-        self._fileinput[ParamType.un1_Q] = 'qa'
-        self._fileinput[ParamType.un2_P] = 'pb'
-        self._fileinput[ParamType.un2_Q] = 'qb'
-        self._fileinput[ParamType.un3_P] = 'pc'
-        self._fileinput[ParamType.un3_Q] = 'qc'
+
+        self._fileinput = {ParamType.un1_P:'pa',ParamType.un1_Q:'qa',
+                           ParamType.un2_P:'pb',ParamType.un2_Q:'qb',
+                           ParamType.un3_P:'pc',ParamType.un3_Q:'qc'}
 
         self._infile.load()
 
@@ -91,16 +85,16 @@ class PQFileReader(Actor,AbstractSimulationElement):
         """
         self.readid = self.readid + 1
         self._outstorage[paramtype] = data
+        print paramtype,data
         if self.readid == self._outlog:
             print 'notify', self._outstorage
             joined = ''
             for value in self._outstorage.values():
-                joined = str(value) + ','
+                joined = joined + str(value) + ','
 
             if len(joined) > 1:
                 joined = joined[:-1] + '\n'
 
-            print 'notify linked list',joined
             self._outfile.write(str(joined))
             self._outfile.flush()
             self.readid = 0
@@ -120,12 +114,7 @@ class PQFileReader(Actor,AbstractSimulationElement):
                 print 'get value', self._instorage
                 self.writeid = 0
 
-            if 'p' in self._fileinput[paramtype]:
-                val = val/22*10
-            if 'q' in self._fileinput[paramtype]:
-                val = (val - 1990) * -1 / 2.254
-
-            return int(struct.pack('>h', val).encode('hex'), 16)
+            return val
 
     def kill(self,time):
         """

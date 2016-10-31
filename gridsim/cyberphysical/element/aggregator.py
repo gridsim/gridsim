@@ -20,18 +20,18 @@ class SumAggregator(Aggregator):
         """
         super(SumAggregator, self).__init__()
 
-    def call(self,unitlist):
+    def call(self,datalist):
         """
 
-        call(self,unitlist)
+        call(self,datalist)
 
-        Aggregate the unitlist with a sum and return the result
+        Aggregate the datalist with a sum and return the result
 
-        :param unitlist: list of data to aggregate, in this case it's a sum
+        :param datalist: list of data to aggregate, in this case it's a sum
         :return: the sum of the given list value
         """
         res = 0
-        for u in unitlist:
+        for u in datalist:
             try:
                 res = res + int(u)
             except TypeError:
