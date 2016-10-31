@@ -394,7 +394,6 @@ class Simulator(object):
         self.time += delta_time_sec
         self._update(delta_time_sec)
 
-    @accepts((1, (int, float)))
     def _end(self):
 
         """
