@@ -5,10 +5,10 @@
 
 """
 
-from gridsim.decorators import accepts
-from gridsim.core import AbstractSimulationModule
-
+from gridsim.core import AbstractSimulationModule, AbstractSimulationElement
 from .external import AbstractCyberPhysicalSystem
+
+from gridsim.decorators import accepts
 
 class CyberPhysicalModule(AbstractSimulationModule):
     def __init__(self):
@@ -77,6 +77,7 @@ class MinimalCyberPhysicalModule(AbstractSimulationModule):
         self.elements = []
         super(MinimalCyberPhysicalModule, self).__init__()
 
+    @accepts((1,AbstractSimulationElement))
     def add(self, element):
         element.id = len(self.elements)
         self.elements.append(element)

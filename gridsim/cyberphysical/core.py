@@ -7,16 +7,36 @@
 
 from gridsim.decorators import accepts
 
+class Converter(object):
+    def __init__(self, lmin, lmax, ldefault):
+        super(Converter, self).__init__()
+
+        self.lmin = lmin
+        self.lmax = lmax
+        self.ldefault = ldefault
+
+    def call(self,data):
+        """
+
+        call(self,data)
+
+        Convert the data before the writing system function
+
+        :param data: data to convert in a writing value
+        :return: the converted value
+        """
+        raise NotImplementedError('Pure abstract method!')
+
 class Aggregator(object):
     def __init__(self):
         super(Aggregator, self).__init__()
-    def call(self,unitlist):
+    def call(self,datalist):
         """
-        call(self,unitlist)
+        call(self,datalist)
 
-        Aggregate all the value passed in unitlist and return a single represented value
+        Aggregate all the value passed in datalist and return a single represented value
 
-        :param unitlist: list of value to be aggregated
+        :param datalist: list of value to be aggregated
         :return: a single represented value
         """
         raise NotImplementedError('Pure abstract method!')
@@ -39,20 +59,24 @@ class Callable(object):
         raise NotImplementedError('Pure abstract method!')
 
 class WriteParam(object):
-    def __init__(self, paramtype, aggregate):
+    #todo add control type on aggregate and converter
+    def __init__(self, paramtype, aggregate, converter=None):
         super(WriteParam, self).__init__()
 
         #aggregator function, does the aggregation when datas are received
         self._aggregator = aggregate
+        #converter function, does the conversion of the data before writing
+        self._converter = converter
+
         #write paramtype id correspond of the current WriteParam in use
         self.paramtype = paramtype
 
         #list of callable to call when the data needs to be updated
         self._callable = []
         #callable respond, datas will be processed with the aggregator function
-        self.unitlist = []
+        self.datalist = []
 
-    @accepts((1,Aggregator))
+    @accepts((1, Aggregator))
     def setAggregator(self,aggregator):
         """
 
@@ -64,6 +88,11 @@ class WriteParam(object):
         """
 
         self._aggregator = aggregator
+
+    @accepts((1, Converter))
+    def setConverter(self,converter):
+
+        self._converter = converter
 
     @accepts((1, Callable))
     def addCallable(self,callable):
@@ -87,38 +116,34 @@ class WriteParam(object):
         :return: aggregated value
         """
 
-        self.unitlist = []
+        self.datalist = []
         for c in self._callable:
-            self.unitlist.append(c.getValue(self.paramtype))
-        if self.aggregate == None:
-            raise NotImplementedError('Aggregate function not defined!')
+            self.datalist.append(c.getValue(self.paramtype))
+        if self._aggregator == None:
+            raise Exception('Aggregate function not defined!')
         else:
-            return self.aggregate(self.unitlist)
+            if self._converter == None:
+                return self.aggregate(self.datalist)
+            else:
+                return self.convert(self.aggregate(self.datalist))
 
-    def aggregate(self, unitlist):
+    def aggregate(self, datalist):
         """
 
-        aggregate(self, unitlist)
+        aggregate(self, datalist)
 
         Aggregate the value passed in parameters and return this value
 
-        :param unitlist: list of data to aggregate
+        :param datalist: list of data to aggregate
 
         :return: output of aggregate value
         """
 
-        return self._aggregator.call(unitlist)
+        return self._aggregator.call(datalist)
 
-    def reset(self):
-        """
+    def convert(self, data):
 
-        reset(self)
-
-        Reset the WriteParam object
-        """
-
-        self.unitlist = []
-        #self._callable = []
+        return self._converter.call(data)
 
 class ParamListener(object):
     def __init__(self):
@@ -166,7 +191,7 @@ class ReadParam(object):
     def pushReadParam(self,data):
         """
 
-        pushReadParam(self,unit)
+        pushReadParam(self,data)
 
         inform all Listener that a new data has been updated
 

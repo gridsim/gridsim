@@ -5,10 +5,10 @@
 
 """
 
-from gridsim.decorators import accepts
-from gridsim.core import AbstractSimulationElement, AbstractSimulationModule
-
+from gridsim.core import AbstractSimulationElement
 from gridsim.cyberphysical.core import Callable, ParamListener
+
+from gridsim.decorators import accepts
 
 class Actor(Callable, ParamListener):
     def __init__(self):
@@ -168,7 +168,7 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
 
         update(self,time,delta_time)
 
-        get aggregated values from Actors and write them on the system
+        Get aggregated values from Actors and write them on the system
         """
         for w in self.writeparamlist:
             self.writeParams(w.paramtype, w.getWriteParam())
@@ -179,7 +179,6 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         end(self, time)
 
         End and terminate all Actors in the simulation
-
         """
         for a in self.actors:
             a.kill(time)
