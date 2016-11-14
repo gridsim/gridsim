@@ -7,13 +7,14 @@
 
 from gridsim.core import AbstractSimulationElement
 from gridsim.cyberphysical.external import Actor
+from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 
 from gridsim.iodata.input import CSVReader
 from gridsim.timeseries import TimeSeriesObject
 
-from paramtype import ParamType
+import collections
 
-class PQFileReader(Actor,AbstractSimulationElement):
+class PQFileReader(Actor,AbstractSimulationElement,CyberPhysicalModuleListener):
 
     def __init__(self, friendly_name, infile, outfile, readparamlist, writeparamlist):
         """
@@ -37,6 +38,7 @@ class PQFileReader(Actor,AbstractSimulationElement):
 
         self._infile = TimeSeriesObject(CSVReader(infile))
         self._outfile = open(outfile,'w')
+        self._outfileinit = False
 
         self._fileinput = {}
         #temp out storage for logging to file
@@ -50,17 +52,20 @@ class PQFileReader(Actor,AbstractSimulationElement):
         self.readid = 0
         self.writeid = 0
 
-    def initFile(self):
+    def initFile(self, opcode):
         """
 
         initFile(self)
 
         Initialize the File to read data from
+        and prepare the output file
         """
+        self._fileinput = opcode
+        self._tempstat = {}
 
-        self._fileinput = {ParamType.un1_P:'pa',ParamType.un1_Q:'qa',
-                           ParamType.un2_P:'pb',ParamType.un2_Q:'qb',
-                           ParamType.un3_P:'pc',ParamType.un3_Q:'qc'}
+        for k,t in opcode.items():
+            attr = str(t[0]) + str(t[1]) + str(t[2])
+            self._tempstat[attr] = k
 
         self._infile.load()
 
@@ -76,51 +81,59 @@ class PQFileReader(Actor,AbstractSimulationElement):
     def calculate(self, time, delta_time):
         pass
 
-    def notifyReadParam(self,paramtype,data):
+    def cyberphysicalReadBegin(self):
+        pass
+
+    def cyberphysicalReadEnd(self):
+        """
+
+        cyberphysicalReadEnd(self)
+
+        print at the end of the step all the notified value inside a csv file.
+        """
+        self._outstorage = collections.OrderedDict(sorted(self._outstorage.items()))
+        if not self._outfileinit:
+            self._outfileinit = True
+            title = ','.join(i.replace('ParamType.','') for i in self._outstorage.keys())
+            self._outfile.write(title + '\n')
+        data = ','.join(str(i) for i in self._outstorage.values())
+        self._outfile.write(data + '\n')
+
+    def notifyReadParam(self,info,data):
         """
 
         notifyReadParam(self,paramtype,data)
 
         Log the measured data to the file
         """
-        self.readid = self.readid + 1
-        self._outstorage[paramtype] = data
-        print paramtype,data
-        if self.readid == self._outlog:
-            print 'notify', self._outstorage
-            joined = ''
-            for value in self._outstorage.values():
-                joined = joined + str(value) + ','
+        attr = ''
+        if len(info) == 2:
+            attr = str(info[1][0]) + str(info[1][1]) + str(info[0])
+        self._outstorage[attr] = data #create
 
-            if len(joined) > 1:
-                joined = joined[:-1] + '\n'
-
-            self._outfile.write(str(joined))
-            self._outfile.flush()
-            self.readid = 0
-
-    def getValue(self,paramtype):
+    def getValue(self,info):
         """
 
         getValue(self,paramtype)
 
         Read data from the file and update to the simulation the new value
         """
-        if paramtype in self._fileinput.keys():
-            val = getattr(self._infile,str(self._fileinput[paramtype]))
+        if len(info) == 2:
+            attr = str(info[0]) + str(info[1][0]) + str(info[1][1])
+        else:
+            return 0
+
+        if attr in self._tempstat.keys():
+            val = getattr(self._infile,str(self._tempstat[attr]))
             self.writeid = self.writeid + 1
-            self._instorage[paramtype] = val
+            self._instorage[attr] = val
             if self.writeid == self._inlog:
                 print 'get value', self._instorage
                 self.writeid = 0
 
             return val
 
-    def kill(self,time):
-        """
+    def cyberphysicalModuleEnd(self):
 
-        kill(self,time)
-
-        close the file before after the end of the simulation
-        """
+        print 'end simulation from PQFileReader'
         self._outfile.close()

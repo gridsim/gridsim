@@ -285,7 +285,3 @@ class AbstractSimulationElement(object):
         :type delta_time: time, see :mod:`gridsim.unit`
         """
         raise NotImplementedError('Pure abstract method!')
-
-    @accepts((1, (int, float)))
-    def end(self, time):
-        pass

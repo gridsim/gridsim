@@ -6,15 +6,14 @@
 """
 
 from gridsim.cyberphysical.external import Actor
-
-from paramtype import ParamType
+from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 
 import threading
 
 import msvcrt
 
 class _TerminalListener(object):
-    def __init__(self, pqcontroller):
+    def __init__(self, pqcontroller,opcode):
         """
 
         __init__(self,pqcontroller)
@@ -26,16 +25,14 @@ class _TerminalListener(object):
         super(_TerminalListener, self).__init__()
 
         #callback object
-        self.pqcontroller = pqcontroller
+        self._pqcontroller = pqcontroller
         #current string updated
-        self.temp = ''
+        self._temp = ''
         #new char entered by the user
-        self.c = ''
+        self._c = ''
 
         #code to identify the ParamType
-        self.opcode = {'pa':ParamType.un1_P,'qa':ParamType.un1_Q,
-                       'pb':ParamType.un2_Q,'qb':ParamType.un2_Q,
-                       'pc':ParamType.un3_Q,'qc':ParamType.un3_Q}
+        self._opcode = opcode
 
         #abort the listening
         self._abort = False
@@ -61,26 +58,30 @@ class _TerminalListener(object):
         """
         while not self._abort:
             if msvcrt.kbhit():
-                self.c = msvcrt.getch()
-                if self.c == 'e':
+                self._c = msvcrt.getch()
+                if self._c == 'e':
                     break
-                elif self.c == ' ':
-                    if ('p' in self.temp or 'q' in self.temp) and ('a' in self.temp or 'b' in self.temp or 'c' in self.temp):
+                elif self._c == ' ':
+                    if ('a' in self._temp or 'b' in self._temp or 'c' in self._temp or 'd' in self._temp) and \
+                            ('p' in self._temp or 'q' in self._temp) and \
+                            ('1' in self._temp or '2' in self._temp or '3' in self._temp):
                         print 'enter'
-                        if len(self.temp) > 2:
-                            value = self.temp[:len(self.temp)-2]
-                            code = self.temp[len(self.temp)-2:]
+                        if len(self._temp) > 3:
+                            value = self._temp[:len(self._temp)-3]
+                            code = self._temp[len(self._temp)-3:]
 
                             print value, code
 
-                            if code in self.opcode.keys():
-                                self.pqcontroller.changeValueFromTerm(self.opcode[code], value)
-                    self.temp = ''
+                            if code in self._opcode.keys():
+                                attr = self._opcode[code]
+                                attr = str(attr[0]) + str(attr[1]) + str(attr[2])
+                                self._pqcontroller.changeValueFromTerm(attr, value)
+                    self._temp = ''
                 else:
-                    self.temp  = self.temp + self.c
-                    print(self.temp)
+                    self._temp  = self._temp + self._c
+                    print(self._temp)
 
-class PQController(Actor):
+class PQController(Actor,CyberPhysicalModuleListener):
 
     terminal = None
 
@@ -99,25 +100,23 @@ class PQController(Actor):
         self.readparamtype = readparamlist
         self.writeparamtype = writeparamlist
 
-        self._consoleinput = {ParamType.un1_P: 0,ParamType.un1_Q: 1000,
-                              ParamType.un2_P: 0, ParamType.un2_Q: 1000,
-                              ParamType.un3_P: 0, ParamType.un3_Q: 1000,}
+        self._consoleinput = {}
 
-    def initConsole(self):
+    def initConsole(self,opcode):
         """
 
         initConsole(self)
 
         Initialize the terminal listener with a thread
         """
-        PQController.terminal = _TerminalListener(self)
+        PQController.terminal = _TerminalListener(self,opcode)
         t = threading.Thread(target=PQController.terminal.start)
         t.start()
 
     def init(self):
         pass
 
-    def notifyReadParam(self, paramtype, data):
+    def notifyReadParam(self, info, data):
         """
 
         notifyReadParam(self,paramtype,data)
@@ -127,9 +126,9 @@ class PQController(Actor):
         :param paramtype: paramtype of data updated
         :param data: data updated
         """
-        print('notifyReadParam ' + str(paramtype) + ' ' + str(data))
+        print 'notifyReadParam', str(info), str(data)
 
-    def changeValueFromTerm(self, paramtype, value):
+    def changeValueFromTerm(self, code, value):
         """
 
         changeValueFromTerm(self,paramtype,value)
@@ -139,10 +138,10 @@ class PQController(Actor):
         :param paramtype: paramtype id of the data
         :param value: new data entered by the user on the console
         """
-        self._consoleinput[paramtype] = value
-        print paramtype, value
+        self._consoleinput[code] = value
+        print code, value
 
-    def getValue(self, paramtype):
+    def getValue(self, info):
         """
 
         getValue(self,paramtype)
@@ -152,18 +151,25 @@ class PQController(Actor):
         :param paramtype: paramtype of the returned value
         :return: compensate user's value entered on the keyboard
         """
-        if paramtype in self._consoleinput.keys():
-            print('getValue ' + str(paramtype) + ' ' + str(self._consoleinput[paramtype]))
-            return self._consoleinput[paramtype]
+        print 'getValue', info
+        attr = ''
+        if len(info) == 2:
+            attr = str(info[0]) + str(info[1][0]) + str(info[1][1])
+        else:
+            return 0
 
-    def kill(self,time):
+        if attr in self._consoleinput.keys():
+            print('getValue ' + str(attr) + ' ' + str(self._consoleinput[attr]))
+            return self._consoleinput[attr]
+        return 0
+
+    def cyberphysicalModuleEnd(self):
         """
 
-        kill(self,time)
+        cyberphysicalModuleEnd(self)
 
-        Terminate the thread when the simulation reaches the end
-
-        :param time: end time
+        Terminate the terminal listening
         """
+
         if PQController.terminal != None:
             PQController.terminal.abort()

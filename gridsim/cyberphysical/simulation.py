@@ -10,6 +10,32 @@ from .external import AbstractCyberPhysicalSystem
 
 from gridsim.decorators import accepts
 
+class CyberPhysicalModuleListener(object):
+    def __init__(self):
+        """
+        __init__(self)
+
+        CyberPhysicalModuleListener is a listener interface, inform when the module start a
+        read or a write at the beginning and when it's done.
+        
+        """
+        #fixme
+        #super(CyberPhysicalModuleListener, self).__init__()
+        pass
+
+    def cyberphysicalReadBegin(self):
+        pass
+    def cyberphysicalReadEnd(self):
+        pass
+
+    def cyberphysicalWriteBegin(self):
+        pass
+    def cyberphysicalWriteEnd(self):
+        pass
+
+    def cyberphysicalModuleEnd(self):
+        pass
+
 class CyberPhysicalModule(AbstractSimulationModule):
     def __init__(self):
         """
@@ -22,6 +48,7 @@ class CyberPhysicalModule(AbstractSimulationModule):
         super(CyberPhysicalModule, self).__init__()
 
         self.lacps = []
+        self.listener = []
 
     @accepts((1,AbstractCyberPhysicalSystem))
     def add(self, acps):
@@ -37,6 +64,11 @@ class CyberPhysicalModule(AbstractSimulationModule):
         acps.id = len(self.lacps)
         self.lacps.append(acps)
         return acps
+
+    @accepts((1, CyberPhysicalModuleListener))
+    def addModuleListener(self, actor):
+
+        self.listener.append(actor)
 
     def attribute_name(self):
         """
@@ -54,16 +86,24 @@ class CyberPhysicalModule(AbstractSimulationModule):
             cps.reset()
 
     def calculate(self, time, delta_time):
+        for l in self.listener:
+            l.cyberphysicalReadBegin()
         for cps in self.lacps:
             cps.calculate(time, delta_time)
+        for l in self.listener:
+            l.cyberphysicalReadEnd()
 
     def update(self, time, delta_time):
+        for l in self.listener:
+            l.cyberphysicalWriteBegin()
         for cps in self.lacps:
             cps.update(time, delta_time)
+        for l in self.listener:
+            l.cyberphysicalWriteEnd()
 
     def end(self, time):
-        for cps in self.lacps:
-            cps.end(time)
+        for l in self.listener:
+            l.cyberphysicalModuleEnd()
 
 class MinimalCyberPhysicalModule(AbstractSimulationModule):
 

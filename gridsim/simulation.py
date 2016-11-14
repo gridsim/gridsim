@@ -449,6 +449,10 @@ class Simulator(object):
             self._step(delta_time)
             self._executionmanager.postprocess()
 
+        if True: # from a cyberphysicalsystem need to end with a calculate 'Read'
+            self._executionmanager.preprocess()
+            self._calculate(delta_time)
+
         self._end()
 
     # Internal class. Holds a recorder and the binding of the recorder to an

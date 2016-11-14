@@ -60,7 +60,7 @@ class Callable(object):
 
 class WriteParam(object):
     #todo add control type on aggregate and converter
-    def __init__(self, paramtype, aggregate, converter=None):
+    def __init__(self, paramtype, aggregate, info=None, converter=None):
         super(WriteParam, self).__init__()
 
         #aggregator function, does the aggregation when datas are received
@@ -70,6 +70,7 @@ class WriteParam(object):
 
         #write paramtype id correspond of the current WriteParam in use
         self.paramtype = paramtype
+        self.info = info
 
         #list of callable to call when the data needs to be updated
         self._callable = []
@@ -118,7 +119,7 @@ class WriteParam(object):
 
         self.datalist = []
         for c in self._callable:
-            self.datalist.append(c.getValue(self.paramtype))
+            self.datalist.append(c.getValue((self.paramtype,self.info)))
         if self._aggregator == None:
             raise Exception('Aggregate function not defined!')
         else:
@@ -151,27 +152,27 @@ class ParamListener(object):
         #super(ParamListener, self).__init__()
         pass
 
-    def notifyReadParam(self,paramtype,data):
+    def notifyReadParam(self,info,data):
         """
 
         notifyReadParam(self,paramtype,data)
 
         notify the listener that a new value from the simulator has been updated
 
-        :param paramtype: paramtype id of the data notified
+        :param info: paramtype id of the data notified
         :param data: data updated itself
         """
-
         raise NotImplementedError('Pure abstract method!')
 
 class ReadParam(object):
-    def __init__(self, paramtype):
+    def __init__(self, paramtype, info):
         super(ReadParam, self).__init__()
 
         #registerd listener for the specific paramtype id
         self._listener = []
         #saved data, when data is updated
-        self.data = None
+        self._data = None
+        self.info = info
         #the paramtype that listener subscribed on
         self.paramtype = paramtype
 
@@ -185,7 +186,6 @@ class ReadParam(object):
 
         :param listener: listener to add to list
         """
-
         self._listener.append(listener)
 
     def pushReadParam(self,data):
@@ -195,9 +195,9 @@ class ReadParam(object):
 
         inform all Listener that a new data has been updated
 
+        :param info: pass some information for the read param
         :param data: updated data published to all listener register in the list
         """
-
-        self.data = data
+        self._data = data
         for l in self._listener:
-            l.notifyReadParam(self.paramtype,self.data)
+            l.notifyReadParam((self.paramtype,self.info),data)

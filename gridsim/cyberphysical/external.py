@@ -59,17 +59,6 @@ class Actor(Callable, ParamListener):
         """
         return self.readparamtype
 
-    def kill(self,time):
-        """
-
-        kill(self,time)
-
-        Terminate the simulation
-
-        :param time:
-        """
-        raise NotImplementedError('Pure abstract method!')
-
 class AbstractCyberPhysicalSystem(AbstractSimulationElement):
     def __init__(self,friendly_name):
         """
@@ -161,7 +150,10 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         read = self.readParams() #give it in the right order
         if read != None:
             for r in self.readparamlist:
-                r.pushReadParam(read.pop(0))
+                if len(read) != 0:
+                    r.pushReadParam(read.pop(0))
+                else:
+                    break
 
     def update(self, time, delta_time):
         """
@@ -172,13 +164,3 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         """
         for w in self.writeparamlist:
             self.writeParams(w.paramtype, w.getWriteParam())
-
-    def end(self, time):
-        """
-
-        end(self, time)
-
-        End and terminate all Actors in the simulation
-        """
-        for a in self.actors:
-            a.kill(time)
