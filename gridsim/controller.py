@@ -77,7 +77,7 @@ class ControllerSimulator(AbstractSimulationModule):
         .. seealso:: :func:`gridsim.core.AbstractSimulationModule.reset`.
         """
         for controller in self._controllers:
-            controller.init()
+            controller.reset()
 
     @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):

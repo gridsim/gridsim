@@ -79,9 +79,9 @@ class ThermalSimulator(AbstractSimulationModule):
         :func:`ThermalSimulator.add`.
         """
         for process in self._processes:
-            process.init()
+            process.reset()
         for coupling in self._couplings:
-            coupling.init()
+            coupling.reset()
 
     @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
