@@ -67,7 +67,6 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
 
         AbstractCyberPhysicalSystem class create ReadParam and WriteParam that Actors can register on.
 
-
         :param friendly_name:
         """
         super(AbstractCyberPhysicalSystem, self).__init__(friendly_name)
@@ -94,10 +93,12 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         rparamlist = actor.getListReadParam()
         wparamlist = actor.getListWriteParam()
 
+        #subscribe actors when the cyberphysicalsystem support the paramtype on write
         for w in self.writeparamlist:
             for a in wparamlist:
                 if a == w.paramtype:
                     w.addCallable(actor)
+        # subscribe actors when the cyberphysicalsystem support the paramtype on read
         for r in self.readparamlist:
             for a in rparamlist:
                 if a == r.paramtype:
@@ -135,10 +136,13 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
 
         reset(self)
 
-        Reset and Initialize all actor registered
+        Reset and Initialize all actors registered
         """
-        for a in self.actors:
-            a.init()
+        #fixme all the actors are called from each cyberphysicalsystem they register on
+        #for a in self.actors:
+        #    a.init()
+        pass
+
 
     def calculate(self, time, delta_time):
         """
@@ -150,10 +154,12 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         read = self.readParams() #give it in the right order
         if read != None:
             for r in self.readparamlist:
+                #check the len of the read data and compare to the readparamlist
                 if len(read) != 0:
                     r.pushReadParam(read.pop(0))
                 else:
-                    break
+                    raise Exception('Missing data from physical device to read - not enough data compare to the readparamlist given')
+                    #break
 
     def update(self, time, delta_time):
         """

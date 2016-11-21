@@ -9,6 +9,17 @@ from gridsim.decorators import accepts
 
 class Converter(object):
     def __init__(self, lmin, lmax, ldefault):
+        """
+
+        __init__(self,lmin,lmax,ldefault)
+
+        Convert the data to an other that is comprehensible by the physical device.
+        Check the limit after conversion with de limit data passed in parameters.
+
+        :param lmin: down limit
+        :param lmax: upper limit
+        :param ldefault: default value on conversion fail
+        """
         super(Converter, self).__init__()
 
         self.lmin = lmin
@@ -32,6 +43,7 @@ class Aggregator(object):
         super(Aggregator, self).__init__()
     def call(self,datalist):
         """
+
         call(self,datalist)
 
         Aggregate all the value passed in datalist and return a single represented value
@@ -48,6 +60,7 @@ class Callable(object):
         pass
     def getValue(self,paramtype):
         """
+
         getValue(self,paramtype)
 
         This function is called by the simulation each time a new value is required with
@@ -59,7 +72,7 @@ class Callable(object):
         raise NotImplementedError('Pure abstract method!')
 
 class WriteParam(object):
-    #todo add control type on aggregate and converter
+    #Todo add control type on aggregate and converter
     def __init__(self, paramtype, aggregate, info=None, converter=None):
         super(WriteParam, self).__init__()
 
@@ -87,12 +100,18 @@ class WriteParam(object):
 
         :param aggregator: aggregator function
         """
-
         self._aggregator = aggregator
 
     @accepts((1, Converter))
     def setConverter(self,converter):
+        """
 
+        setConverter(self,converter)
+
+        Call this function to update the converter object
+
+        :param converter: converter object to call on write
+        """
         self._converter = converter
 
     @accepts((1, Callable))
@@ -105,7 +124,6 @@ class WriteParam(object):
 
         :param callable: callable to add to the list
         """
-
         self._callable.append(callable)
 
     def getWriteParam(self):
@@ -116,10 +134,9 @@ class WriteParam(object):
 
         :return: aggregated value
         """
-
         self.datalist = []
         for c in self._callable:
-            self.datalist.append(c.getValue((self.paramtype,self.info)))
+            self.datalist.append(c.getValue(self.info))
         if self._aggregator == None:
             raise Exception('Aggregate function not defined!')
         else:
@@ -139,7 +156,6 @@ class WriteParam(object):
 
         :return: output of aggregate value
         """
-
         return self._aggregator.call(datalist)
 
     def convert(self, data):
@@ -157,7 +173,7 @@ class ParamListener(object):
 
         notifyReadParam(self,paramtype,data)
 
-        notify the listener that a new value from the simulator has been updated
+        Notify the listener that a new value from the simulator has been updated
 
         :param info: paramtype id of the data notified
         :param data: data updated itself
@@ -193,11 +209,11 @@ class ReadParam(object):
 
         pushReadParam(self,data)
 
-        inform all Listener that a new data has been updated
+        Inform all Listener that a new data has been updated
 
         :param info: pass some information for the read param
         :param data: updated data published to all listener register in the list
         """
         self._data = data
         for l in self._listener:
-            l.notifyReadParam((self.paramtype,self.info),data)
+            l.notifyReadParam(self.info,data)
