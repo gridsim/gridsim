@@ -22,7 +22,7 @@ class PQFileReader(Actor,AbstractSimulationElement,CyberPhysicalModuleListener):
         __init__(self, friendly_name, infile, outfile, readparamlist, writeparamlist)
 
         Initialize the PQFileReader Actor with the readparam and writeparam dependency list.
-        Datas are read from infile, and get to the simulation on getValue function call
+        Datas are read from infile, and get to the simulation on getValue function call.
 
         :param friendly_name: Element name id
         :param infile: csv file to read value from (P,Q)
@@ -37,7 +37,10 @@ class PQFileReader(Actor,AbstractSimulationElement,CyberPhysicalModuleListener):
         self.writeparamtype = writeparamlist
 
         self._infile = TimeSeriesObject(CSVReader(infile))
-        self._outfile = open(outfile,'w')
+        if not outfile == None:
+            self._outfile = open(outfile,'w')
+        else:
+            self._outfile = None
         self._outfileinit = False
 
         self._fileinput = {}
@@ -57,13 +60,14 @@ class PQFileReader(Actor,AbstractSimulationElement,CyberPhysicalModuleListener):
 
         initFile(self)
 
-        Initialize the File to read data from
-        and prepare the output file
+        Initialize the File to read data from,
+        and prepare the output file.
         """
         self._fileinput = opcode
         self._tempstat = {}
 
         for k,t in opcode.items():
+            print t
             attr = str(t[0]) + str(t[1]) + str(t[2])
             self._tempstat[attr] = k
 
@@ -89,46 +93,53 @@ class PQFileReader(Actor,AbstractSimulationElement,CyberPhysicalModuleListener):
 
         cyberphysicalReadEnd(self)
 
-        print at the end of the step all the notified value inside a csv file.
+        Print at the end of the step all the notified value inside a csv file.
         """
-        self._outstorage = collections.OrderedDict(sorted(self._outstorage.items()))
-        if not self._outfileinit:
-            self._outfileinit = True
-            title = ','.join(i.replace('ParamType.','') for i in self._outstorage.keys())
-            self._outfile.write(title + '\n')
-        data = ','.join(str(i) for i in self._outstorage.values())
-        self._outfile.write(data + '\n')
+        #push all the data after the read is finished in the log file
+        if not self._outfile == None:
+            self._outstorage = collections.OrderedDict(sorted(self._outstorage.items()))
+            if not self._outfileinit:
+                self._outfileinit = True
+                title = ','.join(i.replace('ParamType.','') for i in self._outstorage.keys())
+                self._outfile.write(title + '\n')
+            data = ','.join(str(i) for i in self._outstorage.values())
+            self._outfile.write(data + '\n')
+            self._outfile.flush()
 
     def notifyReadParam(self,info,data):
         """
 
         notifyReadParam(self,paramtype,data)
 
-        Log the measured data to the file
+        Log the measured data to the file.
         """
+        #save data to temp list
         attr = ''
-        if len(info) == 2:
-            attr = str(info[1][0]) + str(info[1][1]) + str(info[0])
-        self._outstorage[attr] = data #create
+        if len(info) == 3:
+            attr = str(info[0]) + str(info[1]) + str(info[2])
+        self._outstorage[attr] = data
 
-    def getValue(self,info):
+    def getValue(self,paramtype):
         """
 
         getValue(self,paramtype)
 
-        Read data from the file and update to the simulation the new value
+        Read data from the file and update to the simulation the new value.
+        :param info: paramtype registered on
+        :return: data corresponding to info
         """
-        if len(info) == 2:
-            attr = str(info[0]) + str(info[1][0]) + str(info[1][1])
+        #Todo change the paramtype key (attr) in the list
+        if len(paramtype) == 3:
+            attr = str(paramtype[0]) + str(paramtype[1]) + str(paramtype[2])
         else:
             return 0
 
+        #get the new data from the file based on paramtype
         if attr in self._tempstat.keys():
             val = getattr(self._infile,str(self._tempstat[attr]))
             self.writeid = self.writeid + 1
             self._instorage[attr] = val
             if self.writeid == self._inlog:
-                print 'get value', self._instorage
                 self.writeid = 0
 
             return val
@@ -136,4 +147,6 @@ class PQFileReader(Actor,AbstractSimulationElement,CyberPhysicalModuleListener):
     def cyberphysicalModuleEnd(self):
 
         print 'end simulation from PQFileReader'
-        self._outfile.close()
+
+        if not self._outfile == None:
+            self._outfile.close()

@@ -15,7 +15,7 @@ class QConverter(Converter):
 
         __init__(self)
 
-        convert the data to a writable value for the simulation
+        Convert the data to a writable value for the simulation
 
         """
         super(QConverter, self).__init__(lmin,lmax,ldefault)
@@ -25,7 +25,7 @@ class QConverter(Converter):
 
         call(self,data)
 
-        convert reactive power
+        Convert reactive power
 
         :param data: data to convert
         :return: the converted value
@@ -43,7 +43,7 @@ class PConverter(Converter):
 
         __init__(self)
 
-        convert the data to a writable value for the simulation
+        Convert the data to a writable value for the simulation
 
         """
         super(PConverter, self).__init__(lmin,lmax,ldefault)
@@ -53,7 +53,7 @@ class PConverter(Converter):
 
         call(self,data)
 
-        convert active power
+        Convert active power
 
         :param data, data to convert
         :return the converted value

@@ -43,7 +43,6 @@ class _TerminalListener(object):
         abort(self)
 
         Abort the listening on the keyboard
-
         """
         self._abort = True
 
@@ -53,8 +52,7 @@ class _TerminalListener(object):
         start(self)
 
         Listen on the keyboard and inform back the pqcontroller when new data are entered.
-        EX: 5000pa [SPACE] means 5000 active power on the first unit (A)
-
+        EX: 5000a1p [SPACE] means 5000 active power (p) of the first district (1) on the first house (A)
         """
         while not self._abort:
             if msvcrt.kbhit():
@@ -121,7 +119,7 @@ class PQController(Actor,CyberPhysicalModuleListener):
 
         notifyReadParam(self,paramtype,data)
 
-        get new data from the simulation
+        Get new data from the simulation
 
         :param paramtype: paramtype of data updated
         :param data: data updated
@@ -133,7 +131,7 @@ class PQController(Actor,CyberPhysicalModuleListener):
 
         changeValueFromTerm(self,paramtype,value)
 
-        This function is called by the terminal listener when new data is available
+        This function is called by the terminal listener when new data are available
 
         :param paramtype: paramtype id of the data
         :param value: new data entered by the user on the console
@@ -146,20 +144,18 @@ class PQController(Actor,CyberPhysicalModuleListener):
 
         getValue(self,paramtype)
 
-        return the value corresponding to the paramtype given in parameter
+        Return the value corresponding to the paramtype given in parameter
 
         :param paramtype: paramtype of the returned value
         :return: compensate user's value entered on the keyboard
         """
-        print 'getValue', info
-        attr = ''
         if len(info) == 2:
             attr = str(info[0]) + str(info[1][0]) + str(info[1][1])
         else:
             return 0
 
         if attr in self._consoleinput.keys():
-            print('getValue ' + str(attr) + ' ' + str(self._consoleinput[attr]))
+            #print('getValue ' + str(attr) + ' ' + str(self._consoleinput[attr]))
             return self._consoleinput[attr]
         return 0
 
@@ -170,6 +166,5 @@ class PQController(Actor,CyberPhysicalModuleListener):
 
         Terminate the terminal listening
         """
-
         if PQController.terminal != None:
             PQController.terminal.abort()

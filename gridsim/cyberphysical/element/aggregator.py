@@ -9,7 +9,6 @@ from gridsim.cyberphysical.core import Aggregator
 
 class SumAggregator(Aggregator):
     def __init__(self):
-
         """
 
         __init__(self)
@@ -35,5 +34,23 @@ class SumAggregator(Aggregator):
             try:
                 res = res + int(u)
             except TypeError:
-                return 0
+                raise Exception('Cannot aggregate data - TypeError on int conversion')
         return res
+
+class MeanAggregator(Aggregator):
+    def __init__(self):
+        """
+
+        __init__(self)
+
+        Mean Aggregator class. This does the average value after calling the SumAggregator 'call' function
+
+        """
+        super(MeanAggregator, self).__init__()
+
+        self._sumaggregator = SumAggregator()
+
+    def call(self,datalist):
+        #calculate the average value of the datalist passed in parameter
+        return self._sumaggregator.call(datalist)/len(datalist)
+
