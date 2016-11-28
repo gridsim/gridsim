@@ -8,9 +8,12 @@
 from gridsim.core import AbstractSimulationElement
 from gridsim.cyberphysical.core import Callable, ParamListener, Converter
 
-
 from gridsim.decorators import accepts, returns
+
 import types
+import time
+import threading
+from threading import Lock
 
 class Actor(Callable, ParamListener):
     def __init__(self):
@@ -69,7 +72,7 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         AbstractCyberPhysicalSystem class create ReadParam and WriteParam that Actors can register on.
 
         :param friendly_name: give a friendly name for the element in the simulation
-        :param converters: list of converter function for the write params
+        :param converters: list of Converter function for the write params
         """
         super(AbstractCyberPhysicalSystem, self).__init__(friendly_name)
 
@@ -80,7 +83,11 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         # list of ReadParam instance created
         self.read_params = []
 
+        #this is the converter object for the physical device
         self.converters = converters
+
+        #mutex for the feedback control
+        #self.mutex = Lock()
 
     @accepts((1, Actor))
     @returns((Actor))
@@ -112,6 +119,18 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         self.actors.append(actor)
         return actor
 
+    # fixme regulation manager
+    # @returns((int, float))
+    # def physical_read_regulation(self, write_param):
+    #     """
+    #     physical_read_regulation(self, write_param):
+    #
+    #     This is the measure value for regulator
+    #
+    #     :return: read value from physical device
+    #     """
+    #     raise NotImplementedError('Pure abstract method!')
+
     def physical_read_params(self):
         """
         physical_read_params(self)
@@ -123,6 +142,7 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         raise NotImplementedError('Pure abstract method!')
 
     @accepts((2, (dict, types.NoneType)))
+    @returns((dict))
     def physical_converter_params(self, write_params):
         """
         physical_converter_params(self,write_params)
@@ -136,10 +156,22 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         for write_param,value in write_params.items():
             if write_param in self.converters.keys():
                 converter = self.converters[write_param]
-                #TODO check instance with exception
+                #TODO check instance with exception (subclass)
                 write_params[write_param] = converter.call(value)
 
         return write_params
+
+    # fixme regulation manager
+    # def physical_regulation_params(self,write_params):
+    #     """
+    #     physical_regulation_params(self,write_params)
+    #
+    #     blabla
+    #
+    #     :param write_params:
+    #     :return:
+    #     """
+    #     raise NotImplementedError('Pure abstract method!')
 
     def physical_write_params(self, write_params):
         """
@@ -151,12 +183,36 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         """
         raise NotImplementedError('Pure abstract method!')
 
+    # fixme regulation manager
+    # def do_regulation(self, write_param, data):
+    #     """
+    #     do_regulation(self,write_param,data)
+    #
+    #     :param write_param:
+    #     :param data:
+    #     :return:
+    #     """
+    #     self.mutex.acquire()
+    #     self.physical_write_params(self.physical_converter_params({write_param:data}))
+    #     self.mutex.release()
+    #     time.sleep(2)
+    #
+    #     for i in range(0,3):
+    #         self.mutex.acquire()
+    #         print write_param, data
+    #         error = data - self.physical_read_regulation(write_param)
+    #         get_new_params = self.physical_regulation_params({write_param:error})
+    #         write_value= self.physical_converter_params({write_param:get_new_params+data})
+    #         self.physical_write_params({write_param:write_value})
+    #         self.mutex.release()
+    #         time.sleep(5)
+
     def reset(self):
         pass
 
-    def calculate(self, time, delta_time):
+    def calculate(self, t, dt):
         """
-        calculate(self,time,dela_time)
+        calculate(self,t,dt)
 
         Read all ReadParam on the system and inform the updated values to all Actors
         """
@@ -170,7 +226,7 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
                     raise Exception('Missing data from physical device to read -'
                                     ' not enough data compare to the read params given')
 
-    def update(self, time, delta_time):
+    def update(self, t, dt):
         """
         update(self,time,delta_time)
 
@@ -184,3 +240,13 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
             write_params[w.write_param] = w.get_value()
         self.physical_converter_params(write_params)
         self.physical_write_params(write_params)
+
+        #fixme regulation feedback control
+        # threads = []
+        # for w in self.write_params:
+        #     thread = threading.Thread(target=self.do_regulation, args = (w.write_param, w.get_value(),))
+        #     threads.append(thread)
+        #     thread.start()
+        #
+        # for th in threads:
+        #     th.join()
