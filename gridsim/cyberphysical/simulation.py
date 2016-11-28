@@ -11,7 +11,7 @@ from .external import AbstractCyberPhysicalSystem
 from gridsim.decorators import accepts, returns
 
 
-class CyberPhysicalModuleListener(object):
+class CyberPhysicalModuleListener():
     def __init__(self):
         """
         __init__(self)
@@ -19,14 +19,13 @@ class CyberPhysicalModuleListener(object):
         CyberPhysicalModuleListener is a listener interface, inform when the module start a
         read or a write at the beginning and when it's done.
 
+        :warning: This interface does not implement object for avoid the diamond error.
+        Because actor implement object too
         """
-        # fixme
-        # super(CyberPhysicalModuleListener, self).__init__()
         pass
 
     def cyberphysical_read_begin(self):
         """
-
         cyberphysical_read_begin(self)
 
         This function is called by the module when the Read begin
@@ -35,7 +34,6 @@ class CyberPhysicalModuleListener(object):
 
     def cyberphysical_read_end(self):
         """
-
         cyberphysical_read_end(self)
 
         This function is called by the module when the Read end
@@ -44,7 +42,6 @@ class CyberPhysicalModuleListener(object):
 
     def cyberphysical_write_begin(self):
         """
-
         cyberphysical_write_begin(self)
 
         This function is called by the module when the Write begin
@@ -62,7 +59,6 @@ class CyberPhysicalModuleListener(object):
 
     def cyberphysical_module_begin(self):
         """
-
         cyberphysical_module_begin(self)
 
         This function is called by the module when the simulation begin
