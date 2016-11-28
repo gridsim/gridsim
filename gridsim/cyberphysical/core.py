@@ -77,6 +77,9 @@ class Callable():
 
         This interface is used to get the value requested by the cyber-physical system on get_value function
         with the write_param type specified in parameter
+
+        :warning:This interface does not implement object, with ParamListener there is a diamond problem
+        when actor extends both of these interface
         """
         pass
 
@@ -171,6 +174,8 @@ class ParamListener(object):
 
         This interface is used to notify the data read on the cyber-physical system on notify_read_param function
         with the read_param type specified in parameter
+
+        :warning look at Callable for more informations
         """
         super(ParamListener, self).__init__()
 
