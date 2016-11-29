@@ -8,9 +8,10 @@
 from gridsim.core import AbstractSimulationModule, AbstractSimulationElement
 from .external import AbstractCyberPhysicalSystem
 
-from gridsim.decorators import accepts
+from gridsim.decorators import accepts, returns
 
-class CyberPhysicalModuleListener(object):
+
+class CyberPhysicalModuleListener():
     def __init__(self):
         """
         __init__(self)
@@ -18,63 +19,60 @@ class CyberPhysicalModuleListener(object):
         CyberPhysicalModuleListener is a listener interface, inform when the module start a
         read or a write at the beginning and when it's done.
 
+        :warning: This interface does not implement object for avoid the diamond error.
+        Because actor implement object too
         """
-        #fixme
-        #super(CyberPhysicalModuleListener, self).__init__()
         pass
 
-    def cyberphysicalReadBegin(self):
+    def cyberphysical_read_begin(self):
         """
-
-        cyberphysicalReadBegin(self)
+        cyberphysical_read_begin(self)
 
         This function is called by the module when the Read begin
         """
         pass
-    def cyberphysicalReadEnd(self):
-        """
 
-        cyberphysicalReadEnd(self)
+    def cyberphysical_read_end(self):
+        """
+        cyberphysical_read_end(self)
 
         This function is called by the module when the Read end
         """
         pass
 
-    def cyberphysicalWriteBegin(self):
+    def cyberphysical_write_begin(self):
         """
-
-        cyberphysicalWriteBegin(self)
+        cyberphysical_write_begin(self)
 
         This function is called by the module when the Write begin
         """
         pass
 
-    def cyberphysicalWriteEnd(self):
+    def cyberphysical_write_end(self):
         """
 
-        cyberphysicalWriteEnd(self)
+        cyberphysical_write_end(self)
 
         This function is called by the module when the Write end
         """
         pass
 
-    def cyberphysicalModuleBegin(self):
+    def cyberphysical_module_begin(self):
         """
-
-        cyberphysicalModuleBegin(self)
+        cyberphysical_module_begin(self)
 
         This function is called by the module when the simulation begin
         """
         pass
 
-    def cyberphysicalModuleEnd(self):
+    def cyberphysical_module_end(self):
         """
-
-        cyberphysicalModuleEnd(self)
+        cyberphysical_module_end(self)
 
         This function is called by the module when the simulation end
         """
         pass
+
 
 class CyberPhysicalModule(AbstractSimulationModule):
     def __init__(self):
@@ -88,32 +86,41 @@ class CyberPhysicalModule(AbstractSimulationModule):
         """
         super(CyberPhysicalModule, self).__init__()
 
-        self.lacps = []
-        self.listener = []
+        self.acps = []
+        self.module_listener = []
 
-    @accepts((1,AbstractCyberPhysicalSystem))
-    def add(self, acps):
+    @accepts((1, AbstractCyberPhysicalSystem))
+    @returns((AbstractCyberPhysicalSystem))
+    def add_actor_listener(self, acps):
         """
-
-        add(self, acps)
+        add_actor_listener(self, acps)
 
         Add a AbstractCyberPhysicalSystem to the module list
 
         :param acps: AbstractCyberPhysicalSystem to register the the module
         :return: acps with id
         """
-        acps.id = len(self.lacps)
-        self.lacps.append(acps)
+        acps.id = len(self.acps)
+        self.acps.append(acps)
         return acps
 
     @accepts((1, CyberPhysicalModuleListener))
-    def addModuleListener(self, actor):
+    @returns((CyberPhysicalModuleListener))
+    def add_module_listener(self, actor):
+        """
+        add_module_listener(self,actor)
 
-        self.listener.append(actor)
+        add an actor to be module listener, call the actor when the simulation start and stop
+        a read or write action, do the same the when the simulation start and stop
+
+        :param actor: actor to notify the status of the simulation
+        :return: actor
+        """
+        self.module_listener.append(actor)
+        return actor
 
     def attribute_name(self):
         """
-
         attribut_name(self)
 
         return the static name of the module (cyberphysicalmodule)
@@ -123,45 +130,45 @@ class CyberPhysicalModule(AbstractSimulationModule):
         return "cyberphysicalmodule"
 
     def reset(self):
-        for l in self.listener:
-            l.cyberphysicalModuleBegin()
-        for cps in self.lacps:
+        for l in self.module_listener:
+            l.cyberphysical_module_begin()
+        for cps in self.acps:
             cps.reset()
 
     def calculate(self, time, delta_time):
-        #inform all the listener that a read begin
-        for l in self.listener:
-            l.cyberphysicalReadBegin()
-        #call calculate on all listeners (read)
-        for cps in self.lacps:
+        # inform all the listener that a read begin
+        for l in self.module_listener:
+            l.cyberphysical_read_begin()
+        # call calculate on all listeners (read)
+        for cps in self.acps:
             cps.calculate(time, delta_time)
-        #inform for the end of the read
-        for l in self.listener:
-            l.cyberphysicalReadEnd()
+        # inform for the end of the read
+        for l in self.module_listener:
+            l.cyberphysical_read_end()
 
     def update(self, time, delta_time):
-        #inform all the listener that a write begin
-        for l in self.listener:
-            l.cyberphysicalWriteBegin()
-        #call update on all listeners (write)
-        for cps in self.lacps:
+        # inform all the listener that a write begin
+        for l in self.module_listener:
+            l.cyberphysical_write_begin()
+        # call update on all listeners (write)
+        for cps in self.acps:
             cps.update(time, delta_time)
-        #infor for the end of the write
-        for l in self.listener:
-            l.cyberphysicalWriteEnd()
+        # infor for the end of the write
+        for l in self.module_listener:
+            l.cyberphysical_write_end()
 
     def end(self, time):
-        #inform all listeners for the end of the simulation
-        for l in self.listener:
-            l.cyberphysicalModuleEnd()
+        # inform all listeners for the end of the simulation
+        for l in self.module_listener:
+            l.cyberphysical_module_end()
+
 
 class MinimalCyberPhysicalModule(AbstractSimulationModule):
-
     def __init__(self):
         """
         __init__(self)
 
-        MinimalCyberPhysicalModule module used  to get the update and calculate function from the simulation
+        MinimalCyberPhysicalModule module used to get the update and calculate function from the simulation
         This is useful to synchronize an Actor with the current step (time) of the simulation
         This class call all the listener and inform them for a step of simulation which include a calculate and
         an update to perform.
@@ -169,9 +176,9 @@ class MinimalCyberPhysicalModule(AbstractSimulationModule):
         self.elements = []
         super(MinimalCyberPhysicalModule, self).__init__()
 
-    @accepts((1,AbstractSimulationElement))
-    def add(self, element):
-        #add the element to the list and insert an id
+    @accepts((1, AbstractSimulationElement))
+    def add_element(self, element):
+        # add the element to the list and insert an id
         element.id = len(self.elements)
         self.elements.append(element)
         return element
@@ -180,16 +187,16 @@ class MinimalCyberPhysicalModule(AbstractSimulationModule):
         return 'minimalcyberphysicalmodule'
 
     def reset(self):
-        #call every elements for the reset step
+        # call every elements for the reset step
         for element in self.elements:
             element.init()
 
     def calculate(self, time, delta_time):
-        #call every elements for the calculate step
+        # call every elements for the calculate step
         for element in self.elements:
             element.calculate(time, delta_time)
 
     def update(self, time, delta_time):
-        #call every element for the update step
+        # call every element for the update step
         for element in self.elements:
             element.update(time, delta_time)

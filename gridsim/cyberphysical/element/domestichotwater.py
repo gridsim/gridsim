@@ -8,7 +8,7 @@
 import types
 import math
 
-from gridsim.decorators import accepts
+from gridsim.decorators import accepts, returns
 from gridsim.util import Material, Water
 
 from gridsim.unit import units
@@ -19,6 +19,7 @@ from gridsim.cyberphysical.external import Actor
 from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 
 from gridsim.electrical.core import AbstractElectricalCPSElement
+
 
 class BoilerMaterial(Material):
     def __init__(self):
@@ -33,17 +34,18 @@ class BoilerMaterial(Material):
         super(BoilerMaterial, self).__init__(None, None, 0.04)
 
 
-class Boiler(AbstractElectricalCPSElement,Actor,CyberPhysicalModuleListener):
-
+class Boiler(AbstractElectricalCPSElement, Actor, CyberPhysicalModuleListener):
     @accepts((1, str),
              (9, TimeSeries),
              (12, (types.FunctionType, types.NoneType)))
-    @units.wraps(None, (None, None, units.metre, units.metre, units.metre, units.kelvin, units.watt/(units.kelvin*(units.meter*units.meter)), units.watt, units.kelvin, None, None, None))
+    @units.wraps(None, (None, None, units.metre, units.metre, units.metre, units.kelvin,
+                        units.watt / (units.kelvin * (units.meter * units.meter)), units.watt, units.kelvin, None, None,
+                        None))
     def __init__(self, friendly_name, height, radius, thickness,
                  initial_temperature, heat_transfer_coeff, power,
                  temperature_in,
                  time_series,
-                 readparamlist,writeparamlist,
+                 readparamlist, writeparamlist,
                  time_converter=None):
         """
 
@@ -89,7 +91,7 @@ class Boiler(AbstractElectricalCPSElement,Actor,CyberPhysicalModuleListener):
         if not isinstance(power, (int, float)):
             power = units.value(units.to_si(power))
 
-        super(Boiler, self).\
+        super(Boiler, self). \
             __init__(friendly_name)
 
         self.readparamtype = readparamlist
@@ -116,15 +118,15 @@ class Boiler(AbstractElectricalCPSElement,Actor,CyberPhysicalModuleListener):
 
         # potential energy [J/K]
         self._cb = units.value(Water().thermal_capacity) * \
-            units.value(Water().weight)*math.pi*self._height*(self._radius**2)
+                   units.value(Water().weight) * math.pi * self._height * (self._radius ** 2)
 
         # global loss factor [W/K.m2]
-        self._ub = 1/((1/self._heat_transfer_coeff) +
-                      (self._thickness/units.value(BoilerMaterial().thermal_conductivity)))
+        self._ub = 1 / ((1 / self._heat_transfer_coeff) +
+                        (self._thickness / units.value(BoilerMaterial().thermal_conductivity)))
 
         # thermal losses when off [W/K]
-        self._off_losses = self._ub * ((2.*math.pi*(self._radius**2)) +
-                                       (2*math.pi*self._height*self._radius))
+        self._off_losses = self._ub * ((2. * math.pi * (self._radius ** 2)) +
+                                       (2 * math.pi * self._height * self._radius))
 
         self._on = False
 
@@ -167,40 +169,39 @@ class Boiler(AbstractElectricalCPSElement,Actor,CyberPhysicalModuleListener):
 
     @accepts(((1, 2), (int, float)))
     def calculate(self, time, delta_time):
-
         self._time_series.set_time(time)
-
         unit_delta_time = delta_time
 
         if self._time_converter == None:
-            volume = units.to_si(units(self._time_series.volume, units.litre))*delta_time
+            volume = units.to_si(units(self._time_series.volume, units.litre)) * delta_time
         else:
-            volume = units.to_si(units(self._time_series.volume, units.litre))*delta_time/units.value(self._time_converter(1), units.second)
+            volume = units.to_si(units(self._time_series.volume, units.litre)) * delta_time / units.value(
+                self._time_converter(1), units.second)
 
         # thermal losses when used [W/K]
-        on_losses = units.value(volume)*units.value(Water().weight)*units.value(Water().thermal_capacity)/unit_delta_time
+        on_losses = units.value(volume) * units.value(Water().weight) * units.value(
+            Water().thermal_capacity) / unit_delta_time
 
         # total thermal losses [W/K]
         losses = self._off_losses + on_losses
 
         self._temperature = self._temperature + \
-            ((unit_delta_time*losses/self._cb)*(self._temperature_in-self._temperature)) +\
-            (unit_delta_time/self._cb)*self.power
+                            ((unit_delta_time * losses / self._cb) * (self._temperature_in - self._temperature)) + \
+                            (unit_delta_time / self._cb) * self.power
 
-    def notifyReadParam(self,info,data):
+    @accepts((2, (int, float)))
+    def notify_read_param(self, info, data):
         pass
 
-    def getValue(self,info):
-        #return the consumption of the boiler when it's on
+    @returns((int, float))
+    def get_value(self, info):
+        # return the consumption of the boiler when it's on
         if info in self.writeparamtype:
             if self._on:
-                print 'on'
                 return self._power
-        #no consumption when the boiler is off
+                # no consumption when the boiler is off
             else:
-                print 'off'
                 return 0
 
-    def cyberphysicalModuleEnd(self):
-
+    def cyberphysical_module_end(self):
         print 'end simulation from Boiler'

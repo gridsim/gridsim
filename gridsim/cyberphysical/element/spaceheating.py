@@ -5,17 +5,20 @@
 
 """
 
-from gridsim.unit import units
-
 from gridsim.cyberphysical.external import Actor
 from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 
 from gridsim.electrical.core import AbstractElectricalCPSElement
 
-class ElectroThermalHeaterCooler(AbstractElectricalCPSElement,Actor,CyberPhysicalModuleListener):
-    def __init__(self, friendly_name, pwr, efficiency_factor, thermal_process, readparamlist, writeparamlist):
-        """
+from gridsim.decorators import accepts, returns
+from gridsim.unit import units
 
+
+class ElectroThermalHeaterCooler(AbstractElectricalCPSElement, Actor, CyberPhysicalModuleListener):
+    @accepts((1, str), ((5, 6), (list)))
+    @units.wraps(None, (None, units.watt))
+    def __init__(self, friendly_name, pwr, efficiency_factor, thermal_process, read_params, write_params):
+        """
         __init__(self, friendly_name, pwr, efficiency_factor, thermal_process, readparamlist, writeparamlist)
 
         This class simulate the behavior of a heat pump, this simulation can either heat of cool the air.
@@ -25,13 +28,13 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement,Actor,CyberPhysica
         :param pwr: power of the heatercooler system
         :param efficiency_factor: efficiency factor of the system
         :param thermal_process: thermal process of the system
-        :param readparamlist: read parameter of the actor
-        :param writeparamlist: write parameter of the actor
+        :param read_params: read parameter of the actor
+        :param write_params: write parameter of the actor
         """
         super(ElectroThermalHeaterCooler, self).__init__(friendly_name)
 
-        self.readparamtype = readparamlist
-        self.writeparamtype = writeparamlist
+        self.read_params = read_params
+        self.write_params = write_params
 
         self._efficiency_factor = units.value(efficiency_factor)
 
@@ -67,22 +70,19 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement,Actor,CyberPhysica
         self._thermal_process.add_energy(
             self._delta_energy * self._efficiency_factor)
 
-    def notifyReadParam(self,info,data):
+    @accepts((2, (int, float)))
+    def notify_read_param(self, read_param, data):
         pass
 
-    def getValue(self,paramtype):
-        #return the consumption of the heatercooler system on working state
-        if paramtype in self.writeparamtype:
+    @returns((int, float))
+    def get_value(self, write_param):
+        # return the consumption of the heatercooler system on working state
+        if write_param in self.write_params:
             if self._on:
-                print 'on'
                 return self.power
-        #if the heater cooler system is not working return the consumption in stand-by mode
+            # if the heater cooler system is not working return the consumption in stand-by mode
             else:
-                print 'off'
                 return 0
 
-    def cyberphysicalReadBegin(self):
-        pass
-
-    def cyberphysicalModuleEnd(self):
+    def cyberphysical_module_end(self):
         print 'end simulation from ElectroThermalHeaterCooler'

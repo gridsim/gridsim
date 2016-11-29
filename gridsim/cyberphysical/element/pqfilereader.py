@@ -12,141 +12,91 @@ from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 from gridsim.iodata.input import CSVReader
 from gridsim.timeseries import TimeSeriesObject
 
+from gridsim.decorators import accepts, returns
+
 import collections
 
-class PQFileReader(Actor,AbstractSimulationElement,CyberPhysicalModuleListener):
 
-    def __init__(self, friendly_name, infile, outfile, readparamlist, writeparamlist):
+class PQFileReader(Actor, AbstractSimulationElement, CyberPhysicalModuleListener):
+    @accepts(((1, 2, 3), (str)), ((4, 5), (list)))
+    def __init__(self, friendly_name, in_file_name, out_file_name, read_params, write_params):
         """
+        __init__(self, friendly_name, infile, outfile, read_params, write_params)
 
-        __init__(self, friendly_name, infile, outfile, readparamlist, writeparamlist)
-
-        Initialize the PQFileReader Actor with the readparam and writeparam dependency list.
+        Initialize the PQFileReader Actor with the read_params and write_params dependency list.
         Datas are read from infile, and get to the simulation on getValue function call.
 
         :param friendly_name: Element name id
-        :param infile: csv file to read value from (P,Q)
-        :param outfile: log the data out
-        :param readparamlist: Read param to register on
-        :param writeparamlist: Write param to register on
+        :param in_file_name: csv file to read value from (P,Q)
+        :param out_file_name: log the data out
+        :param read_params: Read param to register on
+        :param write_params: Write param to register on
         """
         Actor.__init__(self)
         AbstractSimulationElement.__init__(self, friendly_name)
 
-        self.readparamtype = readparamlist
-        self.writeparamtype = writeparamlist
+        self.read_params = read_params
+        self.write_params = write_params
 
-        self._infile = TimeSeriesObject(CSVReader(infile))
-        if not outfile == None:
-            self._outfile = open(outfile,'w')
-        else:
-            self._outfile = None
-        self._outfileinit = False
+        self._in_opcode = {}
+        self._in_file = TimeSeriesObject(CSVReader(in_file_name))
 
-        self._fileinput = {}
-        #temp out storage for logging to file
-        self._outstorage = {}
-        #temp in storage for logging
-        self._instorage = {}
+        # temp out storage for logging to file
+        self._out_log = {}
+        self._init_out_file = False
+        self._out_file = open(out_file_name, 'w')
 
-        self._outlog = len(readparamlist)
-        self._inlog = len(writeparamlist)
-
-        self.readid = 0
-        self.writeid = 0
-
+    @accepts((1, dict))
     def initFile(self, opcode):
         """
-
         initFile(self)
 
         Initialize the File to read data from,
         and prepare the output file.
         """
-        self._fileinput = opcode
-        self._tempstat = {}
-
-        for k,t in opcode.items():
-            print t
-            attr = str(t[0]) + str(t[1]) + str(t[2])
-            self._tempstat[attr] = k
-
-        self._infile.load()
+        for k, t in opcode.items():
+            self._in_opcode[t] = k
+        self._in_file.load()
 
     def init(self):
-       pass
+        pass
 
     def reset(self):
-        self.readid = 0
+        pass
 
     def update(self, time, delta_time):
-        self._infile.set_time(time)
+        self._in_file.set_time(time)
 
     def calculate(self, time, delta_time):
         pass
 
-    def cyberphysicalReadBegin(self):
-        pass
+    def cyberphysical_read_end(self):
+        # push all the data after the read is finished in the log file
 
-    def cyberphysicalReadEnd(self):
-        """
+        self._out_log = collections.OrderedDict(sorted(self._out_log.items()))
+        if not self._init_out_file:
+            self._init_out_file = True
+            title = ','.join(i.replace('ParamType.', '') for i in self._out_log.keys())
+            self._out_file.write(title + '\n')
+        data = ','.join(str(i) for i in self._out_log.values())
+        self._out_file.write(data + '\n')
+        self._out_file.flush()
 
-        cyberphysicalReadEnd(self)
+    @accepts((2, (int, float)))
+    def notify_read_param(self, read_param, data):
+        # save data to temp list
+        self._out_log[str(read_param)] = data
 
-        Print at the end of the step all the notified value inside a csv file.
-        """
-        #push all the data after the read is finished in the log file
-        if not self._outfile == None:
-            self._outstorage = collections.OrderedDict(sorted(self._outstorage.items()))
-            if not self._outfileinit:
-                self._outfileinit = True
-                title = ','.join(i.replace('ParamType.','') for i in self._outstorage.keys())
-                self._outfile.write(title + '\n')
-            data = ','.join(str(i) for i in self._outstorage.values())
-            self._outfile.write(data + '\n')
-            self._outfile.flush()
-
-    def notifyReadParam(self,info,data):
-        """
-
-        notifyReadParam(self,paramtype,data)
-
-        Log the measured data to the file.
-        """
-        #save data to temp list
-        attr = ''
-        if len(info) == 3:
-            attr = str(info[0]) + str(info[1]) + str(info[2])
-        self._outstorage[attr] = data
-
-    def getValue(self,paramtype):
-        """
-
-        getValue(self,paramtype)
-
-        Read data from the file and update to the simulation the new value.
-        :param info: paramtype registered on
-        :return: data corresponding to info
-        """
-        #Todo change the paramtype key (attr) in the list
-        if len(paramtype) == 3:
-            attr = str(paramtype[0]) + str(paramtype[1]) + str(paramtype[2])
-        else:
-            return 0
-
-        #get the new data from the file based on paramtype
-        if attr in self._tempstat.keys():
-            val = getattr(self._infile,str(self._tempstat[attr]))
-            self.writeid = self.writeid + 1
-            self._instorage[attr] = val
-            if self.writeid == self._inlog:
-                self.writeid = 0
-
+    @returns((int, float))
+    def get_value(self, write_param):
+        # get the new data from the file based on write_param
+        if write_param in self._in_opcode.keys():
+            val = getattr(self._in_file, str(self._in_opcode[write_param]))
             return val
+        return 0
 
-    def cyberphysicalModuleEnd(self):
-
+    def cyberphysical_module_end(self):
         print 'end simulation from PQFileReader'
 
-        if not self._outfile == None:
-            self._outfile.close()
+        if not self._out_file is None:
+            self._out_file.close()

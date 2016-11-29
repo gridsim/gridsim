@@ -5,120 +5,130 @@
 
 """
 
-from gridsim.decorators import accepts
+from gridsim.decorators import accepts, returns
+
 
 class Converter(object):
-    def __init__(self, lmin, lmax, ldefault):
+    def __init__(self):
         """
-
-        __init__(self,lmin,lmax,ldefault)
+        __init__(self,limit_min,limit_max,default)
 
         Convert the data to an other that is comprehensible by the physical device.
         Check the limit after conversion with de limit data passed in parameters.
 
-        :param lmin: down limit
-        :param lmax: upper limit
-        :param ldefault: default value on conversion fail
+        :param limit_min: down limit
+        :param limit_max: upper limit
+        :param default: default value on conversion fail
         """
         super(Converter, self).__init__()
 
-        self.lmin = lmin
-        self.lmax = lmax
-        self.ldefault = ldefault
-
-    def call(self,data):
+    @accepts((1, (dict)))
+    @returns((dict))
+    def call(self, datas):
         """
-
-        call(self,data)
+        call(self,datas)
 
         Convert the data before the writing system function
 
-        :param data: data to convert in a writing value
+        :param datas: datas to convert for the physical device
         :return: the converted value
         """
         raise NotImplementedError('Pure abstract method!')
 
+
 class Aggregator(object):
-    def __init__(self):
-        super(Aggregator, self).__init__()
-    def call(self,datalist):
+    @accepts(((1, 2, 3), (int, float)))
+    def __init__(self, limit_min, limit_max, default):
         """
+        __init__(self)
 
-        call(self,datalist)
+        This interface aggregate a list of data passed in parameter. This interface must
+        be implemented see SumAggregator class
+        Check the limit after aggregation with de limit data passed in parameters.
 
-        Aggregate all the value passed in datalist and return a single represented value
+        :param limit_min: down limit
+        :param limit_max: upper limit
+        :param default: default value on conversion fail
+        """
+        super(Aggregator, self).__init__()
 
-        :param datalist: list of value to be aggregated
+        self.limit_min = limit_min
+        self.limit_max = limit_max
+        self.default = default
+
+    @accepts((1, list))
+    @returns((int, float))
+    def call(self, datas):
+        """
+        call(self,datas)
+
+        Aggregate all the value passed in datas and return a single represented value
+
+        :param datas: list of value to be aggregated
         :return: a single represented value
         """
         raise NotImplementedError('Pure abstract method!')
 
-class Callable(object):
-    def __init__(self):
-        #fixme
-        #super(Callable, self).__init__()
-        pass
-    def getValue(self,paramtype):
-        """
 
-        getValue(self,paramtype)
+class Callable():
+    def __init__(self):
+        """
+        __init__(self)
+
+        This interface is used to get the value requested by the cyber-physical system on get_value function
+        with the write_param type specified in parameter
+
+        :warning:This interface does not implement object, with ParamListener there is a diamond problem
+        when actor extends both of these interface
+        """
+        pass
+
+    @returns((int, float))
+    def get_value(self, write_param):
+        """
+        get_value(self,write_param)
 
         This function is called by the simulation each time a new value is required with
-        the paramtype id
+        the write_param id
 
-        :param paramtype: The paramtype associate with the return value
-        :return: value that correspond to the paramtype
+        :param write_param: The write_param associate with the return value
+        :return: value that correspond to the write_param
         """
         raise NotImplementedError('Pure abstract method!')
 
+
 class WriteParam(object):
-    #Todo add control type on aggregate and converter
-    def __init__(self, paramtype, aggregate, info=None, converter=None):
+    @accepts((3, Aggregator))
+    def __init__(self, write_param, info=None, aggregate=None):
+        """
+         __init__(self,write_param,info,aggregate)
+
+        This class hold the properties of a write param. It asks for actors to provide
+        a data by the Callable interface. When all actors got values, datas are aggregate by the
+        aggregation function.
+
+        :param write_param: single id for the write param
+        :param info: full id for the write param, same data passed on get_value function from Callable interface
+        :param aggregate: aggregate function call when
+        """
         super(WriteParam, self).__init__()
 
-        #aggregator function, does the aggregation when datas are received
+        # aggregator function does the aggregation when datas are received
         self._aggregator = aggregate
-        #converter function, does the conversion of the data before writing
-        self._converter = converter
 
-        #write paramtype id correspond of the current WriteParam in use
-        self.paramtype = paramtype
+        # write paramtype id correspond of the current WriteParam in use
+        self.write_param = write_param
         self.info = info
 
-        #list of callable to call when the data needs to be updated
+        # list of callable to call when the data needs to be updated
         self._callable = []
-        #callable respond, datas will be processed with the aggregator function
+        # callable respond, datas will be processed with the aggregator function
         self.datalist = []
 
-    @accepts((1, Aggregator))
-    def setAggregator(self,aggregator):
-        """
-
-        setAggregator(self,aggregator)
-
-        Set the current aggregator function
-
-        :param aggregator: aggregator function
-        """
-        self._aggregator = aggregator
-
-    @accepts((1, Converter))
-    def setConverter(self,converter):
-        """
-
-        setConverter(self,converter)
-
-        Call this function to update the converter object
-
-        :param converter: converter object to call on write
-        """
-        self._converter = converter
-
     @accepts((1, Callable))
-    def addCallable(self,callable):
+    def add_callable(self, callable):
         """
-
-        addCallable(self, callable)
+        add_callable(self, callable)
 
         Add Callable to list. This list will be iterate to get new datas
 
@@ -126,8 +136,10 @@ class WriteParam(object):
         """
         self._callable.append(callable)
 
-    def getWriteParam(self):
+    @returns((int, float))
+    def get_value(self):
         """
+        get_value(self)
 
         Ask all callable to return the next value. All the values are aggregated
         with the aggregator function
@@ -136,67 +148,65 @@ class WriteParam(object):
         """
         self.datalist = []
         for c in self._callable:
-            self.datalist.append(c.getValue(self.info))
-        if self._aggregator == None:
+            self.datalist.append(c.get_value(self.info))
+        if self._aggregator is None:
             raise Exception('Aggregate function not defined!')
         else:
-            if self._converter == None:
-                return self.aggregate(self.datalist)
-            else:
-                return self.convert(self.aggregate(self.datalist))
+            return self.aggregate(self.datalist)
 
-    def aggregate(self, datalist):
+    def aggregate(self, datas):
         """
-
-        aggregate(self, datalist)
+        aggregate(self, datas)
 
         Aggregate the value passed in parameters and return this value
 
-        :param datalist: list of data to aggregate
+        :param datas: list of data to aggregate
 
         :return: output of aggregate value
         """
-        return self._aggregator.call(datalist)
+        return self._aggregator.call(datas)
 
-    def convert(self, data):
-
-        return self._converter.call(data)
 
 class ParamListener(object):
     def __init__(self):
-        #fixme
-        #super(ParamListener, self).__init__()
-        pass
-
-    def notifyReadParam(self,info,data):
         """
+        __init__(self)
 
-        notifyReadParam(self,paramtype,data)
+        This interface is used to notify the data read on the cyber-physical system on notify_read_param function
+        with the read_param type specified in parameter
+
+        :warning look at Callable for more informations
+        """
+        super(ParamListener, self).__init__()
+
+    def notify_read_param(self, read_param, data):
+        """
+        notify_read_param(self,read_param,data)
 
         Notify the listener that a new value from the simulator has been updated
 
-        :param info: paramtype id of the data notified
+        :param read_param: paramtype id of the data notified
         :param data: data updated itself
         """
         raise NotImplementedError('Pure abstract method!')
 
+
 class ReadParam(object):
-    def __init__(self, paramtype, info):
+    def __init__(self, read_param, info):
         super(ReadParam, self).__init__()
 
-        #registerd listener for the specific paramtype id
+        # registerd listener for the specific paramtype id
         self._listener = []
-        #saved data, when data is updated
+        # saved data, when data is updated
         self._data = None
         self.info = info
-        #the paramtype that listener subscribed on
-        self.paramtype = paramtype
+        # the paramtype that listener subscribed on
+        self.read_param = read_param
 
     @accepts((1, ParamListener))
-    def addListener(self,listener):
+    def add_listener(self, listener):
         """
-
-        addListener(self,listener)
+        add_listener(self,listener)
 
         Add the listener to the list
 
@@ -204,10 +214,10 @@ class ReadParam(object):
         """
         self._listener.append(listener)
 
-    def pushReadParam(self,data):
+    @accepts((1, (int, float)))
+    def notify_read_param(self, data):
         """
-
-        pushReadParam(self,data)
+        notify_read_param(self,data)
 
         Inform all Listener that a new data has been updated
 
@@ -216,4 +226,4 @@ class ReadParam(object):
         """
         self._data = data
         for l in self._listener:
-            l.notifyReadParam(self.info,data)
+            l.notify_read_param(self.info, data)
