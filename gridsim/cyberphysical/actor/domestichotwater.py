@@ -1,6 +1,8 @@
 """
-.. moduleauthor:: Yann Maret <yann.maret@hevs.ch>
+.. moduleauthor:: Michael Clausen <clm@hevs.ch>
 
+.. codeauthor:: Michael Clausen <clm@hevs.ch>
+.. codeauthor:: Gillian Basso <gillian.basso@hevs.ch>
 .. codeauthor:: Yann Maret <yann.maret@hevs.ch>
 
 """
@@ -15,7 +17,7 @@ from gridsim.unit import units
 
 from gridsim.timeseries import TimeSeries
 
-from gridsim.cyberphysical.external import Actor
+from gridsim.cyberphysical.element import Actor
 from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 
 from gridsim.electrical.core import AbstractElectricalCPSElement
@@ -49,7 +51,7 @@ class Boiler(AbstractElectricalCPSElement, Actor, CyberPhysicalModuleListener):
                  time_converter=None):
         """
 
-        :param friendly_name:Friendly name to give to the process.
+        :param friendly_name: Friendly name to give to the process.
         :type friendly_name: str, unicode
         :param height: the height of the boiler
         :type height: units.metre
@@ -135,6 +137,9 @@ class Boiler(AbstractElectricalCPSElement, Actor, CyberPhysicalModuleListener):
 
     @property
     def temperature(self):
+        """
+        The water temperature is consider as uniform in the tank.
+        """
         return self._temperature
 
     @temperature.setter
@@ -143,6 +148,11 @@ class Boiler(AbstractElectricalCPSElement, Actor, CyberPhysicalModuleListener):
 
     @property
     def on(self):
+        """
+        The ``on`` parameter allows to turn on or off the boiler.
+        If ``on is True`` the boiler is running (maintains the boiler temperature between hysteresis), otherwise the
+        boiler is shutdown (and cannot heat the water).
+        """
         return self._on
 
     @on.setter
@@ -151,6 +161,9 @@ class Boiler(AbstractElectricalCPSElement, Actor, CyberPhysicalModuleListener):
 
     @property
     def power(self):
+        """
+        The electrical power of the boiler ``power`` if heating, otherwise ``0``.
+        """
         if self.on:
             return self._power
         else:

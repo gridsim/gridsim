@@ -42,9 +42,9 @@ The electrical module
 
 .. _gridsim-cyberphysical-core-mod:
 
-*********************
+************************
 The cyberphysical module
-*********************
+************************
 .. automodule:: gridsim.cyberphysical.core
     :members:
     :undoc-members:

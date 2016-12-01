@@ -2,6 +2,8 @@
 .. moduleauthor:: Michael Sequeira Carvalho <michael.sequeira@hevs.ch>
 .. moduleauthor:: Gilbert Maitre <gilbert.maitre@hevs.ch>
 
+.. codeauthor:: Gilbert Maitre <gilbert.maitre@hevs.ch>
+
 This module provides a toolbox to Gridsim to perform computation of electrical
 values within the electrical network, in other words to solve the so-called
 power-flow problem:

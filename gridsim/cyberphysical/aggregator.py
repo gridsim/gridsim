@@ -1,6 +1,4 @@
 """
-.. moduleauthor:: Yann Maret <yann.maret@hevs.ch>
-
 .. codeauthor:: Yann Maret <yann.maret@hevs.ch>
 
 """

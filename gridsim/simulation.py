@@ -54,6 +54,7 @@ from collections import namedtuple
 
 from .decorators import accepts, returns
 from .core import AbstractSimulationElement, AbstractSimulationModule
+from .execution import DefaultExecutionManager
 from .util import Position
 from .unit import units
 
@@ -187,7 +188,7 @@ class Simulator(object):
         Simulator._simulation_modules.append(module_class)
 
     @accepts((1, ExecutionManager))
-    def __init__(self, executionmanager):
+    def __init__(self, execution_manager=DefaultExecutionManager()):
         """
         __init__(self)
 
@@ -200,7 +201,7 @@ class Simulator(object):
         """
         super(Simulator, self).__init__()
 
-        self._executionmanager = executionmanager
+        self._execution_manager = execution_manager
 
         # Create an instance for each simulation module.
         self._modules = {}
@@ -437,20 +438,20 @@ class Simulator(object):
         """
         if self.time is None:
             self.reset()
-        self._executionmanager.reset()
+        self._execution_manager.reset()
 
-        self._executionmanager.preprocess()
+        self._execution_manager.preprocess()
         end_time = self.time + run_time
         self._update(delta_time)
-        self._executionmanager.postprocess()
+        self._execution_manager.postprocess()
 
         while self.time < end_time:
-            self._executionmanager.preprocess()
+            self._execution_manager.preprocess()
             self._step(delta_time)
-            self._executionmanager.postprocess()
+            self._execution_manager.postprocess()
 
         if True: # from a cyberphysicalsystem need to end with a calculate 'Read'
-            self._executionmanager.preprocess()
+            self._execution_manager.preprocess()
             self._calculate(delta_time)
 
         self._end()

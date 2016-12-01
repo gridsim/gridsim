@@ -21,10 +21,10 @@ This simulation outputs the following plots:
             :align: center
 
 """
-from .decorators import accepts, returns
-from .util import Position
-from .core import AbstractSimulationModule, AbstractSimulationElement
-from .simulation import Simulator
+from gridsim.decorators import accepts, returns
+from gridsim.util import Position
+from gridsim.core import AbstractSimulationModule, AbstractSimulationElement
+from gridsim.simulation import Simulator
 
 
 class AbstractControllerElement(AbstractSimulationElement):

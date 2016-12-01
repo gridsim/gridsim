@@ -49,6 +49,47 @@ class ExecutionManager(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
+
+class DefaultExecutionManager(object):
+    def __init__(self):
+        """
+
+        __init__(self)
+
+        An execution manager that does not influence the execution
+        """
+        super(DefaultExecutionManager, self).__init__()
+
+    def reset(self):
+        """
+
+        reset(self)
+
+        Resets the execution manager object.
+        """
+        pass
+
+    def preprocess(self):
+        """
+
+        preprocess(self)
+
+        Preprocesses the step (calculate, update). This function is executed at the beginning of the
+        step of the simulation.
+        """
+        pass
+
+    def postprocess(self):
+        """
+
+        postprocess(self)
+
+        Postprocesses the step (calculate, update). This function is executed directly after the step
+        of the simulation.
+        """
+        pass
+
+
 class RealTimeExecutionManager(ExecutionManager):
     @units.wraps(None, (None, units.second))
     def __init__(self, time):

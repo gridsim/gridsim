@@ -6,7 +6,7 @@
 """
 
 from gridsim.core import AbstractSimulationElement
-from gridsim.cyberphysical.external import Actor
+from gridsim.cyberphysical.element import Actor
 from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 
 from gridsim.iodata.input import CSVReader
@@ -18,13 +18,13 @@ import collections
 
 
 class PQFileReader(Actor, AbstractSimulationElement, CyberPhysicalModuleListener):
-    @accepts(((1, 2, 3), (str)), ((4, 5), (list)))
+    @accepts(((1, 2, 3), str), ((4, 5), list))
     def __init__(self, friendly_name, in_file_name, out_file_name, read_params, write_params):
         """
         __init__(self, friendly_name, infile, outfile, read_params, write_params)
 
         Initialize the PQFileReader Actor with the read_params and write_params dependency list.
-        Datas are read from infile, and get to the simulation on getValue function call.
+        Data are read from infile, and get to the simulation on getValue function call.
 
         :param friendly_name: Element name id
         :param in_file_name: csv file to read value from (P,Q)

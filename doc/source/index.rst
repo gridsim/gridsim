@@ -26,6 +26,7 @@ This documentation is separated into:
     documentation.rst
     core.rst
     tools.rst
+    actor.rst
     unit.rst
     io.rst
     copyright.rst

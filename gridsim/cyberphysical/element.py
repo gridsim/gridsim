@@ -1,27 +1,29 @@
 """
-.. moduleauthor:: Yann Maret <yann.maret@hevs.ch>
-
 .. codeauthor:: Yann Maret <yann.maret@hevs.ch>
 
 """
 
 from gridsim.core import AbstractSimulationElement
-from gridsim.cyberphysical.core import Callable, ParamListener, Converter
+from gridsim.cyberphysical.core import Callable, ParamListener
 
 from gridsim.decorators import accepts, returns
 
 import types
-import time
-import threading
-from threading import Lock
+
 
 class Actor(Callable, ParamListener):
+
     def __init__(self):
         """
         __init__(self)
 
-        Actor are from the AbstractCyberPhysicalSystem ask for given a value corresponding to the ParamType that
-        it register on. The actor is informed by the ACPS when new data are updated
+        An actor represents a (set of) virtual device. Therefore it has to communicate with a real device to send energy
+        to a real network. To do so, it has to be connected to :class:`gridsim.cyberphysical.core.ReadParam` to receive
+        data from real device and connected to :class:`gridsim.cyberphysical.core.WriteParam` to influence a device.
+        This is done by a registration to an :class:`AbstractCyberPhysicalSystem`. This registration also adds the
+        :class:`Actor` to the simulation.
+
+        .. note:: More details about :class:`Actor` can be found at :ref:`gridsim-actor`.
         """
         super(Actor, self).__init__()
 
@@ -34,42 +36,45 @@ class Actor(Callable, ParamListener):
         """
         init(self)
 
-        Initialize the Actor
+        Initializes the :class:`Actor`.
         """
         raise NotImplementedError('Pure abstract method!')
 
-    @returns((list))
-    def get_write_params(self):
+    def notify_read_param(self, read_param, data):
         """
-        getListWriteParam(self)
+        notify_read_param(self,read_param,data)
 
-        Return the list of write ParamType to register on. The actor will be asked for providing the
-        value of the given ParamType on running simulation time
+        Notifies the listener that a new value from the simulator has been updated.
 
-        :return: write ParamType to register on
+        :param read_param: paramtype id of the data notified
+        :param data: data updated itself
         """
-        return self.write_params
+        super(Actor, self).notify_read_param(read_param, data)
 
-    @returns((list))
-    def get_read_params(self):
+    def get_value(self, write_param):
         """
-        get_read_params(self)
+        get_value(self,write_param)
 
-        Return the list of Read ParamType to register on. The actor will be inform of new values updated
-        in the simulation
+        This function is called by the simulation each time a new value is required with
+        the ``write_param`` id.
 
-        :return: read ParamType to register on
+        :param write_param: The id of the :class:`gridsim.cyberphysical.core.WriteParam` associated with the return
+            value
+        :return: value that correspond to the given :class:`gridsim.cyberphysical.core.WriteParam`
         """
-        return self.read_params
+        super(Actor, self).get_value(self, write_param)
 
 
 class AbstractCyberPhysicalSystem(AbstractSimulationElement):
-    @accepts((1,str),(2,(dict,types.NoneType)))
+
+    @accepts((1, str), (2, (dict, types.NoneType)))
     def __init__(self, friendly_name, converters=None):
         """
         __init__(self,friendly_name)
 
-        AbstractCyberPhysicalSystem class create ReadParam and WriteParam that Actors can register on.
+        An :class:`AbstractCyberPhysicalSystem` creates ReadParam and WriteParam to communicate with real devices.
+        Actors can be registered to an :class:`AbstractCyberPhysicalSystem` to influence the real device the
+        :class:`AbstractCyberPhysicalSystem` is connected.
 
         :param friendly_name: give a friendly name for the element in the simulation
         :param converters: list of Converter function for the write params
@@ -83,23 +88,23 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         # list of ReadParam instance created
         self.read_params = []
 
-        #this is the converter object for the physical device
+        # this is the converter object for the physical device
         self.converters = converters
 
-        #mutex for the feedback control
-        #self.mutex = Lock()
+        # mutex for the feedback control
+        # self.mutex = Lock()
 
     @accepts((1, Actor))
-    @returns((Actor))
+    @returns(Actor)
     def add(self, actor):
         """
         add(self, actor)
 
-        add a single actor to the system and register it with the ReadParam and WriteParam
-        that it want to listen and be callable on
+        Adds an actor to the system and register it with the ReadParam and WriteParam
+        that it wants to be connected.
 
-        :param actor: actor to register in the system
-        :return:  same actor, with id
+        :param actor: :class:`Actor` to register in the system
+        :return: the :class:`Actor`
         """
         actor_read_params = actor.get_read_params()
         actor_write_params = actor.get_write_params()
@@ -135,14 +140,14 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         """
         physical_read_params(self)
 
-        read the data on the system
+        Reads the data on the system.
 
         :return: read data
         """
         raise NotImplementedError('Pure abstract method!')
 
     @accepts((2, (dict, types.NoneType)))
-    @returns((dict))
+    @returns(dict)
     def physical_converter_params(self, write_params):
         """
         physical_converter_params(self,write_params)
@@ -153,10 +158,10 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         if self.converters is None:
             return write_params
 
-        for write_param,value in write_params.items():
+        for write_param, value in write_params.items():
             if write_param in self.converters.keys():
                 converter = self.converters[write_param]
-                #TODO check instance with exception (subclass)
+                # TODO check instance with exception (subclass)
                 write_params[write_param] = converter.call(value)
 
         return write_params
@@ -177,7 +182,7 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         """
         physical_write_params(self,write_params)
 
-        write the data to the system
+        Writes the data to the system.
 
         :param write_params: map of {id:datas} to write to the cyberphysical system
         """
@@ -208,13 +213,18 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
     #         time.sleep(5)
 
     def reset(self):
+        """
+        reset(self)
+
+        Nothing to reset.
+        """
         pass
 
     def calculate(self, t, dt):
         """
         calculate(self,t,dt)
 
-        Read all ReadParam on the system and inform the updated values to all Actors
+        Reads all :class:`ReadParam` on the system and inform the updated values to all :class:`Actor`.
         """
         read = self.physical_read_params()  # give it in the right order
         if read is not None:
@@ -230,7 +240,7 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         """
         update(self,time,delta_time)
 
-        Get aggregated values from Actors and write them on the system
+        Gets aggregated values from :class:`Actor` and write them on the system.
         """
         if len(self.write_params) is 0:
             return

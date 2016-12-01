@@ -5,7 +5,7 @@
 
 """
 
-from gridsim.cyberphysical.external import Actor
+from gridsim.cyberphysical.element import Actor
 from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 
 from gridsim.decorators import accepts, returns

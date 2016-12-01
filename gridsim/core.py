@@ -196,9 +196,10 @@ class AbstractSimulationModule(object):
         #TODO raise NotImplementedError('Abstract method called!')
         pass
 
+
 class AbstractSimulationElement(object):
 
-    #@accepts((1, str), (2, (int, type(None))))
+    # @accepts((1, str), (2, (int, type(None))))
     def __init__(self, friendly_name, element_id=None):
         """
         __init__(self, friendly_name, element_id=None)

@@ -1,26 +1,26 @@
 """
-.. moduleauthor:: Yann Maret <yann.maret@hevs.ch>
-
 .. codeauthor:: Yann Maret <yann.maret@hevs.ch>
 
 """
 
 from gridsim.core import AbstractSimulationModule, AbstractSimulationElement
-from .external import AbstractCyberPhysicalSystem
+from .element import AbstractCyberPhysicalSystem
 
 from gridsim.decorators import accepts, returns
 
 
-class CyberPhysicalModuleListener():
+class CyberPhysicalModuleListener:
     def __init__(self):
         """
         __init__(self)
 
-        CyberPhysicalModuleListener is a listener interface, inform when the module start a
-        read or a write at the beginning and when it's done.
+        This Listener is informed when the module start an action (read, write) or at the initialisation
+        (:func:`CyberPhysicalModule.reset()`) or the end (:func:`CyberPhysicalModule.end()`) of a step.
 
-        :warning: This interface does not implement object for avoid the diamond error.
-        Because actor implement object too
+        .. warning:: This interface does not extend ``object`` class. As its implementation should implements
+                another class (e.g. :class:`ParamListener`), a
+                `diamond problem <https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem>`_
+                could arise.
         """
         pass
 
@@ -28,7 +28,7 @@ class CyberPhysicalModuleListener():
         """
         cyberphysical_read_begin(self)
 
-        This function is called by the module when the Read begin
+        Called by the module when the Read begin.
         """
         pass
 
@@ -36,7 +36,7 @@ class CyberPhysicalModuleListener():
         """
         cyberphysical_read_end(self)
 
-        This function is called by the module when the Read end
+        Called by the module when the Read end.
         """
         pass
 
@@ -44,7 +44,7 @@ class CyberPhysicalModuleListener():
         """
         cyberphysical_write_begin(self)
 
-        This function is called by the module when the Write begin
+        Called by the module when the Write begin.
         """
         pass
 
@@ -53,7 +53,7 @@ class CyberPhysicalModuleListener():
 
         cyberphysical_write_end(self)
 
-        This function is called by the module when the Write end
+        Called by the module when the Write end.
         """
         pass
 
@@ -61,7 +61,7 @@ class CyberPhysicalModuleListener():
         """
         cyberphysical_module_begin(self)
 
-        This function is called by the module when the simulation begin
+        Called by the module when the simulation begin.
         """
         pass
 
@@ -69,7 +69,7 @@ class CyberPhysicalModuleListener():
         """
         cyberphysical_module_end(self)
 
-        This function is called by the module when the simulation end
+        Called by the module when the simulation end.
         """
         pass
 
@@ -79,10 +79,12 @@ class CyberPhysicalModule(AbstractSimulationModule):
         """
         __init__(self)
 
-        CyberPhysicalModule registers AbstractCyberPhysicalSystem (Element) and call
-        calculate and update when the simulation is running.
-        It inform all the subscribers, when a Read and Write start and end.
-        This is useful for log the data at the end of the cycle for ones.
+        CyberPhysicalModule registers :class:`AbstractCyberPhysicalSystem` (which are
+        :class:`gridsim.core.AbstractSimulationElement) and calls
+        :func:`gridsim.core.AbstractSimulationElement.calculate` and
+        :func:`gridsim.core.AbstractSimulationElement.update` when the simulation is running.
+        It informs all the subscribers, when a Read and Write start and end.
+        This allows easy logging at the end of a cycle.
         """
         super(CyberPhysicalModule, self).__init__()
 
@@ -90,44 +92,51 @@ class CyberPhysicalModule(AbstractSimulationModule):
         self.module_listener = []
 
     @accepts((1, AbstractCyberPhysicalSystem))
-    @returns((AbstractCyberPhysicalSystem))
+    @returns(AbstractCyberPhysicalSystem)
     def add_actor_listener(self, acps):
         """
         add_actor_listener(self, acps)
 
-        Add a AbstractCyberPhysicalSystem to the module list
+        Adds an :class:`gridsim.core.AbstractCyberPhysicalSystem` to the module list.
 
-        :param acps: AbstractCyberPhysicalSystem to register the the module
-        :return: acps with id
+        :param acps: :class:`gridsim.cyberphysical.external.AbstractCyberPhysicalSystem` to register the the module
+        :return: the :class:`gridsim.cyberphysical.external.AbstractCyberPhysicalSystem`.
         """
         acps.id = len(self.acps)
         self.acps.append(acps)
         return acps
 
     @accepts((1, CyberPhysicalModuleListener))
-    @returns((CyberPhysicalModuleListener))
-    def add_module_listener(self, actor):
+    @returns(CyberPhysicalModuleListener)
+    def add_module_listener(self, listener):
         """
         add_module_listener(self,actor)
 
-        add an actor to be module listener, call the actor when the simulation start and stop
-        a read or write action, do the same the when the simulation start and stop
+        Adds a :class:`CyberPhysicalModuleListener` to the module , calls the listener when the simulation starts,
+        stops, or do an action (read or write).
 
-        :param actor: actor to notify the status of the simulation
-        :return: actor
+        :param listener: :class:`CyberPhysicalModuleListener` to notify the status of the simulation
+        :return: the :class:`CyberPhysicalModuleListener`
         """
-        self.module_listener.append(actor)
-        return actor
+        self.module_listener.append(listener)
+        return listener
 
     def attribute_name(self):
         """
         attribut_name(self)
 
-        return the static name of the module (cyberphysicalmodule)
+        Returns the name of this module.
+        This name is used to access to this electrical simulator from the
+        :class:`.Simulator`::
 
-        :return: cyberphysicalmodule module name
+            # Create the simulation.
+            sim = Simulator()
+            thsim = sim.cyberphysical
+
+        :return: 'cyberphysical'
+        :rtype: str
         """
-        return "cyberphysicalmodule"
+        return "cyberphysical"
 
     def reset(self):
         for l in self.module_listener:
@@ -168,10 +177,11 @@ class MinimalCyberPhysicalModule(AbstractSimulationModule):
         """
         __init__(self)
 
-        MinimalCyberPhysicalModule module used to get the update and calculate function from the simulation
-        This is useful to synchronize an Actor with the current step (time) of the simulation
-        This class call all the listener and inform them for a step of simulation which include a calculate and
-        an update to perform.
+        This module is used to get the update and calculate function from the simulation.
+        This is useful to synchronize an :class:`gridsim.cyberphysical.external.Actor` with the current step (time) of
+        the simulation. This class calls all the listeners and informs them for a step of simulation which include when
+        a :func:`gridsim.core.AbstractSimulationElement.calculate` and
+        :func:`gridsim.core.AbstractSimulationElement.update` functions are called.
         """
         self.elements = []
         super(MinimalCyberPhysicalModule, self).__init__()
@@ -184,7 +194,7 @@ class MinimalCyberPhysicalModule(AbstractSimulationModule):
         return element
 
     def attribute_name(self):
-        return 'minimalcyberphysicalmodule'
+        return 'minimalcyberphysical'
 
     def reset(self):
         # call every elements for the reset step

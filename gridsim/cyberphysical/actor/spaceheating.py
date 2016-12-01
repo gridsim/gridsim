@@ -1,11 +1,13 @@
 """
-.. moduleauthor:: Yann Maret <yann.maret@hevs.ch>
+.. moduleauthor:: Michael Clausen <clm@hevs.ch>
 
+.. codeauthor:: Michael Clausen <clm@hevs.ch>
+.. codeauthor:: Gillian Basso <gillian.basso@hevs.ch>
 .. codeauthor:: Yann Maret <yann.maret@hevs.ch>
 
 """
 
-from gridsim.cyberphysical.external import Actor
+from gridsim.cyberphysical.element import Actor
 from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 
 from gridsim.electrical.core import AbstractElectricalCPSElement
@@ -15,17 +17,16 @@ from gridsim.unit import units
 
 
 class ElectroThermalHeaterCooler(AbstractElectricalCPSElement, Actor, CyberPhysicalModuleListener):
-    @accepts((1, str), ((5, 6), (list)))
+    @accepts((1, str), ((5, 6), list))
     @units.wraps(None, (None, units.watt))
     def __init__(self, friendly_name, pwr, efficiency_factor, thermal_process, read_params, write_params):
         """
         __init__(self, friendly_name, pwr, efficiency_factor, thermal_process, readparamlist, writeparamlist)
 
-        This class simulate the behavior of a heat pump, this simulation can either heat of cool the air.
-        This ElectroThermalHeaterCooler is based on the max power available for the heat or cool of the system.
+        This :class:`Actor` can either heat of cool a :class:`gridsim.thermal.core.ThermalProcess`.
 
         :param friendly_name: friendly name for the AbstractElectricalCPSElement
-        :param pwr: power of the heatercooler system
+        :param pwr: power of the heater/cooler system
         :param efficiency_factor: efficiency factor of the system
         :param thermal_process: thermal process of the system
         :param read_params: read parameter of the actor
@@ -49,6 +50,12 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement, Actor, CyberPhysi
 
     @property
     def on(self):
+        """
+        The ``on`` parameter allows to turn on or off the system.
+        If ``on is True`` the system is running (change temperature of the
+        :class:`gridsim.thermal.core.ThermalProcess`), otherwise the system is shutdown (and do not influence the
+        :class:`gridsim.thermal.core.ThermalProcess`).
+        """
         return self._on
 
     @on.setter

@@ -7,7 +7,7 @@
 
 from gridsim.core import AbstractSimulationElement
 
-from gridsim.cyberphysical.external import Actor
+from gridsim.cyberphysical.element import Actor
 from gridsim.cyberphysical.simulation import CyberPhysicalModuleListener
 
 from gridsim.decorators import accepts, returns
@@ -19,17 +19,15 @@ class Battery(Actor, AbstractSimulationElement, CyberPhysicalModuleListener):
     @units.wraps(None, (None, None, units.watt_hour, units.watt_hour, units.watt, None, None))
     def __init__(self, friendly_name, start_energy, max_energy, power, read_params, write_params):
         """
-        __init__(self,friendly_name,start_energy,maxenergy,power,readparamist,writeparamlist)
+        __init__(self,friendly_name,start_energy,max_energy,power,read_params,write_params)
 
-        This class simulate the behavior of a battery. The amount of energy is provided at the beginning.
-        The load and the unload rate is the same, that provide the same time to load and to unload the battery.
+        This :class:`Actor` simulates the behavior of a battery. The charge and discharge is considered equal.
         The battery reach a max energy when the battery is full and the empty state when the battery is low.
-        With the command store, this is possible to change between load and unload. When the store is true the battery
-        is in load state otherwise the in unload mode.
-        On consumption the battery get current, the power is positive.
-        On injection the battery give current, the power is negative.
 
-        :param friendly_name: friendly name for the abstractsimulationelement
+        .. note :: On consumption, the power is considered positive.
+                   On injection, the power is considered negative.
+
+        :param friendly_name: friendly name for the :class:`gridsim.core.AbstractSimulationElement`
         :param start_energy: amount of energy to start with
         :param max_energy: max energy of the battery, the battery will stop storing
         :param power: power rate for the storage and discharge
