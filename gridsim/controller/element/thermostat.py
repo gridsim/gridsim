@@ -1,8 +1,7 @@
 from gridsim.unit import units
 
 from gridsim.util import Position
-from gridsim.controller import AbstractControllerElement
-
+from gridsim.controller.simulation import AbstractControllerElement
 
 class Thermostat(AbstractControllerElement):
     def __init__(self, friendly_name, target_temperature, hysteresis,
