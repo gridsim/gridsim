@@ -147,7 +147,11 @@ class WriteParam(object):
         datalist = []
         for c in self._callable:
             datalist.append(c.get_value(self.info))
-        if self._aggregator is None:
+        if len(datalist) is 0:
+            return 0
+        if len(datalist) is 1:
+            return datalist[0]
+        elif self._aggregator is None:
             raise Exception('Aggregate function not defined!')
         else:
             return self._aggregator.call(datalist)
@@ -179,7 +183,7 @@ class ParamListener(object):
 
 
 class ReadParam(object):
-    def __init__(self, read_param, info):
+    def __init__(self, read_param, info=None):
         """
         __init__(self, read_param, info)
 

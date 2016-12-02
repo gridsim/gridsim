@@ -104,12 +104,12 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         # subscribe actors when the cyberphysicalsystem support the paramtype on write
         for w in self.write_params:
             for a in actor_write_params:
-                if a is w.paramtype:
+                if a is w.write_param:
                     w.add_callable(actor)
         # subscribe actors when the cyberphysicalsystem support the paramtype on read
         for r in self.read_params:
             for a in actor_read_params:
-                if a is r.paramtype:
+                if a is r.read_param:
                     r.add_listener(actor)
 
         actor.id = len(self.actors)
