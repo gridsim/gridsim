@@ -65,9 +65,6 @@ class Battery(Actor, AbstractSimulationElement, CyberPhysicalModuleListener):
         # the simulation runs with second, this is the conversion factor
         self._energy_seconds_to_hours = 3600.0
 
-    def init(self):
-        pass
-
     def reset(self):
         self.energy = self._energy
 

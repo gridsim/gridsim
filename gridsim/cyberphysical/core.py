@@ -17,7 +17,6 @@ class Converter(object):
 
         Converts the data to an other that is comprehensible by the physical device.
         Check the limit after conversion with de limit data passed in parameters.
-
         """
         super(Converter, self).__init__()
 
@@ -117,14 +116,12 @@ class WriteParam(object):
         # aggregator function does the aggregation when data are received
         self._aggregator = aggregator
 
-        # write paramtype id correspond of the current WriteParam in use
+        # write param id correspond of the current ParamType in use
         self.write_param = write_param
         self.info = info
 
         # list of callable to call when the data needs to be updated
         self._callable = []
-        # callable respond, data will be processed with the aggregator function
-        self.datalist = []
 
     @accepts((1, Callable))
     def add_callable(self, callable):
@@ -147,26 +144,13 @@ class WriteParam(object):
 
         :return: aggregated value (int, float)
         """
-        self.datalist = []
+        datalist = []
         for c in self._callable:
-            self.datalist.append(c.get_value(self.info))
+            datalist.append(c.get_value(self.info))
         if self._aggregator is None:
             raise Exception('Aggregate function not defined!')
         else:
-            return self.aggregate(self.datalist)
-
-    def aggregate(self, data):
-        """
-        aggregate(self, data)
-
-        Aggregates the value passed in parameters and return this value.
-
-        :param data: list of data to aggregate
-
-        :return: output of aggregate value
-        """
-        return self._aggregator.call(data)
-
+            return self._aggregator.call(datalist)
 
 class ParamListener(object):
     def __init__(self):
@@ -188,7 +172,7 @@ class ParamListener(object):
 
         Notifies the listener that a new value from the simulator has been updated.
 
-        :param read_param: paramtype id of the data notified
+        :param read_param: ParamType id of the data notified
         :param data: data updated itself
         """
         raise NotImplementedError('Pure abstract method!')
@@ -207,12 +191,12 @@ class ReadParam(object):
         """
         super(ReadParam, self).__init__()
 
-        # registered listener for the specific paramtype id
+        # registerd listener for the specific ParamType id
         self._listener = []
         # saved data, when data is updated
         self._data = None
         self.info = info
-        # the paramtype that listener subscribed on
+        # the ParamType that listener subscribed on
         self.read_param = read_param
 
     @accepts((1, ParamListener))

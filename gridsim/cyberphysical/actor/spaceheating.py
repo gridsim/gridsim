@@ -45,9 +45,6 @@ class ElectroThermalHeaterCooler(AbstractElectricalCPSElement, Actor, CyberPhysi
 
         self._on = False
 
-    def init(self):
-        pass
-
     @property
     def on(self):
         """

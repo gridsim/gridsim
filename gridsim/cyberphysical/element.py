@@ -32,14 +32,6 @@ class Actor(Callable, ParamListener):
         # list of read ParamType to register on
         self.read_params = []
 
-    def init(self):
-        """
-        init(self)
-
-        Initializes the :class:`Actor`.
-        """
-        raise NotImplementedError('Pure abstract method!')
-
     def notify_read_param(self, read_param, data):
         """
         notify_read_param(self,read_param,data)
@@ -77,7 +69,7 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         :class:`AbstractCyberPhysicalSystem` is connected.
 
         :param friendly_name: give a friendly name for the element in the simulation
-        :param converters: list of Converter function for the write params
+        :param converters: Dict of Converter function for the write params
         """
         super(AbstractCyberPhysicalSystem, self).__init__(friendly_name)
 
@@ -106,8 +98,8 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         :param actor: :class:`Actor` to register in the system
         :return: the :class:`Actor`
         """
-        actor_read_params = actor.get_read_params()
-        actor_write_params = actor.get_write_params()
+        actor_read_params = actor.read_params
+        actor_write_params = actor.write_params
 
         # subscribe actors when the cyberphysicalsystem support the paramtype on write
         for w in self.write_params:
@@ -142,7 +134,7 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
 
         Reads the data on the system.
 
-        :return: read data
+        :return: read data list
         """
         raise NotImplementedError('Pure abstract method!')
 
@@ -171,7 +163,6 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
     #     """
     #     physical_regulation_params(self,write_params)
     #
-    #     blabla
     #
     #     :param write_params:
     #     :return:

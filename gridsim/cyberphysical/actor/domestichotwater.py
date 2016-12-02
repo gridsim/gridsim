@@ -132,9 +132,6 @@ class Boiler(AbstractElectricalCPSElement, Actor, CyberPhysicalModuleListener):
 
         self._on = False
 
-    def init(self):
-        pass
-
     @property
     def temperature(self):
         """

@@ -150,9 +150,6 @@ class PQController(Actor, CyberPhysicalModuleListener, TerminalListener):
         self._console_inputs[code] = value
         print 'new_terminal_data', code, value
 
-    def init(self):
-        pass
-
     @accepts((2, (int, float)))
     def notify_read_param(self, read_param, data):
         print 'notify_read_param', str(read_param), str(data)

@@ -58,9 +58,6 @@ class PQFileReader(Actor, AbstractSimulationElement, CyberPhysicalModuleListener
             self._in_opcode[t] = k
         self._in_file.load()
 
-    def init(self):
-        pass
-
     def reset(self):
         pass
 

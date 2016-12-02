@@ -88,8 +88,8 @@ class CyberPhysicalModule(AbstractSimulationModule):
         """
         super(CyberPhysicalModule, self).__init__()
 
-        self.acps = []
-        self.module_listener = []
+        self._acps = []
+        self._module_listener = []
 
     @accepts((1, AbstractCyberPhysicalSystem))
     @returns(AbstractCyberPhysicalSystem)
@@ -102,8 +102,8 @@ class CyberPhysicalModule(AbstractSimulationModule):
         :param acps: :class:`gridsim.cyberphysical.external.AbstractCyberPhysicalSystem` to register the the module
         :return: the :class:`gridsim.cyberphysical.external.AbstractCyberPhysicalSystem`.
         """
-        acps.id = len(self.acps)
-        self.acps.append(acps)
+        acps.id = len(self._acps)
+        self._acps.append(acps)
         return acps
 
     @accepts((1, CyberPhysicalModuleListener))
@@ -118,7 +118,7 @@ class CyberPhysicalModule(AbstractSimulationModule):
         :param listener: :class:`CyberPhysicalModuleListener` to notify the status of the simulation
         :return: the :class:`CyberPhysicalModuleListener`
         """
-        self.module_listener.append(listener)
+        self._module_listener.append(listener)
         return listener
 
     def attribute_name(self):
@@ -139,36 +139,36 @@ class CyberPhysicalModule(AbstractSimulationModule):
         return "cyberphysical"
 
     def reset(self):
-        for l in self.module_listener:
+        for l in self._module_listener:
             l.cyberphysical_module_begin()
-        for cps in self.acps:
+        for cps in self._acps:
             cps.reset()
 
     def calculate(self, time, delta_time):
         # inform all the listener that a read begin
-        for l in self.module_listener:
+        for l in self._module_listener:
             l.cyberphysical_read_begin()
         # call calculate on all listeners (read)
-        for cps in self.acps:
+        for cps in self._acps:
             cps.calculate(time, delta_time)
         # inform for the end of the read
-        for l in self.module_listener:
+        for l in self._module_listener:
             l.cyberphysical_read_end()
 
     def update(self, time, delta_time):
         # inform all the listener that a write begin
-        for l in self.module_listener:
+        for l in self._module_listener:
             l.cyberphysical_write_begin()
         # call update on all listeners (write)
-        for cps in self.acps:
+        for cps in self._acps:
             cps.update(time, delta_time)
-        # infor for the end of the write
-        for l in self.module_listener:
+        # inform for the end of the write
+        for l in self._module_listener:
             l.cyberphysical_write_end()
 
     def end(self, time):
         # inform all listeners for the end of the simulation
-        for l in self.module_listener:
+        for l in self._module_listener:
             l.cyberphysical_module_end()
 
 
@@ -183,30 +183,29 @@ class MinimalCyberPhysicalModule(AbstractSimulationModule):
         a :func:`gridsim.core.AbstractSimulationElement.calculate` and
         :func:`gridsim.core.AbstractSimulationElement.update` functions are called.
         """
-        self.elements = []
+        self._elements = []
         super(MinimalCyberPhysicalModule, self).__init__()
 
     @accepts((1, AbstractSimulationElement))
     def add_element(self, element):
         # add the element to the list and insert an id
-        element.id = len(self.elements)
-        self.elements.append(element)
+        element.id = len(self._elements)
+        self._elements.append(element)
         return element
 
     def attribute_name(self):
         return 'minimalcyberphysical'
 
     def reset(self):
-        # call every elements for the reset step
-        for element in self.elements:
-            element.init()
+        for element in self._elements:
+            element.reset()
 
     def calculate(self, time, delta_time):
         # call every elements for the calculate step
-        for element in self.elements:
+        for element in self._elements:
             element.calculate(time, delta_time)
 
     def update(self, time, delta_time):
         # call every element for the update step
-        for element in self.elements:
+        for element in self._elements:
             element.update(time, delta_time)
