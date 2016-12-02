@@ -46,7 +46,7 @@ class TimeTestModule(AbstractSimulationModule):
 
     def reset(self):
         for element in self.elements:
-            element.init()
+            element.reset()
 
     def calculate(self, time, delta_time):
         for element in self.elements:

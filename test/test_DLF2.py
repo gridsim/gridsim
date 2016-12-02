@@ -10,22 +10,20 @@ from gridsim.electrical.loadflow import DirectLoadFlowCalculator
 
 
 class TestDLF2(unittest.TestCase):
-
     def test_reference(self):
-
         # network set-up
-        #----------------
+        # ----------------
         # boolean array specifying which bus is a PV bus
         # has to be a one-dimensional boolean numpy array
-        is_PV = np.array([False,True,False,True])
+        is_PV = np.array([False, True, False, True])
 
         # array giving from-bus and to-bus ids for each branch
         # b12, b13, b14, b23, b34
         b = np.array([[0, 1], [0, 2], [0, 3], [1, 2], [2, 3]])
 
         # array containing branch admittances
-        Yb = np.zeros((5,4),dtype=complex)
-        yT = [1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.), 1j*(-10.)]
+        Yb = np.zeros((5, 4), dtype=complex)
+        yT = [1j * (-10.), 1j * (-10.), 1j * (-10.), 1j * (-10.), 1j * (-10.)]
         for i_branch in range(0, 5):
             Yb[i_branch, 0] = yT[i_branch]
             Yb[i_branch, 1] = yT[i_branch]
@@ -33,20 +31,20 @@ class TestDLF2(unittest.TestCase):
             Yb[i_branch, 3] = yT[i_branch]
 
         # calculator initialization
-        #--------------------------
+        # --------------------------
         s_base = 1.0
         v_base = 1.0
         dlf = DirectLoadFlowCalculator()
-        #dlf = NewtonRaphsonLoadFlowCalculator()
+        # dlf = NewtonRaphsonLoadFlowCalculator()
         dlf.update(s_base, v_base, is_PV, b, Yb)
 
         # input buses electrical values
-        #------------------------------
+        # ------------------------------
         # P, Q, V, Th can be either numpy 1-D arrays or 2-D arrays with 1 row,
         # respectively 1 column
 
         # P1,P2,P3,P4, slack power can be set to any value, e.g. float('NaN')
-        P = np.array([float('NaN'), 2.-1., -4., 1.])
+        P = np.array([float('NaN'), 2. - 1., -4., 1.])
         Q = np.array([float('NaN'), 0., 0., 0.])
         # mutable variable is needed
         V = np.ones([4])
@@ -54,7 +52,7 @@ class TestDLF2(unittest.TestCase):
         Th = np.zeros([4])
 
         # compute buses other electrical values
-        #--------------------------------------
+        # --------------------------------------
         [P, Q, V, Th] = dlf.calculate(P, Q, V, Th, True)
 
         # check results against reference values
@@ -72,7 +70,7 @@ class TestDLF2(unittest.TestCase):
         self.assertTrue(np.allclose(Th, ref_Th))
 
         # get branch currents
-        #---------------------------------
+        # ---------------------------------
         [Pij, Qij, Pji, Qji] = dlf.get_branch_power_flows(True)
 
         # check results against reference values
@@ -82,6 +80,7 @@ class TestDLF2(unittest.TestCase):
         ref_Pij = np.array([0.25, 1.5, 0.25, 1.25, -1.25])
 
         self.assertTrue(np.allclose(Pij, ref_Pij))
+
 
 if __name__ == '__main__':
     unittest.main()

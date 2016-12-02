@@ -12,7 +12,7 @@ from gridsim.timeseries import SortedConstantStepTimeSeriesObject
 from gridsim.iodata.input import CSVReader
 from gridsim.iodata.output import FigureSaver
 
-from gridsim.controller import AbstractControllerElement
+from gridsim.controller.simulation import AbstractControllerElement
 
 
 class Thermostat(AbstractControllerElement):

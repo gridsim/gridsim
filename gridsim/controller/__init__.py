@@ -1,0 +1,4 @@
+from gridsim.simulation import Simulator
+from .simulation import ControllerSimulator
+
+Simulator.register_simulation_module(ControllerSimulator)

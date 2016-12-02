@@ -110,5 +110,3 @@ class ControllerSimulator(AbstractSimulationModule):
         self._controllers.append(element)
         return element
 
-
-Simulator.register_simulation_module(ControllerSimulator)

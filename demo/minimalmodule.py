@@ -65,7 +65,7 @@ class MinimalGridsimModuleAbstract(AbstractSimulationModule):
     def reset(self):
         #print 'reset'
         for element in self.elements:
-            element.init()
+            element.reset()
 
     def calculate(self, time, delta_time):
         #print 'calculate, time=' + str(time) + ', delta_time=' + str(delta_time)
