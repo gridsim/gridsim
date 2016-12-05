@@ -101,7 +101,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 9. Copyright
 ===
-Copyright (C) 2011-2016 The Gridsim Team
+Copyright (C) 2011-2017 The Gridsim Team
 
 This file is part of the Gridsim project.
 
