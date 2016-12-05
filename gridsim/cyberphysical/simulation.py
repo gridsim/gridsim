@@ -8,6 +8,8 @@ from .element import AbstractCyberPhysicalSystem
 
 from gridsim.decorators import accepts, returns
 
+from multiprocessing.dummy import Pool as ThreadPool
+
 
 class CyberPhysicalModuleListener:
     def __init__(self):
@@ -91,6 +93,8 @@ class CyberPhysicalModule(AbstractSimulationModule):
         self._acps = []
         self._module_listener = []
 
+        self._pool = ThreadPool(2)
+
     @accepts((1, AbstractCyberPhysicalSystem))
     @returns(AbstractCyberPhysicalSystem)
     def add_actor_listener(self, acps):
@@ -131,7 +135,7 @@ class CyberPhysicalModule(AbstractSimulationModule):
 
             # Create the simulation.
             sim = Simulator()
-            thsim = sim.cyberphysical
+            the_sim = sim.cyberphysical
 
         :return: 'cyberphysical'
         :rtype: str
@@ -162,6 +166,18 @@ class CyberPhysicalModule(AbstractSimulationModule):
         # call update on all listeners (write)
         for cps in self._acps:
             cps.update(time, delta_time)
+
+        #self._pool = ThreadPool(2)
+        #self._pool.map(AbstractCyberPhysicalSystem.regulation,self._acps)
+
+        for cps in self._acps:
+            cps.regulation()
+
+        print 'test'
+
+        #self._pool.close()
+        #self._pool.join()
+
         # inform for the end of the write
         for l in self._module_listener:
             l.cyberphysical_write_end()

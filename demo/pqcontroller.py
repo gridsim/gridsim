@@ -23,12 +23,6 @@ import random
 
 import os
 
-if os.name == 'nt':
-    import msvcrt as getch
-else:
-    import getch
-
-
 class ParamType(Enum):
     WRITEPARAM1 = 0
     WRITEPARAM2 = 1
@@ -84,7 +78,7 @@ class Terminal(object):
         # abort the listening
         self._abort = False
 
-        # pqcontroller listener
+        # TerminalListener
         self._listener = []
 
     @accepts((1, TerminalListener))
@@ -113,32 +107,25 @@ class Terminal(object):
         EX: 5000a1p [SPACE] means 5000 active power (p) of the first district (1) on the first house (A)
         """
         while not self._abort:
-            if getch.kbhit():
-                # get char from the terminal
-                _c = getch.getche()
-                if _c is 'e':
-                    break
-                elif _c is ' ':
-                    if len(self._temp) > self._opcodelen:
-                        # get value and code (id of the value)
-                        s_value = self._temp[:len(self._temp) - self._opcodelen]
-                        code = self._temp[len(self._temp) - self._opcodelen:]
+            self._temp = raw_input()
+            if len(self._temp) > self._opcodelen:
+                # get value and code (id of the value)
+                s_value = self._temp[:len(self._temp) - self._opcodelen]
+                code = self._temp[len(self._temp) - self._opcodelen:]
 
-                        try:
-                            value = float(s_value)
-                            if code in self._opcode.keys():
-                                attr = self._opcode[code]
-                                # send data to all listeners
-                                for l in self._listener:
-                                    l.new_terminal_data(attr, value)
-                        except TypeError:
-                            pass
-                        except ValueError:
-                            pass
+                try:
+                    value = float(s_value)
+                    if code in self._opcode.keys():
+                        attr = self._opcode[code]
+                        # send data to all listeners
+                        for l in self._listener:
+                            l.new_terminal_data(attr, value)
+                except TypeError:
+                    print 'Error value inserted'
+                except ValueError:
+                    print 'Error value inserted'
 
-                    self._temp = ''
-                else:
-                    self._temp = self._temp + _c
+            self._temp = ''
 
 
 class PQController(Actor, CyberPhysicalModuleListener, TerminalListener):
@@ -201,20 +188,20 @@ class ConsoleCyberPhysicalSystem(AbstractCyberPhysicalSystem):
 
     def initialize(self, read_params, write_params):
         for r in read_params:
-            self.read_params.append(ReadParam(r,r))
+            self.read_params.append(ReadParam(r, r))
         for w in write_params:
-            self.write_params.append(WriteParam(w,w))
+            self.write_params.append(WriteParam(w, w))
 
     def physical_read_params(self):
         l = []
         for i in range(3):
             l.append(random.uniform(0, 1000))
 
-        print 'physical_read_params',l
+        print 'physical_read_params', l
         return l
 
     def physical_write_params(self, write_params):
-        print 'physical_write_params',write_params
+        print 'physical_write_params', write_params
 
 
 if __name__ == '__main__':

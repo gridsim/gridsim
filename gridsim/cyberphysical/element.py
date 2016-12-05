@@ -9,6 +9,7 @@ from gridsim.cyberphysical.core import Callable, ParamListener
 from gridsim.decorators import accepts, returns
 
 import types
+import time
 
 
 class Actor(Callable, ParamListener):
@@ -84,7 +85,7 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         self.converters = converters
 
         # mutex for the feedback control
-        # self.mutex = Lock()
+        self.do_regulation = {}
 
     @accepts((1, Actor))
     @returns(Actor)
@@ -116,17 +117,16 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         self.actors.append(actor)
         return actor
 
-    # fixme regulation manager
-    # @returns((int, float))
-    # def physical_read_regulation(self, write_param):
-    #     """
-    #     physical_read_regulation(self, write_param):
-    #
-    #     This is the measure value for regulator
-    #
-    #     :return: read value from physical device
-    #     """
-    #     raise NotImplementedError('Pure abstract method!')
+    @returns((int, float))
+    def physical_read_regulation(self, write_param):
+        """
+        physical_read_regulation(self, write_param):
+
+        This is the measure value for regulator
+
+        :return: read value from physical device
+        """
+        raise NotImplementedError('Pure abstract method!')
 
     def physical_read_params(self):
         """
@@ -150,24 +150,24 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         if self.converters is None:
             return write_params
 
+        wp = {}
         for write_param, value in write_params.items():
             if write_param in self.converters.keys():
                 converter = self.converters[write_param]
                 # TODO check instance with exception (subclass)
-                write_params[write_param] = converter.call(value)
+                wp[write_param] = converter.call(value)
 
-        return write_params
+        return wp
 
-    # fixme regulation manager
-    # def physical_regulation_params(self,write_params):
-    #     """
-    #     physical_regulation_params(self,write_params)
-    #
-    #
-    #     :param write_params:
-    #     :return:
-    #     """
-    #     raise NotImplementedError('Pure abstract method!')
+    def physical_regulation_params(self,write_params):
+        """
+        physical_regulation_params(self,write_params)
+
+
+        :param write_params:
+        :return:
+        """
+        raise NotImplementedError('Pure abstract method!')
 
     def physical_write_params(self, write_params):
         """
@@ -179,29 +179,26 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         """
         raise NotImplementedError('Pure abstract method!')
 
-    # fixme regulation manager
-    # def do_regulation(self, write_param, data):
-    #     """
-    #     do_regulation(self,write_param,data)
-    #
-    #     :param write_param:
-    #     :param data:
-    #     :return:
-    #     """
-    #     self.mutex.acquire()
-    #     self.physical_write_params(self.physical_converter_params({write_param:data}))
-    #     self.mutex.release()
-    #     time.sleep(2)
-    #
-    #     for i in range(0,3):
-    #         self.mutex.acquire()
-    #         print write_param, data
-    #         error = data - self.physical_read_regulation(write_param)
-    #         get_new_params = self.physical_regulation_params({write_param:error})
-    #         write_value= self.physical_converter_params({write_param:get_new_params+data})
-    #         self.physical_write_params({write_param:write_value})
-    #         self.mutex.release()
-    #         time.sleep(5)
+    def init_regulator(self, write_params):
+        pass
+
+    def regulation(self):
+        print 'start regulation'
+        self.init_regulator(self.do_regulation)
+        for i in range(0,3):
+            #read the value
+            for k,v in self.do_regulation.items():
+                #print 'regulation',i,k,v
+                error = v - self.physical_read_regulation(k)
+                get_new_params = self.physical_regulation_params({k: error})
+                write_value = self.physical_converter_params({k: get_new_params + v})
+                self.physical_write_params({k: write_value})
+
+            #write
+            for k,v in self.do_regulation.items():
+                self.physical_write_params(self.physical_converter_params({k: v}))
+            time.sleep(2)
+        print 'end regulation'
 
     def reset(self):
         """
@@ -236,11 +233,11 @@ class AbstractCyberPhysicalSystem(AbstractSimulationElement):
         if len(self.write_params) is 0:
             return
 
-        write_params = {}
         for w in self.write_params:
-            write_params[w.write_param] = w.get_value()
-        self.physical_converter_params(write_params)
-        self.physical_write_params(write_params)
+            self.do_regulation[w.write_param] = w.get_value()
+            print 'update',self.do_regulation[w.write_param]
+
+        self.physical_write_params(self.physical_converter_params(self.do_regulation))
 
         #fixme regulation feedback control
         # threads = []
