@@ -63,6 +63,9 @@ Simulator.register_simulation_module(MyModule)
 # Create a simulator, add an element and record the temperature signal using
 # a recorder.
 sim = Simulator()
+
+print("Loading data...")
+
 obj = sim.my.add(MyObject("myObject", CSVReader('./data/example_time_series.csv')))
 obj.convert("temperature", lambda t: units(t, units.degC))
 

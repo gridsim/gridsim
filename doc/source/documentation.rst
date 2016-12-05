@@ -11,6 +11,7 @@ Currently, the simulator provides:
 
 * :ref:`gridsim-simu`
 * :ref:`gridsim-electrical-simu`
+* :ref:`gridsim-cyberphysical-simu`
 * :ref:`gridsim-thermal-simu`
 * :ref:`gridsim-control`
 * :ref:`gridsim-record`
@@ -59,6 +60,33 @@ Electrical network
 Electrical elements
 -------------------
 .. automodule:: gridsim.electrical.element
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. _gridsim-cyberphysical-simu:
+
+Cyber-physical simulation
+=========================
+.. automodule:: gridsim.cyberphysical
+
+Cyber-physical package
+----------------------
+.. automodule:: gridsim.cyberphysical.simulation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Cyber-physical elements
+-----------------------
+.. automodule:: gridsim.cyberphysical.element
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Cyber-physical aggregator
+-------------------------
+.. automodule:: gridsim.cyberphysical.aggregator
     :members:
     :undoc-members:
     :show-inheritance:

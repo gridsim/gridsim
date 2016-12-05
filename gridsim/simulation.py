@@ -54,13 +54,16 @@ from collections import namedtuple
 
 from .decorators import accepts, returns
 from .core import AbstractSimulationElement, AbstractSimulationModule
+from .execution import DefaultExecutionManager
 from .util import Position
 from .unit import units
+
+from .execution import ExecutionManager
 
 
 class Recorder(object):
 
-    @accepts((1, str), ((2, 3), (units.Quantity, type, type(None))))
+    @accepts((1, str), ((2, 3), (units.Unit, type, type(None))))
     def __init__(self, attribute_name, x_unit, y_unit):
         """
         __init__(self, attribute_name, x_unit=None, y_unit=None)
@@ -184,7 +187,8 @@ class Simulator(object):
         """
         Simulator._simulation_modules.append(module_class)
 
-    def __init__(self):
+    @accepts((1, ExecutionManager))
+    def __init__(self, execution_manager=DefaultExecutionManager()):
         """
         __init__(self)
 
@@ -196,6 +200,8 @@ class Simulator(object):
         used by the simulation are instantiated.
         """
         super(Simulator, self).__init__()
+
+        self._execution_manager = execution_manager
 
         # Create an instance for each simulation module.
         self._modules = {}
@@ -248,11 +254,11 @@ class Simulator(object):
         objects matching the given criteria by searching on either the given
         Gridsim simulation module or by searching the whole simulation of the
         module was not specified. Note that the method returns always a list of
-        elements, even if only a single instance is found. All parameters are
+        element, even if only a single instance is found. All parameters are
         optional, if :func:`find()` will be called without any parameters,
-        the list of all elements in the actual simulation will be returned.
+        the list of all element in the actual simulation will be returned.
 
-        :param module: The module to search for elements.
+        :param module: The module to search for element.
         :type module: str
         
         :param uid: ID of the element. Note that these ID's are only unique for
@@ -291,7 +297,7 @@ class Simulator(object):
         """
         elements = []
 
-        # Get the complete list of elements from either specific or all modules.
+        # Get the complete list of element from either specific or all modules.
         if module is not None:
             if module in self._modules.keys():
                 elements = self._modules[module].all_elements()
@@ -389,6 +395,18 @@ class Simulator(object):
         self.time += delta_time_sec
         self._update(delta_time_sec)
 
+    def _end(self):
+
+        """
+        _end(self)
+
+        Inform all module that the simulation ended
+
+        """
+
+        for module in self._modules.values():
+            module.end(self.time)
+
     @units.wraps(None, (None, units.second))
     def step(self, delta_time):
         """
@@ -420,11 +438,23 @@ class Simulator(object):
         """
         if self.time is None:
             self.reset()
+        self._execution_manager.reset()
 
+        self._execution_manager.preprocess()
         end_time = self.time + run_time
         self._update(delta_time)
+        self._execution_manager.postprocess()
+
         while self.time < end_time:
+            self._execution_manager.preprocess()
             self._step(delta_time)
+            self._execution_manager.postprocess()
+
+        if True: # from a cyberphysicalsystem need to end with a calculate 'Read'
+            self._execution_manager.preprocess()
+            self._calculate(delta_time)
+
+        self._end()
 
     # Internal class. Holds a recorder and the binding of the recorder to an
     # attribute of an object.
@@ -477,7 +507,7 @@ class Simulator(object):
         :param conversion: Lambda function to convert the actual value taken
             from the attribute before recording. The lambda function gets a
             single parameter ``context`` which is a named tuple with the following
-            elements:
+            element:
             
             **value**: The actual value just read from the simulation element's
             attribute.

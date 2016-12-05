@@ -15,6 +15,7 @@ It consists into three parts :
 
 * :ref:`gridsim-core-mod`
 * :ref:`gridsim-electrical-core-mod`
+* :ref:`gridsim-cyberphysical-core-mod`
 * :ref:`gridsim-thermal-core-mod`
 
 .. note::
@@ -36,6 +37,15 @@ The core module
 The electrical module
 *********************
 .. automodule:: gridsim.electrical.core
+    :members:
+    :undoc-members:
+
+.. _gridsim-cyberphysical-core-mod:
+
+************************
+The cyberphysical module
+************************
+.. automodule:: gridsim.cyberphysical.core
     :members:
     :undoc-members:
 
