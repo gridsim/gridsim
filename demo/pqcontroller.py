@@ -143,7 +143,7 @@ class PQController(Actor, CyberPhysicalModuleListener, TerminalListener):
     # only one instance of _TerminalListener is available
     terminal = None
 
-    @accepts(((1, 2), (list)))
+    @accepts(((1, 2), list))
     def __init__(self, read_params, write_params):
         """
         __init__(self,read_params,write_params)
@@ -163,7 +163,7 @@ class PQController(Actor, CyberPhysicalModuleListener, TerminalListener):
         self._kill = False
 
     @accepts((1, dict))
-    def initConsole(self, opcode):
+    def init_console(self, opcode):
         """
         initConsole(self)
 
@@ -232,7 +232,7 @@ if __name__ == '__main__':
 
     opcode = {'w1': (ParamType.WRITEPARAM1), 'w2': (ParamType.WRITEPARAM2)}
 
-    pqcontroller.initConsole(opcode)
+    pqcontroller.init_console(opcode)
 
     console = ConsoleCyberPhysicalSystem("consolecyberphysicalsystem")
 

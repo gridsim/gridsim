@@ -156,6 +156,7 @@ class WriteParam(object):
         else:
             return self._aggregator.call(datalist)
 
+
 class ParamListener(object):
     def __init__(self):
         """

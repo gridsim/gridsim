@@ -18,19 +18,19 @@ class SumAggregator(Aggregator):
         """
         super(SumAggregator, self).__init__(limit_min, limit_max, default)
 
-    def call(self, datas):
+    def call(self, data):
         """
-        call(self,datas)
+        call(self,data)
 
-        Aggregate the datas with a sum and return the result
+        Aggregate the data with a sum and return the result
 
-        :param datas: list of data to aggregate, in this case it's a sum
+        :param data: list of data to aggregate, in this case it's a sum
         :return: the sum of the given list value
         """
         res = 0
-        for u in datas:
+        for u in data:
             try:
-                res = res + int(u)
+                res += int(u)
             except TypeError:
                 raise Exception('Cannot aggregate data - TypeError on int conversion')
 
@@ -61,6 +61,6 @@ class MeanAggregator(Aggregator):
 
     @accepts((1, list))
     @returns((int, float))
-    def call(self, datas):
-        # calculate the average value of the datalist passed in parameter
-        return self._sum_aggregator.call(datas) / len(datas)
+    def call(self, data):
+        # calculate the average value of the data list passed in parameter
+        return self._sum_aggregator.call(data) / len(data)

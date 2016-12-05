@@ -167,16 +167,14 @@ class CyberPhysicalModule(AbstractSimulationModule):
         for cps in self._acps:
             cps.update(time, delta_time)
 
-        #self._pool = ThreadPool(2)
-        #self._pool.map(AbstractCyberPhysicalSystem.regulation,self._acps)
-
-        for cps in self._acps:
-            cps.regulation()
-
-        print 'test'
-
-        #self._pool.close()
-        #self._pool.join()
+        # self._pool = ThreadPool(2)
+        # self._pool.map(AbstractCyberPhysicalSystem.regulation,self._acps)
+        #
+        # for cps in self._acps:
+        #     cps.regulation()
+        #
+        # self._pool.close()
+        # self._pool.join()
 
         # inform for the end of the write
         for l in self._module_listener:
