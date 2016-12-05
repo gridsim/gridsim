@@ -615,20 +615,34 @@ class _Unit(object):
         self._registry.define('mass_density = kg/(m*m*m)')
         self._registry.define('thermal_conductivity = W/(K*m)')
 
+        self._Quantity_class = self._registry.Quantity
+        self._Unit_class = self._registry.Quantity
+
+    @property
+    def Quantity(self):
+        return self._Quantity_class
+
+    @property
+    def Unit(self):
+        return self._Unit_class
+
     def __call__(self, *args, **kwargs):
         if len(args) is 1:
             return self._registry(args[0])
-        return self._registry.Quantity(args[0], args[1])
+        return self._Quantity_class(args[0], args[1])
 
     def __getattr__(self, item):
         return getattr(self._registry, item)
 
-    def to_si(self, measurement):
-        if isinstance(measurement, self._registry.Quantity):
-            _measurement = measurement.to_base_units()
+    def to_si(self, measurement_or_unit):
+        if isinstance(measurement_or_unit, self._Quantity_class):
+            _measurement = measurement_or_unit.to_base_units()
             return _measurement
+        elif isinstance(measurement_or_unit, self._Unit_class):
+            _unit = self.unit(self.to_si(1*measurement_or_unit))
+            return _unit
         else:
-            raise AttributeError('Attribute must be a unit or a measurement not a '+str(type(measurement)))
+            raise AttributeError('Attribute must be a unit or a measurement not a '+str(type(measurement_or_unit)))
 
     def value(self, measurement, unit=None):
         if unit is not None:
@@ -636,26 +650,26 @@ class _Unit(object):
         else:
             _measurement = measurement
 
-        if isinstance(_measurement, self._registry.Quantity):
+        if isinstance(_measurement, self._Quantity_class):
             return _measurement.magnitude
         else:
             return _measurement
 
     def unit(self, measurement):
-        if isinstance(measurement, self._registry.Quantity):
+        if isinstance(measurement, self._Quantity_class):
             return str(measurement.units)
         else:
             return ""
 
     def dimension(self, measurement):
-        if isinstance(measurement, self._registry.Quantity):
+        if isinstance(measurement, self._Quantity_class):
             return str(measurement.dimensionality)
         else:
             return ""
 
     def convert(self, m, u):
         if isinstance(m, (int, float)):
-            return self._registry.Quantity(m, u)
+            return self._Quantity_class(m, u)
         else:
             return m.to(u)
 

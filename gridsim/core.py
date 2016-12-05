@@ -85,7 +85,7 @@ class AbstractSimulationModule(object):
         """
         all_elements(self)
 
-        This method should return a list of all elements contained in the
+        This method should return a list of all element contained in the
         module. The core simulator will use these lists in order to be able
         to retrieve objects or list of objects by certain criteria.
         """
@@ -101,9 +101,9 @@ class AbstractSimulationModule(object):
         Convenience method, already implemented for all modules in Gridsim.core.
         Finds all AbstractSimulationElement derived objects matching the
         given criteria by searching this Gridsim simulation module. Note that
-        the method returns always a list of elements, even if only a single
+        the method returns always a list of element, even if only a single
         instance is found. All parameters are optional, if :func:`find` will be
-        called without any parameters, the list of all elements in the actual
+        called without any parameters, the list of all element in the actual
         simulation module will be returned.
 
         :param uid: ID of the element. Note that these ID's are only unique for
@@ -141,7 +141,7 @@ class AbstractSimulationModule(object):
         reset(self)
 
         The module has to reset/initialize his internal variables and to call 
-        the reset method of all simulation elements it owns/manages.
+        the reset method of all simulation element it owns/manages.
         """
         raise NotImplementedError('Abstract method called!')
 
@@ -153,7 +153,7 @@ class AbstractSimulationModule(object):
         The master simulation object executes this method on all registered
         simulation modules in order to finish a simulation step. The module has
         to update its external state/variables and/or call the :func:`update`
-        method on all simulation elements it owns/manages.
+        method on all simulation element it owns/manages.
 
         :param time: The actual simulation time.
         :type time: int or float in in second
@@ -172,7 +172,7 @@ class AbstractSimulationModule(object):
         The master simulation object executes this method on all registered
         simulation modules in order to calculate a step during the simulation
         process. The module has to calculate its internal state and/or call
-        the :func:`update` method on all simulation elements it owns/manages.
+        the :func:`update` method on all simulation element it owns/manages.
 
         :param time: The actual simulation time.
         :type time: int or float in in second
@@ -183,15 +183,28 @@ class AbstractSimulationModule(object):
         """
         raise NotImplementedError('Abstract method called!')
 
+    @accepts((1, (int, float)))
+    def end(self, time):
+        """
+
+        end(self,time)
+
+        Inform all the module of the simulation that the simulation has reached the end
+
+        :param time: end time
+        """
+        #TODO raise NotImplementedError('Abstract method called!')
+        pass
+
 
 class AbstractSimulationElement(object):
 
-    @accepts((1, str), (2, (int, type(None))))
+    # @accepts((1, str), (2, (int, type(None))))
     def __init__(self, friendly_name, element_id=None):
         """
         __init__(self, friendly_name, element_id=None)
 
-        This class is the base for all elements that can be part of the
+        This class is the base for all element that can be part of the
         simulation. It basically defines the 'friendly_name' and the 'id'
         properties and all abstract methods an element should provide for to be
         part of a simulation in Gridsim.
@@ -231,7 +244,7 @@ class AbstractSimulationElement(object):
         reset(self)
 
         This method is called by the core simulator or the simulator module in 
-        order to reset the elements internal data and state to initial values.
+        order to reset the element internal data and state to initial values.
         Each simulation element has to implement this method without exception.
         """
         raise NotImplementedError('Pure abstract method!')
@@ -262,7 +275,7 @@ class AbstractSimulationElement(object):
         """
         update(self, time, delta_time)
 
-        This method will be called after all simulation elements have done their
+        This method will be called after all simulation element have done their
         calculation step. Each element should copy its internal state and data
         to the external accessible locations.
 

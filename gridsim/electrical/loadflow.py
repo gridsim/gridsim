@@ -2,6 +2,8 @@
 .. moduleauthor:: Michael Sequeira Carvalho <michael.sequeira@hevs.ch>
 .. moduleauthor:: Gilbert Maitre <gilbert.maitre@hevs.ch>
 
+.. codeauthor:: Gilbert Maitre <gilbert.maitre@hevs.ch>
+
 This module provides a toolbox to Gridsim to perform computation of electrical
 values within the electrical network, in other words to solve the so-called
 power-flow problem:
@@ -148,10 +150,10 @@ class AbstractElectricalLoadFlowCalculator(object):
 
         # compute admittance matrix Y
         self._Y = np.zeros([self._nBu, self._nBu], dtype=complex)
-        # off-diagonal elements
+        # off-diagonal element
         self._Y[self._b[:, 0], self._b[:, 1]] = -self._Yb[:, 1]
         self._Y[self._b[:, 1], self._b[:, 0]] = -self._Yb[:, 3]
-        # diagonal elements
+        # diagonal element
         for i_branch in range(0, self._nBr):
             i_bus = self._b[i_branch, 0]
             j_bus = self._b[i_branch, 1]
@@ -396,9 +398,9 @@ class DirectLoadFlowCalculator(AbstractElectricalLoadFlowCalculator):
 
 
         # compute matrix B from admittance matrix Y
-        # off-diagonal elements are equal to minus imaginary part of Y elements
+        # off-diagonal element are equal to minus imaginary part of Y element
         B = -np.imag(self._Y)
-        # diagonal elements are equal to minus sum of off-diagonal elements
+        # diagonal element are equal to minus sum of off-diagonal element
         np.fill_diagonal(B, np.zeros(B.shape[0]))
         np.fill_diagonal(B, -B.sum(1))
         # compute inverse of B after removing first row and first column

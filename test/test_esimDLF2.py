@@ -29,7 +29,7 @@ class TestEsimDLF2(unittest.TestCase):
         esim.load_flow_calculator = DirectLoadFlowCalculator()
 
         # network initialization
-        #----------------------
+        # ----------------------
 
         # add buses to simulator
         # slack bus has been automatically added
@@ -67,7 +67,7 @@ class TestEsimDLF2(unittest.TestCase):
                             1.0*units.metre, 0.1*units.ohm))
 
         # input buses electrical values
-        #------------------------------
+        # -----------------------------
         esim.attach('Bus 2',
                     ConstantElectricalCPSElement('GD2', -1.*units.watt))
         esim.attach('Bus 3',
@@ -76,7 +76,7 @@ class TestEsimDLF2(unittest.TestCase):
                     ConstantElectricalCPSElement('GD4', -1.*units.watt))
 
         # create recorders to collect output data
-        #-----------------------------------------
+        # ----------------------------------------
         # Create a plot recorder which records active power on slack bus.
         bus_pwr = PlotRecorder('P', units.second, units.watt)
         sim.record(bus_pwr, esim.find(element_class=ElectricalSlackBus))
@@ -88,13 +88,13 @@ class TestEsimDLF2(unittest.TestCase):
         sim.record(bra_pwr, esim.find(element_class=ElectricalNetworkBranch))
 
         # make one simulation step
-        #-------------------------
+        # ------------------------
         sim.reset()
         sim.step(1*units.second)
 
         # get values stored by recorders
         # and compare them with references
-        #----------------------------------
+        # --------------------------------
         # slack active power
         y = bus_pwr.y_values()
 

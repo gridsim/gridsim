@@ -21,10 +21,10 @@ This simulation outputs the following plots:
             :align: center
 
 """
-from .decorators import accepts, returns
-from .util import Position
-from .core import AbstractSimulationModule, AbstractSimulationElement
-from .simulation import Simulator
+from gridsim.decorators import accepts, returns
+from gridsim.util import Position
+from gridsim.core import AbstractSimulationModule, AbstractSimulationElement
+from gridsim.simulation import Simulator
 
 
 class AbstractControllerElement(AbstractSimulationElement):
@@ -32,7 +32,7 @@ class AbstractControllerElement(AbstractSimulationElement):
     @accepts((1, str), (2, Position))
     def __init__(self, friendly_name, position=Position()):
         """
-        Base class of all elements which can be part of a controller simulation.
+        Base class of all element which can be part of a controller simulation.
 
         :param friendly_name: User friendly name to give to the element.
         :type friendly_name: str, unicode
@@ -110,5 +110,3 @@ class ControllerSimulator(AbstractSimulationModule):
         self._controllers.append(element)
         return element
 
-
-Simulator.register_simulation_module(ControllerSimulator)
