@@ -21,7 +21,6 @@ from enum import Enum
 import threading
 import random
 
-import os
 
 class ParamType(Enum):
     WRITEPARAM1 = 0
@@ -53,6 +52,13 @@ class TerminalListener(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
+    def terminal_end(self):
+        """
+        terminal_data(self)
+
+        This function inform the listener that an exit key is pressed for the terminal thread
+        """
+        raise NotImplementedError('Pure abstract method!')
 
 class Terminal(object):
     @accepts((1, dict))
@@ -108,6 +114,10 @@ class Terminal(object):
         """
         while not self._abort:
             self._temp = raw_input()
+            if 'q' in self._temp:
+                for l in self._listener:
+                    l.terminal_end()
+                exit()
             if len(self._temp) > self._opcodelen:
                 # get value and code (id of the value)
                 s_value = self._temp[:len(self._temp) - self._opcodelen]
@@ -149,6 +159,8 @@ class PQController(Actor, CyberPhysicalModuleListener, TerminalListener):
 
         self._console_inputs = {}
 
+        self._kill = False
+
     @accepts((1, dict))
     def initConsole(self, opcode):
         """
@@ -166,13 +178,22 @@ class PQController(Actor, CyberPhysicalModuleListener, TerminalListener):
         self._console_inputs[code] = value
         print 'new_terminal_data', code, value
 
+    def terminal_end(self):
+        self._kill = True
+        print('exiting program in progress,...')
+
     @accepts((2, (int, float)))
     def notify_read_param(self, read_param, data):
-        print 'notify_read_param', str(read_param), str(data)
+        if self._kill:
+            exit()
+        else:
+            print 'notify_read_param', str(read_param), str(data)
 
     @returns((int, float))
     def get_value(self, write_param):
-        if write_param in self._console_inputs.keys():
+        if self._kill:
+            exit()
+        elif write_param in self._console_inputs.keys():
             print 'get_value', write_param, self._console_inputs[write_param]
             return self._console_inputs[write_param]
         return 0
