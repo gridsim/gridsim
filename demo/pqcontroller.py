@@ -60,6 +60,7 @@ class TerminalListener(object):
         """
         raise NotImplementedError('Pure abstract method!')
 
+
 class Terminal(object):
     @accepts((1, dict))
     def __init__(self, opcode):
@@ -217,12 +218,10 @@ class ConsoleCyberPhysicalSystem(AbstractCyberPhysicalSystem):
         l = []
         for i in range(3):
             l.append(random.uniform(0, 1000))
-
-        print 'physical_read_params', l
         return l
 
     def physical_write_params(self, write_params):
-        print 'physical_write_params', write_params
+        pass
 
 
 if __name__ == '__main__':
