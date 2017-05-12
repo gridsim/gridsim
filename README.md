@@ -12,7 +12,7 @@ Table of Contents
  9. Copyright
 
 
-1. Synopsis
+Synopsis
 ===
 Gridsim has two distinctive features:
 
@@ -31,13 +31,13 @@ and instances can be increased while keeping a manageable program structure. New
 element(s) types are typically designed by specialising existing elements.
 
 
-2. Latest Version
+Latest Version
 ===
 You can find the latest version of Gridsim on :
     https://github.com/gridsim/
 
 
-3. Installation
+Installation
 ===
 Gridsim is a full python project thus as long as Python is installed on your
 system you can install it by moving in the root folder (the folder this README
@@ -56,7 +56,7 @@ Warning : Gridsim requires these packages to be used in full :
  * enum34
 
 
-4. Documentation
+Documentation
 ===
 You can find the full documentation on :
     http://gridsim.hevs.ch
@@ -64,14 +64,14 @@ You can find the full documentation on :
 A documentation also is provided with this release in './doc' folder.
 
 
-5. Bug Reporting
+Bug Reporting
 ===
 If you find any bugs, or if you want new features you can put your request on
 github at the following address :
     https://github.com/gridsim/gridsim
 
 
-6. Contributors
+Contributors
 ===
 
 The Gridsim Team is currently composed of :
@@ -86,20 +86,20 @@ The Gridsim Team is currently composed of :
  * Yann Maret (yann.maret@hevs.ch)
 
 
-7. Contacts
+Contacts
 ===
 For questions, bug reports, patches and new elements / modules, contact :
 gridsim@hevs.ch.
 
 
-8. License
+License
 ===
 You should have received a copy of the GNU General Public License along with
 this program.
 If not, see <http://www.gnu.org/licenses/>.
 
 
-9. Copyright
+Copyright
 ===
 Copyright (C) 2011-2017 The Gridsim Team
 
